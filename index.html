@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MotaGrowth | Bold Ideas That Start With Vision</title>
+  <meta name="description" content="We help modern brands craft digital stories that inspire action and drive results.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+
+  <!-- =========================================================================
+       1. MAIN LANDING PAGE (Exact Layout from Reference)
+       ========================================================================= -->
+  <div class="landing-viewport" id="landingView">
+    
+    <!-- Halftone Texture Backdrop -->
+    <div class="halftone-bg"></div>
+
+    <!-- Background Hands Artwork -->
+    <div class="hero-hands-bg" id="heroHandsBg">
+      <img src="START.png" alt="MotaGrowth Digital & Human Touch" class="hands-still-img" id="handsStillImg">
+      <video 
+        id="seamlessVideo" 
+        src="Hands_touching_fingertips_1080p_202609051632.mp4" 
+        playsinline
+        preload="auto"
+        class="hands-video-elem"
+      ></video>
+    </div>
+
+    <!-- Minimal Header -->
+    <header class="clean-header">
+      <div class="header-inner">
+        <a href="#" class="brand-logo" id="mainLogoLink">
+          <span class="logo-name">Mota<span class="gold-text">Growth</span></span>
+        </a>
+
+        <div class="header-right">
+          <a href="#client-space" class="client-space-btn" id="clientSpaceNavBtn">
+            <i data-lucide="user"></i>
+            <span>Client Space</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Center Hero Content -->
+    <main class="hero-center-container" id="heroCenterContent">
+      <div class="hero-center-box">
+        <h1 class="hero-main-title">
+          Bold Ideas That<br>Start With Vision.
+        </h1>
+        <p class="hero-description">
+          We help modern brands craft digital stories that inspire action and drive results.
+        </p>
+
+        <div class="hero-cta-box">
+          <button class="btn-gold-pill" id="startExperienceBtn">
+            <span>Get In Touch</span>
+            <span class="arrow-glyph">↗</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- =========================================================================
+       2. CLIENT PROJECT INTAKE QUESTIONNAIRE MODAL
+       ========================================================================= -->
+  <div class="intake-modal" id="intakeModal" aria-hidden="true">
+    <div class="intake-backdrop" id="intakeBackdrop"></div>
+    
+    <div class="intake-card">
+      <div class="intake-top-bar">
+        <div class="intake-brand">
+          <span class="logo-name">Mota<span class="gold-text">Growth</span></span>
+          <span class="intake-tagline">Client Vision & Project Brief</span>
+        </div>
+        <button class="modal-close-icon" id="closeIntakeBtn" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- Step Indicators -->
+      <div class="intake-stepper">
+        <div class="step-item active" data-step="1">
+          <div class="step-circle">1</div>
+          <span>Contact</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item" data-step="2">
+          <div class="step-circle">2</div>
+          <span>Services</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item" data-step="3">
+          <div class="step-circle">3</div>
+          <span>Goals</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item" data-step="4">
+          <div class="step-circle">4</div>
+          <span>Budget & Launch</span>
+        </div>
+      </div>
+
+      <!-- Form Body -->
+      <form id="projectIntakeForm" class="intake-form" novalidate>
+        
+        <!-- Step 1: Contact -->
+        <div class="wizard-step active" id="wizardStep1">
+          <div class="step-header">
+            <h3>Let's get connected</h3>
+            <p>Tell us who you are and where we can reach you to review your project roadmap.</p>
+          </div>
+
+          <div class="form-row-grid">
+            <div class="field-wrap">
+              <label for="inputClientName">Full Name <span class="gold-text">*</span></label>
+              <input type="text" id="inputClientName" placeholder="e.g. Marcus Vance" required>
+              <span class="error-msg" id="nameError"></span>
+            </div>
+
+            <div class="field-wrap">
+              <label for="inputClientEmail">Email Address <span class="gold-text">*</span></label>
+              <input type="email" id="inputClientEmail" placeholder="e.g. marcus@company.com" required>
+              <span class="error-msg" id="emailError"></span>
+            </div>
+
+            <div class="field-wrap">
+              <label for="inputClientPhone">Phone / WhatsApp <span class="gold-text">*</span></label>
+              <input type="tel" id="inputClientPhone" placeholder="e.g. +1 (555) 345-6789" required>
+              <span class="error-msg" id="phoneError"></span>
+            </div>
+
+            <div class="field-wrap">
+              <label for="inputCompanyName">Company / Brand Name <span class="gold-text">*</span></label>
+              <input type="text" id="inputCompanyName" placeholder="e.g. Hyperion Digital" required>
+              <span class="error-msg" id="companyError"></span>
+            </div>
+
+            <div class="field-wrap full-span">
+              <label for="inputCurrentUrl">Current Website or Social Handle (Optional)</label>
+              <input type="text" id="inputCurrentUrl" placeholder="e.g. https://yourbrand.com or @yourbrand">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Services -->
+        <div class="wizard-step" id="wizardStep2">
+          <div class="step-header">
+            <h3>What services do you need?</h3>
+            <p>Select all that apply for your growth strategy.</p>
+          </div>
+
+          <div class="services-toggle-grid">
+            <label class="service-checkbox-card">
+              <input type="checkbox" name="services" value="Custom Website Design & Development">
+              <div class="card-inner">
+                <div class="card-icon"><i data-lucide="layout"></i></div>
+                <div class="card-info">
+                  <strong>Custom Website Design & Dev</strong>
+                  <span>High-converting, interactive websites & web applications.</span>
+                </div>
+                <div class="card-tick"><i data-lucide="check"></i></div>
+              </div>
+            </label>
+
+            <label class="service-checkbox-card">
+              <input type="checkbox" name="services" value="Social Media Management">
+              <div class="card-inner">
+                <div class="card-icon"><i data-lucide="share-2"></i></div>
+                <div class="card-info">
+                  <strong>Social Media Growth & Management</strong>
+                  <span>Viral short-form videos, content strategy, and community scaling.</span>
+                </div>
+                <div class="card-tick"><i data-lucide="check"></i></div>
+              </div>
+            </label>
+
+            <label class="service-checkbox-card">
+              <input type="checkbox" name="services" value="Paid Ads & Performance Marketing">
+              <div class="card-inner">
+                <div class="card-icon"><i data-lucide="trending-up"></i></div>
+                <div class="card-info">
+                  <strong>Paid Ads & Performance Marketing</strong>
+                  <span>Meta, TikTok, and Google campaigns engineered for high ROI.</span>
+                </div>
+                <div class="card-tick"><i data-lucide="check"></i></div>
+              </div>
+            </label>
+
+            <label class="service-checkbox-card">
+              <input type="checkbox" name="services" value="Brand Identity & Creative Direction">
+              <div class="card-inner">
+                <div class="card-icon"><i data-lucide="sparkles"></i></div>
+                <div class="card-info">
+                  <strong>Brand Identity & Creative Direction</strong>
+                  <span>Logos, aesthetic design systems, 3D motion, and visual guidelines.</span>
+                </div>
+                <div class="card-tick"><i data-lucide="check"></i></div>
+              </div>
+            </label>
+          </div>
+          <span class="error-msg text-center" id="servicesError"></span>
+        </div>
+
+        <!-- Step 3: Goals -->
+        <div class="wizard-step" id="wizardStep3">
+          <div class="step-header">
+            <h3>Project Goals & Scope</h3>
+            <p>Tell us what milestone you are aiming to reach.</p>
+          </div>
+
+          <div class="form-row-grid">
+            <div class="field-wrap full-span">
+              <label for="inputPrimaryGoal">Primary Business Objective <span class="gold-text">*</span></label>
+              <select id="inputPrimaryGoal" required>
+                <option value="">Select your main goal...</option>
+                <option value="Launch a new brand or web presence">Launch a new brand or web presence</option>
+                <option value="Redesign existing site to boost conversions">Redesign existing site to boost conversions</option>
+                <option value="Scale inbound qualified customer leads">Scale inbound qualified customer leads</option>
+                <option value="Explode social media audience and reach">Explode social media audience and reach</option>
+                <option value="Complete full-funnel agency management">Complete full-funnel agency management</option>
+              </select>
+              <span class="error-msg" id="goalError"></span>
+            </div>
+
+            <div class="field-wrap">
+              <label for="inputAudience">Target Audience / Ideal Customer</label>
+              <input type="text" id="inputAudience" placeholder="e.g. Modern consumers, B2B executives">
+            </div>
+
+            <div class="field-wrap">
+              <label for="inputBusinessStage">Current Business Stage</label>
+              <select id="inputBusinessStage">
+                <option value="Early-Stage Startup">Early-Stage Startup</option>
+                <option value="Growing ($10k - $50k/mo)">Growing ($10k - $50k/mo)</option>
+                <option value="Scaling ($50k - $200k/mo)">Scaling ($50k - $200k/mo)</option>
+                <option value="Established Enterprise ($200k+/mo)">Established Enterprise ($200k+/mo)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Budget & Timeline -->
+        <div class="wizard-step" id="wizardStep4">
+          <div class="step-header">
+            <h3>Budget & Timeline</h3>
+            <p>Help us assign the appropriate creative and engineering resources.</p>
+          </div>
+
+          <div class="form-row-grid">
+            <div class="field-wrap">
+              <label for="inputBudget">Estimated Investment Budget <span class="gold-text">*</span></label>
+              <select id="inputBudget" required>
+                <option value="">Select budget range...</option>
+                <option value="$2,000 - $4,000">$2,000 - $4,000</option>
+                <option value="$4,000 - $8,000">$4,000 - $8,000 (Recommended)</option>
+                <option value="$8,000 - $15,000">$8,000 - $15,000 (Growth Accelerator)</option>
+                <option value="$15,000+">$15,000+ (Full Scale)</option>
+              </select>
+              <span class="error-msg" id="budgetError"></span>
+            </div>
+
+            <div class="field-wrap">
+              <label for="inputTimeline">Target Launch Date <span class="gold-text">*</span></label>
+              <select id="inputTimeline" required>
+                <option value="Immediately (1-2 weeks)">Immediately (1-2 weeks)</option>
+                <option value="Within 1 month" selected>Within 1 month</option>
+                <option value="1 to 3 months">1 to 3 months</option>
+                <option value="Flexible">Flexible</option>
+              </select>
+            </div>
+
+            <div class="field-wrap full-span">
+              <label for="inputNotes">Project Vision & Special Requirements</label>
+              <textarea id="inputNotes" rows="3" placeholder="Describe any design references, specific features, or notes for our creative team..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Navigation Footer -->
+        <div class="wizard-footer">
+          <button type="button" class="btn-ghost" id="stepBackBtn" style="display: none;">
+            <i data-lucide="arrow-left"></i>
+            <span>Back</span>
+          </button>
+          
+          <div class="footer-right">
+            <button type="button" class="btn-gold-pill" id="stepNextBtn">
+              <span>Next Step</span>
+              <i data-lucide="arrow-right"></i>
+            </button>
+            <button type="submit" class="btn-gold-pill" id="stepSubmitBtn" style="display: none;">
+              <span>Submit Project Brief</span>
+              <i data-lucide="send"></i>
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+      <!-- Confirmation Screen -->
+      <div class="intake-confirmation" id="intakeConfirmation" style="display: none;">
+        <div class="confirm-badge"><i data-lucide="check-circle-2"></i></div>
+        <h2>Project Brief Received!</h2>
+        <p>Thank you, <strong id="confirmClientName" class="gold-text"></strong>. Our team at MotaGrowth is reviewing your requirements and will reach out within 24 hours.</p>
+        <div class="confirm-box">
+          <div><i data-lucide="mail"></i> Proposal copy dispatched to <span id="confirmClientEmail" class="gold-text"></span></div>
+          <div><i data-lucide="sparkles"></i> Direct strategy briefing will be scheduled.</div>
+        </div>
+        <button class="btn-gold-pill" id="confirmDoneBtn">Return to Home</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       3. CLIENT SPACE PORTAL (#client-space)
+       ========================================================================= -->
+  <div class="client-portal-view" id="clientPortalView" style="display: none;">
+    
+    <!-- Portal Navigation Bar -->
+    <header class="portal-header">
+      <div class="portal-header-left">
+        <a href="#" class="brand-logo" id="portalHomeLink">
+          <span class="logo-name">Mota<span class="gold-text">Growth</span></span>
+          <span class="portal-badge">Client Space</span>
+        </a>
+      </div>
+
+      <div class="portal-header-right" id="portalAuthControls">
+        <!-- Swapped via JS based on auth state -->
+        <button class="btn-ghost" id="clientLogoutBtn" style="display: none;">
+          <i data-lucide="log-out"></i>
+          <span>Log Out</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Client Login Screen -->
+    <div class="client-login-card" id="clientLoginScreen">
+      <div class="login-intro">
+        <div class="login-icon"><i data-lucide="lock"></i></div>
+        <h2>Client Portal Login</h2>
+        <p>Enter your private client credentials created by MotaGrowth to access your project workspace.</p>
+      </div>
+
+      <form id="clientLoginForm" class="login-form">
+        <div class="field-wrap">
+          <label for="clientLoginUser">Username or Business Email</label>
+          <input type="text" id="clientLoginUser" placeholder="e.g. elena@velourclothing.co" required>
+        </div>
+
+        <div class="field-wrap">
+          <label for="clientLoginPass">Access Password</label>
+          <input type="password" id="clientLoginPass" placeholder="Enter password" required>
+        </div>
+
+        <span class="error-msg" id="clientLoginError"></span>
+
+        <button type="submit" class="btn-gold-pill full-btn">
+          <span>Sign In to Client Space</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="demo-client-hints">
+        <span>Demo Account Credentials:</span>
+        <div class="demo-pill" id="fillDemoClient1">
+          <strong>Velour Apparel:</strong> <code>elena@velourclothing.co</code> / <code>growth2026</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Client Workspace Dashboard -->
+    <div class="client-dashboard" id="clientDashboardScreen" style="display: none;">
+      
+      <!-- Welcome Banner -->
+      <div class="client-welcome-banner">
+        <div class="welcome-text">
+          <span class="client-badge" id="clientTagTier">Active Client Workspace</span>
+          <h1 id="clientWelcomeHeading">Welcome, <span id="clientBrandName">Client</span></h1>
+          <p id="clientProjectSummary">Your dedicated roadmap, creative ideas, calendar schedule, and approval items.</p>
+        </div>
+        <div class="welcome-actions">
+          <a href="mailto:team@motagrowth.agency" class="btn-gold-pill btn-small">
+            <i data-lucide="message-square"></i>
+            <span>Message Agency</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Client Workspace Grid -->
+      <div class="client-grid">
+        
+        <!-- 1. Things Needing Your Approval -->
+        <div class="client-card approvals-card">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <i data-lucide="check-square" class="gold-text"></i>
+              <h3>Items Needing Your Approval</h3>
+            </div>
+            <span class="count-badge" id="clientPendingCount">0 Pending</span>
+          </div>
+
+          <div class="approvals-list" id="clientApprovalsList">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- 2. Project Calendar & Deliverables Timeline -->
+        <div class="client-card calendar-card">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <i data-lucide="calendar" class="gold-text"></i>
+              <h3>Project Calendar & Milestones</h3>
+            </div>
+          </div>
+
+          <div class="timeline-list" id="clientTimelineList">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- 3. Shared Ideas & Creative Concepts -->
+        <div class="client-card ideas-card">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <i data-lucide="lightbulb" class="gold-text"></i>
+              <h3>Creative Ideas & Strategic Concepts</h3>
+            </div>
+          </div>
+
+          <div class="ideas-list" id="clientIdeasList">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- 4. Project Info & Deliverables -->
+        <div class="client-card info-card">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <i data-lucide="folder" class="gold-text"></i>
+              <h3>Project Info & Assets</h3>
+            </div>
+          </div>
+
+          <div class="project-info-body" id="clientInfoBody">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================================================
+       4. PRIVATE ADMIN CRM DASHBOARD (#admin)
+       ========================================================================= -->
+  <div class="admin-portal-view" id="adminPortalView" style="display: none;">
+    
+    <!-- Admin Top Header -->
+    <header class="admin-top-bar">
+      <div class="admin-bar-left">
+        <a href="#" class="btn-ghost" id="adminHomeLink">
+          <i data-lucide="arrow-left"></i>
+          <span>Exit to Website</span>
+        </a>
+        <div class="admin-branding">
+          <h2>Mota<span class="gold-text">Growth</span> <span class="private-tag">Agency Private CRM</span></h2>
+        </div>
+      </div>
+
+      <!-- Admin Tab Switcher -->
+      <div class="admin-nav-tabs">
+        <button class="tab-btn active" id="tabInquiriesBtn">
+          <i data-lucide="inbox"></i>
+          <span>Lead Inquiries</span>
+          <span class="tab-badge" id="tabLeadCountBadge">0</span>
+        </button>
+        <button class="tab-btn" id="tabClientsBtn">
+          <i data-lucide="users"></i>
+          <span>Client Workspaces</span>
+          <span class="tab-badge" id="tabClientCountBadge">0</span>
+        </button>
+      </div>
+
+      <div class="admin-bar-right">
+        <button class="btn-gold-pill btn-small" id="openNewClientModalBtn">
+          <i data-lucide="user-plus"></i>
+          <span>+ Create Client Account</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- SECTION A: INQUIRIES & SUBMISSIONS -->
+    <div class="admin-section" id="adminInquiriesSection">
+      
+      <!-- KPI Stats -->
+      <div class="kpi-banner">
+        <div class="kpi-box">
+          <span class="kpi-title">Total Submissions</span>
+          <span class="kpi-num" id="kpiSubmissionsTotal">0</span>
+        </div>
+        <div class="kpi-box">
+          <span class="kpi-title">New Inquiries</span>
+          <span class="kpi-num gold-text" id="kpiSubmissionsNew">0</span>
+        </div>
+        <div class="kpi-box">
+          <span class="kpi-title">In Discussion</span>
+          <span class="kpi-num" id="kpiSubmissionsDiscuss">0</span>
+        </div>
+        <div class="kpi-box">
+          <span class="kpi-title">Deals Closed</span>
+          <span class="kpi-num" id="kpiSubmissionsClosed">0</span>
+        </div>
+        <div class="kpi-box">
+          <span class="kpi-title">Est. Pipeline Value</span>
+          <span class="kpi-num gold-text" id="kpiSubmissionsPipeline">$0</span>
+        </div>
+      </div>
+
+      <!-- Controls & Actions -->
+      <div class="admin-action-row">
+        <div class="search-input-wrap">
+          <i data-lucide="search"></i>
+          <input type="text" id="inquirySearchInput" placeholder="Search inquiries by name, email, company...">
+        </div>
+
+        <div class="right-actions">
+          <select id="inquiryStatusFilter">
+            <option value="all">All Statuses</option>
+            <option value="New">New</option>
+            <option value="Contacted">Contacted</option>
+            <option value="Proposal Sent">Proposal Sent</option>
+            <option value="Closed Won">Closed Won</option>
+            <option value="Closed Lost">Closed Lost</option>
+          </select>
+
+          <button class="btn-ghost-small" id="exportCsvBtn" title="Export to CSV">
+            <i data-lucide="download"></i>
+            <span>Export CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Inquiries Table -->
+      <div class="admin-table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date & ID</th>
+              <th>Client & Company</th>
+              <th>Services</th>
+              <th>Budget</th>
+              <th>Timeline</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inquiriesTableBody">
+            <!-- Injected via JS -->
+          </tbody>
+        </table>
+        
+        <div class="table-empty" id="inquiriesEmptyState" style="display: none;">
+          <i data-lucide="inbox"></i>
+          <p>No client inquiries found matching your filters.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECTION B: CLIENT WORKSPACES MANAGER -->
+    <div class="admin-section" id="adminClientsSection" style="display: none;">
+      
+      <div class="clients-manager-header">
+        <div>
+          <h2>Client Accounts & Workspaces</h2>
+          <p>Manage client spaces, post creative ideas, set calendar updates, and request client approvals.</p>
+        </div>
+      </div>
+
+      <!-- Client Accounts Grid -->
+      <div class="clients-cards-grid" id="adminClientsGrid">
+        <!-- Injected via JS -->
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================================================
+       5. MODAL: CREATE CLIENT ACCOUNT
+       ========================================================================= -->
+  <div class="modal-backdrop" id="createClientModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Create New Client Space Account</h3>
+        <button class="modal-close" id="closeCreateClientBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <form id="createClientForm" class="modal-form">
+        <div class="form-row-grid">
+          <div class="field-wrap">
+            <label for="newClientName">Client Full Name <span class="gold-text">*</span></label>
+            <input type="text" id="newClientName" placeholder="e.g. Liam Thorne" required>
+          </div>
+
+          <div class="field-wrap">
+            <label for="newClientCompany">Company / Brand Name <span class="gold-text">*</span></label>
+            <input type="text" id="newClientCompany" placeholder="e.g. Lumina Health" required>
+          </div>
+
+          <div class="field-wrap">
+            <label for="newClientEmail">Login Email <span class="gold-text">*</span></label>
+            <input type="email" id="newClientEmail" placeholder="e.g. liam@luminahealth.com" required>
+          </div>
+
+          <div class="field-wrap">
+            <label for="newClientPassword">Access Password <span class="gold-text">*</span></label>
+            <input type="text" id="newClientPassword" value="growth2026" required>
+          </div>
+
+          <div class="field-wrap">
+            <label for="newClientServices">Assigned Service Tier</label>
+            <select id="newClientServices">
+              <option value="Full-Service Growth Package">Full-Service Growth Package</option>
+              <option value="Website Design & Development">Website Design & Development</option>
+              <option value="Social Media Management">Social Media Management</option>
+              <option value="Paid Performance Marketing">Paid Performance Marketing</option>
+            </select>
+          </div>
+
+          <div class="field-wrap">
+            <label for="newClientStatus">Account Status</label>
+            <select id="newClientStatus">
+              <option value="Active">Active Workspace</option>
+              <option value="Onboarding">Onboarding</option>
+              <option value="Completed">Completed / Archived</option>
+            </select>
+          </div>
+
+          <div class="field-wrap full-span">
+            <label for="newClientSummary">Project Scope Summary</label>
+            <textarea id="newClientSummary" rows="2" placeholder="e.g. Complete website revamp, monthly TikTok viral content, and Meta ad scaling."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelCreateClientBtn">Cancel</button>
+          <button type="submit" class="btn-gold-pill">Create Client Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       6. MODAL / DRAWER: MANAGE CLIENT DETAILS (Ideas, Calendar, Approvals, Info)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="manageClientModal" style="display: none;">
+    <div class="modal-card wide-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="manageClientTitle">Manage Client Workspace</h3>
+          <span class="gold-text" id="manageClientSub" style="font-size: 0.9rem;"></span>
+        </div>
+        <button class="modal-close" id="closeManageClientBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <div class="client-editor-tabs">
+        <button class="editor-tab active" data-tab="approvals">
+          <i data-lucide="check-square"></i>
+          <span>Approvals Needed</span>
+        </button>
+        <button class="editor-tab" data-tab="calendar">
+          <i data-lucide="calendar"></i>
+          <span>Calendar & Roadmap</span>
+        </button>
+        <button class="editor-tab" data-tab="ideas">
+          <i data-lucide="lightbulb"></i>
+          <span>Ideas & Concepts</span>
+        </button>
+        <button class="editor-tab" data-tab="info">
+          <i data-lucide="file-text"></i>
+          <span>Project Info & Links</span>
+        </button>
+      </div>
+
+      <div class="client-editor-content">
+        
+        <!-- Tab 1: Approvals -->
+        <div class="editor-pane active" id="paneApprovals">
+          <div class="pane-action-bar">
+            <h4>Items for Client Review & Approval</h4>
+            <button class="btn-gold-pill btn-small" id="addApprovalItemBtn">+ Add Approval Item</button>
+          </div>
+          <div class="editor-items-list" id="editorApprovalsList">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- Tab 2: Calendar -->
+        <div class="editor-pane" id="paneCalendar">
+          <div class="pane-action-bar">
+            <h4>Calendar Events, Milestones & Deadlines</h4>
+            <button class="btn-gold-pill btn-small" id="addCalendarItemBtn">+ Add Calendar Event</button>
+          </div>
+          <div class="editor-items-list" id="editorCalendarList">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Ideas -->
+        <div class="editor-pane" id="paneIdeas">
+          <div class="pane-action-bar">
+            <h4>Strategic Ideas & Creative Concepts</h4>
+            <button class="btn-gold-pill btn-small" id="addIdeaItemBtn">+ Add Creative Idea</button>
+          </div>
+          <div class="editor-items-list" id="editorIdeasList">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- Tab 4: Info -->
+        <div class="editor-pane" id="paneInfo">
+          <div class="pane-action-bar">
+            <h4>Project Specifications & Shared Resources</h4>
+          </div>
+          <div class="field-wrap full-span" style="margin-top: 1rem;">
+            <label for="editorProjectSummary">Project Scope & Guidelines</label>
+            <textarea id="editorProjectSummary" rows="3" class="editor-textarea"></textarea>
+          </div>
+          <div class="field-wrap full-span" style="margin-top: 1rem;">
+            <label for="editorSharedLinks">Key Asset & Design Links (One per line)</label>
+            <textarea id="editorSharedLinks" rows="3" class="editor-textarea" placeholder="e.g. Figma Prototype: https://figma.com/file/...&#10;Google Drive Brand Assets: https://drive.google.com/..."></textarea>
+          </div>
+          <button class="btn-gold-pill btn-small" id="saveProjectInfoBtn" style="margin-top: 1rem;">Save Project Info</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
