@@ -1,6 +1,6 @@
 /**
  * MotaGrowth - Unified Agency Platform Engine
- * 1. Native Seamless Video Animation with Sound
+ * 1. Native Motion Video Animation with Sound (finalanimation.mp4)
  * 2. 4-Step Agency Intake Brief Wizard
  * 3. Dedicated Client Space Portal (Calendar, Approvals, Ideas, Assets)
  * 4. Private Agency Admin CRM (Leads, Client Account Creator, Workspace Manager)
@@ -26,11 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const clientPortalView = document.getElementById('clientPortalView');
   const adminPortalView = document.getElementById('adminPortalView');
 
-  // DOM Elements - Hero & Animation
-  const startExperienceBtn = document.getElementById('startExperienceBtn');
-  const heroCenterContent = document.getElementById('heroCenterContent');
-  const handsStillImg = document.getElementById('handsStillImg');
-  const seamlessVideo = document.getElementById('seamlessVideo');
+  // DOM Elements - Hero & Motion Animation
+  const getInTouchBtn = document.getElementById('getInTouchBtn');
+  const heroCenterWrapper = document.getElementById('heroCenterWrapper');
+  const motionVideo = document.getElementById('motionVideo');
 
   // DOM Elements - Intake Modal
   const intakeModal = document.getElementById('intakeModal');
@@ -147,47 +146,54 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 2. SEAMLESS NATIVE VIDEO ANIMATION WITH AUDIO (NO VIDEO OVERLAYS/TIMERS)
+  // 2. SLEEK NATIVE ANIMATION TRIGGER WITH AUDIO (finalanimation.mp4)
   // =========================================================================
 
-  function triggerAnimation() {
-    // Fade out hero text
-    heroCenterContent.classList.add('animating-out');
+  function playNativeAnimation() {
+    // Smoothly fade out center hero copy and button
+    if (heroCenterWrapper) {
+      heroCenterWrapper.classList.add('animating-out');
+    }
 
-    // Switch image to video and play unmuted
-    seamlessVideo.classList.add('playing');
-    seamlessVideo.currentTime = 0;
-    seamlessVideo.muted = false;
-    seamlessVideo.volume = 1.0;
+    // Play finalanimation.mp4 with audio unmuted
+    if (motionVideo) {
+      motionVideo.classList.add('playing');
+      motionVideo.currentTime = 0;
+      motionVideo.muted = false;
+      motionVideo.volume = 1.0;
 
-    const playPromise = seamlessVideo.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(err => {
-        console.warn('Audio autoplay fallback:', err);
-        // Fallback to muted if browser requires
-        seamlessVideo.muted = true;
-        seamlessVideo.play();
-      });
+      const playPromise = motionVideo.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.warn('Audio autoplay fallback:', err);
+          motionVideo.muted = true;
+          motionVideo.play();
+        });
+      }
     }
   }
 
-  function finishAnimationAndOpenForm() {
-    seamlessVideo.pause();
-    seamlessVideo.classList.remove('playing');
-    heroCenterContent.classList.remove('animating-out');
+  function onAnimationComplete() {
+    if (motionVideo) {
+      motionVideo.pause();
+      motionVideo.classList.remove('playing');
+    }
+    if (heroCenterWrapper) {
+      heroCenterWrapper.classList.remove('animating-out');
+    }
     openIntakeModal();
   }
 
-  if (startExperienceBtn) {
-    startExperienceBtn.addEventListener('click', (e) => {
+  if (getInTouchBtn) {
+    getInTouchBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      triggerAnimation();
+      playNativeAnimation();
     });
   }
 
-  if (seamlessVideo) {
-    seamlessVideo.addEventListener('ended', () => {
-      finishAnimationAndOpenForm();
+  if (motionVideo) {
+    motionVideo.addEventListener('ended', () => {
+      onAnimationComplete();
     });
   }
 

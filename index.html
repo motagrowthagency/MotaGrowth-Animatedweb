@@ -6,10 +6,10 @@
   <title>MotaGrowth | Bold Ideas That Start With Vision</title>
   <meta name="description" content="We help modern brands craft digital stories that inspire action and drive results.">
   
-  <!-- Google Fonts -->
+  <!-- Google Fonts: Inter / Plus Jakarta Sans for exact font match -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -19,55 +19,50 @@
 <body class="theme-dark">
 
   <!-- =========================================================================
-       1. MAIN LANDING PAGE (Exact Layout from Reference)
+       1. MAIN HEAD PAGE (Exact Replica of headpage.png)
        ========================================================================= -->
-  <div class="landing-viewport" id="landingView">
+  <div class="headpage-viewport" id="landingView">
     
-    <!-- Halftone Texture Backdrop -->
-    <div class="halftone-bg"></div>
-
-    <!-- Background Hands Artwork -->
-    <div class="hero-hands-bg" id="heroHandsBg">
-      <img src="START.png" alt="MotaGrowth Digital & Human Touch" class="hands-still-img" id="handsStillImg">
+    <!-- Seamless Background Artwork & Motion Video -->
+    <div class="artwork-backdrop-layer">
+      <img src="usethusoe.png" alt="MotaGrowth Digital & Human Touch" class="backdrop-still-image" id="backdropStill">
       <video 
-        id="seamlessVideo" 
-        src="Hands_touching_fingertips_1080p_202609051632.mp4" 
-        playsinline
+        id="motionVideo" 
+        src="finalanimation.mp4" 
+        playsinline 
         preload="auto"
-        class="hands-video-elem"
+        class="backdrop-motion-video"
       ></video>
     </div>
 
-    <!-- Minimal Header -->
-    <header class="clean-header">
-      <div class="header-inner">
-        <a href="#" class="brand-logo" id="mainLogoLink">
-          <span class="logo-name">Mota<span class="gold-text">Growth</span></span>
-        </a>
+    <!-- Top Brand Header -->
+    <header class="headpage-header">
+      <a href="#" class="brand-title" id="mainBrandLink">
+        <span class="brand-mota">Mota</span><span class="brand-growth">Growth</span>
+      </a>
 
-        <div class="header-right">
-          <a href="#client-space" class="client-space-btn" id="clientSpaceNavBtn">
-            <i data-lucide="user"></i>
-            <span>Client Space</span>
-          </a>
-        </div>
+      <div class="headpage-nav-actions">
+        <a href="#client-space" class="client-portal-link" id="clientSpaceNavBtn" title="Client Portal Workspace">
+          <i data-lucide="user"></i>
+          <span>Client Space</span>
+        </a>
       </div>
     </header>
 
-    <!-- Center Hero Content -->
-    <main class="hero-center-container" id="heroCenterContent">
-      <div class="hero-center-box">
-        <h1 class="hero-main-title">
+    <!-- Center Hero Copy & Interactive CTA -->
+    <main class="headpage-hero" id="heroCenterWrapper">
+      <div class="hero-text-block">
+        <h1 class="hero-headline">
           Bold Ideas That<br>Start With Vision.
         </h1>
-        <p class="hero-description">
-          We help modern brands craft digital stories that inspire action and drive results.
+        <p class="hero-tagline">
+          We help modern brands craft digital stories that inspire action and drive results
         </p>
 
-        <div class="hero-cta-box">
-          <button class="btn-gold-pill" id="startExperienceBtn">
+        <div class="hero-btn-wrap">
+          <button class="btn-get-in-touch" id="getInTouchBtn">
             <span>Get In Touch</span>
-            <span class="arrow-glyph">↗</span>
+            <span class="btn-arrow">↗</span>
           </button>
         </div>
       </div>
@@ -84,7 +79,7 @@
     <div class="intake-card">
       <div class="intake-top-bar">
         <div class="intake-brand">
-          <span class="logo-name">Mota<span class="gold-text">Growth</span></span>
+          <span class="brand-mota">Mota</span><span class="brand-growth">Growth</span>
           <span class="intake-tagline">Client Vision & Project Brief</span>
         </div>
         <button class="modal-close-icon" id="closeIntakeBtn" aria-label="Close">
@@ -335,14 +330,13 @@
     <!-- Portal Navigation Bar -->
     <header class="portal-header">
       <div class="portal-header-left">
-        <a href="#" class="brand-logo" id="portalHomeLink">
-          <span class="logo-name">Mota<span class="gold-text">Growth</span></span>
+        <a href="#" class="brand-title" id="portalHomeLink">
+          <span class="brand-mota">Mota</span><span class="brand-growth">Growth</span>
           <span class="portal-badge">Client Space</span>
         </a>
       </div>
 
       <div class="portal-header-right" id="portalAuthControls">
-        <!-- Swapped via JS based on auth state -->
         <button class="btn-ghost" id="clientLogoutBtn" style="display: none;">
           <i data-lucide="log-out"></i>
           <span>Log Out</span>
@@ -482,7 +476,7 @@
           <span>Exit to Website</span>
         </a>
         <div class="admin-branding">
-          <h2>Mota<span class="gold-text">Growth</span> <span class="private-tag">Agency Private CRM</span></h2>
+          <h2><span class="brand-mota">Mota</span><span class="brand-growth">Growth</span> <span class="private-tag">Agency Private CRM</span></h2>
         </div>
       </div>
 
