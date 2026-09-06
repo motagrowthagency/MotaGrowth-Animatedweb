@@ -173,10 +173,8 @@ function initMotaGrowthApp() {
     landingView.style.display = 'none';
     if (adminPortalView) adminPortalView.style.display = 'none';
 
-    // Synchronize session state from storage if not in memory
-    if (!loggedInClient) {
-      loggedInClient = getActiveSessionClient();
-    }
+    // Always synchronize latest client session state from storage
+    loggedInClient = getActiveSessionClient();
 
     // Gate Client Portal behind Sign In
     if (!loggedInClient) {
@@ -2440,8 +2438,83 @@ function initMotaGrowthApp() {
   }
 
   function saveClients(arr) {
-    try { localStorage.setItem(STORAGE_CLIENTS, JSON.stringify(arr)); }
+    try {
+      localStorage.setItem(STORAGE_CLIENTS, JSON.stringify(arr));
+      if (loggedInClient && loggedInClient.id) {
+        const fresh = arr.find(c => c.id === loggedInClient.id);
+        if (fresh) loggedInClient = fresh;
+      }
+      if (typeof window._motaRefreshPortal === 'function') {
+        window._motaRefreshPortal();
+      }
+    }
     catch (e) { console.error(e); }
+  }
+
+  function getTimelineItemDateKey(item) {
+    if (!item) return null;
+    if (item.rawDate && /^\d{4}-\d{2}-\d{2}$/.test(item.rawDate)) {
+      return item.rawDate;
+    }
+    let str = item.date || item.dateDisplay || '';
+    if (!str) return null;
+    str = str.split('•')[0].split('<br>')[0].trim();
+    
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+      return str;
+    }
+
+    const dmyMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (dmyMatch) {
+      return `${dmyMatch[3]}-${dmyMatch[2].padStart(2, '0')}-${dmyMatch[1].padStart(2, '0')}`;
+    }
+
+    const frMonths = {
+      'janv': 1, 'janvier': 1, 'january': 1, 'jan': 1,
+      'févr': 2, 'fevr': 2, 'février': 2, 'fevrier': 2, 'february': 2, 'feb': 2,
+      'mars': 3, 'march': 3, 'mar': 3,
+      'avril': 4, 'april': 4, 'avr': 4, 'apr': 4,
+      'mai': 5, 'may': 5,
+      'juin': 6, 'june': 6, 'jun': 6,
+      'juil': 7, 'juillet': 7, 'july': 7, 'jul': 7,
+      'août': 8, 'aout': 8, 'august': 8, 'aug': 8,
+      'sept': 9, 'septembre': 9, 'september': 9, 'sep': 9,
+      'oct': 10, 'octobre': 10, 'october': 10,
+      'nov': 11, 'novembre': 11, 'november': 11,
+      'déc': 12, 'dec': 12, 'décembre': 12, 'decembre': 12, 'december': 12
+    };
+
+    const mMatch = str.toLowerCase().replace(/,/g, '').split(/\s+/);
+    if (mMatch.length >= 3) {
+      if (!isNaN(parseInt(mMatch[0], 10)) && isNaN(parseInt(mMatch[1], 10))) {
+        const d = String(parseInt(mMatch[0], 10)).padStart(2, '0');
+        const cleanMonth = mMatch[1].replace('.', '');
+        const mNum = frMonths[cleanMonth];
+        const y = mMatch[2];
+        if (mNum && y && y.length === 4) {
+          return `${y}-${String(mNum).padStart(2, '0')}-${d}`;
+        }
+      }
+      if (isNaN(parseInt(mMatch[0], 10)) && !isNaN(parseInt(mMatch[1], 10))) {
+        const cleanMonth = mMatch[0].replace('.', '');
+        const mNum = frMonths[cleanMonth];
+        const d = String(parseInt(mMatch[1], 10)).padStart(2, '0');
+        const y = mMatch[2];
+        if (mNum && y && y.length === 4) {
+          return `${y}-${String(mNum).padStart(2, '0')}-${d}`;
+        }
+      }
+    }
+
+    const parsed = new Date(str);
+    if (!isNaN(parsed.getTime())) {
+      const y = parsed.getFullYear();
+      const m = String(parsed.getMonth() + 1).padStart(2, '0');
+      const d = String(parsed.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    return null;
   }
 
   function getSeedInquiries() {
@@ -2776,73 +2849,84 @@ function initMotaGrowthApp() {
     let ideasFilter = 'all';
     let tasksFilter = 'all';
 
-    // --- State Storage Keys ---
-    const STORAGE_CAL_EVENTS = 'motagrowth_client_calendar_events_v2';
-    const STORAGE_PORTAL_TASKS = 'motagrowth_client_tasks_v2';
-
-    let portalTasks = loadStoredPortalTasks();
-    let portalCalendarEvents = loadStoredCalendarEvents();
-
-    // --- Data Isolation Helpers for Custom Clients vs Demo ---
-    function getActiveCalendarEvents() {
-      if (loggedInClient) {
-        if (loggedInClient.id === 'CLI-VELOUR') {
-          return portalCalendarEvents;
+    // --- Real-time Data Linking Helpers (Directly Connected to Admin Dashboard) ---
+    function getActiveClient() {
+      const allClients = loadClients();
+      const activeSessionId = sessionStorage.getItem(STORAGE_ACTIVE_CLIENT_SESSION) || localStorage.getItem(STORAGE_ACTIVE_CLIENT_SESSION);
+      if (activeSessionId && Array.isArray(allClients)) {
+        const found = allClients.find(c => c.id === activeSessionId);
+        if (found) {
+          loggedInClient = found;
+          return found;
         }
-        const eventsMap = {};
-        if (loggedInClient.calendarEvents && typeof loggedInClient.calendarEvents === 'object') {
-          Object.assign(eventsMap, loggedInClient.calendarEvents);
-        }
-        if (Array.isArray(loggedInClient.timeline)) {
-          loggedInClient.timeline.forEach(item => {
-            const dKey = item.rawDate || (item.date ? item.date : '');
-            if (dKey) {
-              if (!eventsMap[dKey]) eventsMap[dKey] = [];
-              if (!eventsMap[dKey].some(e => e.id === item.id)) {
-                eventsMap[dKey].push({
-                  id: item.id || 'EV-' + Math.random().toString(36).substr(2, 6),
-                  title: item.title,
-                  type: item.type || 'Deliverable',
-                  time: item.time || 'All Day',
-                  desc: item.description || ''
-                });
-              }
-            }
-          });
-        }
-        return eventsMap;
       }
-      return portalCalendarEvents;
+      if (loggedInClient && loggedInClient.id && Array.isArray(allClients)) {
+        const found = allClients.find(c => c.id === loggedInClient.id);
+        if (found) {
+          loggedInClient = found;
+          return found;
+        }
+      }
+      return loggedInClient;
+    }
+
+    function getActiveCalendarEvents() {
+      const client = getActiveClient();
+      const eventsMap = {};
+      if (!client) return eventsMap;
+
+      // 1. Map client.timeline from Admin Dashboard
+      if (Array.isArray(client.timeline)) {
+        client.timeline.forEach(item => {
+          const dKey = getTimelineItemDateKey(item);
+          if (dKey) {
+            if (!eventsMap[dKey]) eventsMap[dKey] = [];
+            if (!eventsMap[dKey].some(e => e.id === item.id)) {
+              eventsMap[dKey].push({
+                id: item.id || 'EV-' + Math.random().toString(36).substr(2, 6),
+                title: item.title,
+                type: item.type || 'Deliverable',
+                time: item.time || 'All Day',
+                desc: item.description || ''
+              });
+            }
+          }
+        });
+      }
+
+      // 2. Map client.calendarEvents from client portal bookings
+      if (client.calendarEvents && typeof client.calendarEvents === 'object') {
+        Object.keys(client.calendarEvents).forEach(dKey => {
+          if (Array.isArray(client.calendarEvents[dKey])) {
+            if (!eventsMap[dKey]) eventsMap[dKey] = [];
+            client.calendarEvents[dKey].forEach(ev => {
+              if (!eventsMap[dKey].some(e => e.id === ev.id)) {
+                eventsMap[dKey].push(ev);
+              }
+            });
+          }
+        });
+      }
+
+      return eventsMap;
     }
 
     function getActiveTasks() {
-      if (loggedInClient) {
-        if (loggedInClient.id === 'CLI-VELOUR') {
-          return portalTasks;
-        }
-        return Array.isArray(loggedInClient.tasks) ? loggedInClient.tasks : [];
-      }
-      return portalTasks;
+      const client = getActiveClient();
+      if (!client) return [];
+      return Array.isArray(client.tasks) ? client.tasks : [];
     }
 
     function getActiveIdeas() {
-      if (loggedInClient) {
-        if (loggedInClient.id === 'CLI-VELOUR') {
-          return (loggedInClient.ideas && loggedInClient.ideas.length > 0) ? loggedInClient.ideas : portalIdeas;
-        }
-        return Array.isArray(loggedInClient.ideas) ? loggedInClient.ideas : [];
-      }
-      return portalIdeas;
+      const client = getActiveClient();
+      if (!client) return [];
+      return Array.isArray(client.ideas) ? client.ideas : [];
     }
 
     function getActiveDocs() {
-      if (loggedInClient) {
-        if (loggedInClient.id === 'CLI-VELOUR') {
-          return (loggedInClient.files && loggedInClient.files.length > 0) ? loggedInClient.files : defaultVaultDocs;
-        }
-        return Array.isArray(loggedInClient.files) ? loggedInClient.files : [];
-      }
-      return defaultVaultDocs;
+      const client = getActiveClient();
+      if (!client) return [];
+      return Array.isArray(client.files) ? client.files : [];
     }
 
     // --- DOM Elements ---
@@ -3570,49 +3654,6 @@ function initMotaGrowthApp() {
     // -----------------------------------------------------------------------
     // G. IDEA BANK & PROPOSALS
     // -----------------------------------------------------------------------
-    let portalIdeas = [
-      {
-        id: 'IDEA-1',
-        title: 'Interactive 3D Lookbook with Instant Swipe-to-Cart',
-        category: 'Website & 3D UX',
-        priority: 'High',
-        status: 'Pending',
-        impact: '+35% Mobile Conversion & $42k/mo Added GMV',
-        desc: 'VIP shoppers explore seasonal outfits with fluid 3D fabric physics and a 1-click sliding checkout drawer.',
-        date: 'Oct 04, 2026'
-      },
-      {
-        id: 'IDEA-2',
-        title: 'Meta Advantage+ Dynamic Retargeting Architecture',
-        category: 'Paid Growth & Ads',
-        priority: 'High',
-        status: 'Approved',
-        impact: '3.8x Target ROAS & 22% Lower CAC',
-        desc: 'Full revamp of Meta catalog ad sets using cinematic product overlays, urgency badges, and custom review carousels.',
-        date: 'Oct 03, 2026'
-      },
-      {
-        id: 'IDEA-3',
-        title: '15-Part Behind-The-Atelier Artisanal Documentary Reels',
-        category: 'Viral Video Production',
-        priority: 'Medium',
-        status: 'Approved',
-        impact: '500k+ Organic Views & Brand Prestige Elevation',
-        desc: 'Short-form episodic series documenting raw craftsmanship, Italian textiles, and studio design process.',
-        date: 'Oct 02, 2026'
-      },
-      {
-        id: 'IDEA-4',
-        title: 'Custom Unboxing NFC Smart Card Authentication',
-        category: 'Brand Strategy',
-        priority: 'Medium',
-        status: 'Pending',
-        impact: 'Premium Customer Retention & Anti-Counterfeit Verification',
-        desc: 'Embedded NFC micro-tags inside garment tags directing buyers to private editorial drops and authenticity certificates.',
-        date: 'Sep 29, 2026'
-      }
-    ];
-
     function renderIdeasList() {
       const container = document.getElementById('portalIdeasListContainer');
       if (!container) return;
@@ -3670,20 +3711,20 @@ function initMotaGrowthApp() {
       container.querySelectorAll('[data-approve-id]').forEach(btn => {
         btn.addEventListener('click', () => {
           const id = btn.getAttribute('data-approve-id');
-          const currentList = getActiveIdeas();
-          const item = currentList.find(i => i.id === id);
-          if (item) {
-            item.status = (item.status === 'Approved') ? 'Pending' : 'Approved';
-            if (loggedInClient) {
+          const client = getActiveClient();
+          if (client && Array.isArray(client.ideas)) {
+            const item = client.ideas.find(i => i.id === id);
+            if (item) {
+              item.status = (item.status === 'Approved') ? 'Pending' : 'Approved';
               const currentClients = loadClients();
-              const cIdx = currentClients.findIndex(c => c.id === loggedInClient.id);
+              const cIdx = currentClients.findIndex(c => c.id === client.id);
               if (cIdx !== -1) {
-                currentClients[cIdx].ideas = loggedInClient.ideas;
+                currentClients[cIdx].ideas = client.ideas;
                 saveClients(currentClients);
               }
+              renderIdeasList();
+              showPortalToast(item.status === 'Approved' ? `Approved "${item.title}"!` : 'Status updated to pending');
             }
-            renderIdeasList();
-            showPortalToast(item.status === 'Approved' ? `Approved "${item.title}"!` : 'Status updated to pending');
           }
         });
       });
@@ -3709,14 +3750,6 @@ function initMotaGrowthApp() {
     // -----------------------------------------------------------------------
     // H. DOCUMENTS VAULT & 1-CLICK DOWNLOADS
     // -----------------------------------------------------------------------
-    const defaultVaultDocs = [
-      { name: 'Agency client contract.doc', category: 'Word Document', size: '1.2 MB', date: 'Oct 01, 2026', downloadName: 'Agency client contract.doc' },
-      { name: 'Main concept.pdf', category: 'PDF Document', size: '4.8 MB', date: 'Oct 02, 2026', downloadName: 'Main concept.pdf' },
-      { name: 'Agreement.pdf', category: 'PDF Document', size: '850 KB', date: 'Sep 28, 2026', downloadName: 'Agreement.pdf' },
-      { name: 'Project Plan.doc', category: 'Word Document', size: '2.1 MB', date: 'Oct 03, 2026', downloadName: 'Project Plan.doc' },
-      { name: 'Sales Presentation.pdf', category: 'PDF Document', size: '14.5 MB', date: 'Oct 04, 2026', downloadName: 'Sales Presentation.pdf' },
-      { name: 'SWOT Analysis.pdf', category: 'PDF Document', size: '920 KB', date: 'Sep 30, 2026', downloadName: 'SWOT Analysis.pdf' }
-    ];
 
     function renderVaultDocs() {
       const tbody = document.getElementById('portalVaultFilesBody');
@@ -3855,10 +3888,11 @@ function initMotaGrowthApp() {
         const time = document.getElementById('portalMeetTime').value || '2:00 PM EST';
         const agenda = document.getElementById('portalMeetAgenda').value.trim();
 
-        if (loggedInClient) {
-          if (!loggedInClient.calendarEvents) loggedInClient.calendarEvents = {};
-          if (!loggedInClient.calendarEvents[date]) loggedInClient.calendarEvents[date] = [];
-          loggedInClient.calendarEvents[date].push({
+        const client = getActiveClient();
+        if (client) {
+          if (!client.calendarEvents) client.calendarEvents = {};
+          if (!client.calendarEvents[date]) client.calendarEvents[date] = [];
+          client.calendarEvents[date].push({
             id: 'MEET-' + Date.now().toString(36),
             title: `Strategy Session (${format})`,
             type: 'Sync',
@@ -3867,21 +3901,11 @@ function initMotaGrowthApp() {
           });
 
           const currentClients = loadClients();
-          const cIdx = currentClients.findIndex(c => c.id === loggedInClient.id);
+          const cIdx = currentClients.findIndex(c => c.id === client.id);
           if (cIdx !== -1) {
-            currentClients[cIdx].calendarEvents = loggedInClient.calendarEvents;
+            currentClients[cIdx].calendarEvents = client.calendarEvents;
             saveClients(currentClients);
           }
-        } else {
-          if (!portalCalendarEvents[date]) portalCalendarEvents[date] = [];
-          portalCalendarEvents[date].push({
-            id: 'MEET-' + Date.now().toString(36),
-            title: `Strategy Session (${format})`,
-            type: 'Sync',
-            time: time,
-            desc: agenda || 'Scheduled directly from client meeting portal'
-          });
-          saveCalendarEvents(portalCalendarEvents);
         }
 
         // Show Success confirmation inside modal
@@ -3903,69 +3927,6 @@ function initMotaGrowthApp() {
       portalMeetingDoneBtn.addEventListener('click', closePortalMeetingModal);
     }
 
-    // -----------------------------------------------------------------------
-    // J. STATE PERSISTENCE HELPERS
-    // -----------------------------------------------------------------------
-    function loadStoredPortalTasks() {
-      try {
-        const raw = localStorage.getItem(STORAGE_PORTAL_TASKS);
-        if (raw) return JSON.parse(raw);
-      } catch (err) {
-        console.warn('Tasks storage fallback:', err);
-      }
-      return [
-        { id: 'T1', title: 'Send over all the raw footage for the next video', status: 'Pending', priority: 'High', date: 'Oct 09, 2026', tag: 'Deliverable' },
-        { id: 'T2', title: 'Pay monthly retainer by Oct 15th', status: 'Pending', priority: 'Urgent', date: 'Oct 15, 2026', tag: 'Finance' },
-        { id: 'T3', title: 'Approve final design concept for the site', status: 'Pending', priority: 'High', date: 'Oct 18, 2026', tag: 'Design' },
-        { id: 'T4', title: 'Review brand guidelines and visual direction', status: 'Done', priority: 'Normal', date: 'Oct 04, 2026', tag: 'Review' }
-      ];
-    }
-
-    function saveStoredPortalTasks(tasks) {
-      try {
-        localStorage.setItem(STORAGE_PORTAL_TASKS, JSON.stringify(tasks));
-      } catch (e) {}
-    }
-
-    function loadStoredCalendarEvents() {
-      try {
-        const raw = localStorage.getItem(STORAGE_CAL_EVENTS);
-        if (raw) return JSON.parse(raw);
-      } catch (err) {
-        console.warn('Calendar events storage fallback:', err);
-      }
-      return {
-        '2026-10-04': [
-          { id: 'E1', title: 'Brand Guidelines Sign-Off', type: 'Deliverable', time: '11:00 AM EST', desc: 'Approved Obsidian & Azure visual palette' }
-        ],
-        '2026-10-08': [
-          { id: 'E2', title: 'TikTok Reel 01: Behind The Silk Drop', type: 'Reel', time: '6:30 PM EST', desc: 'Italian atelier 38s ASMR craft reel' }
-        ],
-        '2026-10-12': [
-          { id: 'E3', title: 'Studio 4K B-Roll Fashion Shoot', type: 'Shoot', time: '2:00 PM EST', desc: 'Milan editorial model session with macro lighting' },
-          { id: 'E4', title: 'Strategy & Media Retargeting Sync', type: 'Sync', time: '4:30 PM EST', desc: 'Q4 Meta Advantage+ campaign review' }
-        ],
-        '2026-10-15': [
-          { id: 'E5', title: 'Website Alpha Staging Launch', type: 'Deliverable', time: '10:00 AM EST', desc: 'Private 3D interactive hero and sliding cart preview' }
-        ],
-        '2026-10-22': [
-          { id: 'E6', title: 'Autumn VIP Campaign Live Kickoff', type: 'Deliverable', time: '1:00 PM EST', desc: 'Meta dynamic retargeting & Creator Spark push' }
-        ],
-        '2026-10-28': [
-          { id: 'E7', title: 'TikTok Reel 02: Reverse Quality Test', type: 'Reel', time: '7:15 PM EST', desc: 'Macro stitch comparison viral video' }
-        ],
-        '2026-11-05': [
-          { id: 'E8', title: 'VIP Black Friday Early Drop Launch', type: 'Deliverable', time: '9:00 AM EST', desc: 'Gated preview launch for top 1,000 tier-1 VIP customers' }
-        ]
-      };
-    }
-
-    function saveCalendarEvents(events) {
-      try {
-        localStorage.setItem(STORAGE_CAL_EVENTS, JSON.stringify(events));
-      } catch (e) {}
-    }
-
     // Expose portal refresher for dynamic switching & account logins
     window._motaSwitchPortalTab = switchPortalSubView;
     window._motaRefreshPortal = function() {
@@ -3981,6 +3942,13 @@ function initMotaGrowthApp() {
         console.warn('Portal refresh error:', err);
       }
     };
+
+    // Auto-refresh when localStorage is updated across tabs or admin modals
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_CLIENTS && typeof window._motaRefreshPortal === 'function') {
+        window._motaRefreshPortal();
+      }
+    });
 
     // --- Initial Boot of Interactive Portal Components ---
     renderHomeTasksTable();
