@@ -132,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     adminPortalView.style.display = 'none';
     clientPortalView.style.display = 'block';
 
+    initMotaGrowthClientSpace();
     if (window.lucide) window.lucide.createIcons();
   }
 
@@ -1953,4 +1954,1141 @@ document.addEventListener('DOMContentLoaded', () => {
     a.click();
     URL.revokeObjectURL(a.href);
   }
+
+  // =========================================================================
+  // 5. MOTAGROWTH CLIENT PORTAL ENGINE (CALENDAR, AI SEARCH, CHAT, TASKS, DOCS)
+  // =========================================================================
+
+  let isClientPortalInitialized = false;
+
+  function initMotaGrowthClientSpace() {
+    if (isClientPortalInitialized) return;
+    isClientPortalInitialized = true;
+
+    // --- State Storage Keys & In-Memory State ---
+    const STORAGE_CAL_EVENTS = 'motagrowth_client_calendar_events_v2';
+    const STORAGE_PORTAL_TASKS = 'motagrowth_client_tasks_v2';
+
+    let portalTasks = loadStoredPortalTasks();
+    let portalCalendarEvents = loadStoredCalendarEvents();
+    let currentCalYear = 2026;
+    let currentCalMonth = 9; // October (0-indexed)
+    let selectedCalDate = '2026-10-12';
+    let currentActiveTab = 'home';
+    let ideasFilter = 'all';
+    let tasksFilter = 'all';
+
+    // --- DOM Elements ---
+    const portalSubViews = {
+      'home': document.getElementById('portalSubViewHome'),
+      'calendar': document.getElementById('portalSubViewCalendar'),
+      'ideas': document.getElementById('portalSubViewIdeas'),
+      'moodboard': document.getElementById('portalSubViewMoodboard'),
+      'tasks': document.getElementById('portalSubViewTasks'),
+      'documents': document.getElementById('portalSubViewDocs')
+    };
+
+    // -----------------------------------------------------------------------
+    // A. TOAST NOTIFICATION SYSTEM
+    // -----------------------------------------------------------------------
+    function showPortalToast(message, icon = 'check-circle') {
+      let toast = document.getElementById('portalFloatingToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'portalFloatingToast';
+        toast.style.cssText = `
+          position: fixed;
+          bottom: 2rem;
+          right: 2rem;
+          background: #0f172a;
+          color: #f8fafc;
+          padding: 0.9rem 1.4rem;
+          border-radius: 9999px;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          font-size: 0.88rem;
+          font-weight: 500;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+          border: 1px solid rgba(255,255,255,0.15);
+          z-index: 99999;
+          transform: translateY(100px);
+          opacity: 0;
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        `;
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = `<i data-lucide="${icon}" style="width: 18px; height: 18px; color: #38bdf8;"></i> <span>${escapeHtml(message)}</span>`;
+      if (window.lucide) window.lucide.createIcons();
+
+      requestAnimationFrame(() => {
+        toast.style.transform = 'translateY(0)';
+        toast.style.opacity = '1';
+      });
+
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => {
+        toast.style.transform = 'translateY(100px)';
+        toast.style.opacity = '0';
+      }, 3500);
+    }
+
+    // -----------------------------------------------------------------------
+    // B. NAVIGATION & SUBVIEW SWITCHER
+    // -----------------------------------------------------------------------
+    function switchPortalSubView(tabName) {
+      if (!tabName) return;
+      currentActiveTab = tabName;
+
+      // Update Navigation Row States
+      document.querySelectorAll('[data-portal-tab]').forEach(el => {
+        const tab = el.getAttribute('data-portal-tab');
+        el.classList.toggle('active', tab === tabName);
+      });
+
+      // Show Selected Subview
+      Object.keys(portalSubViews).forEach(key => {
+        const viewEl = portalSubViews[key];
+        if (viewEl) {
+          viewEl.style.display = '';
+          if (key === tabName) {
+            viewEl.classList.add('active');
+          } else {
+            viewEl.classList.remove('active');
+          }
+        }
+      });
+
+      // Render tab-specific dynamic content
+      if (tabName === 'calendar') {
+        renderInteractiveCalendar();
+      } else if (tabName === 'tasks') {
+        renderFullTasksList();
+      } else if (tabName === 'ideas') {
+        renderIdeasList();
+      } else if (tabName === 'documents') {
+        renderVaultDocs();
+      } else if (tabName === 'home') {
+        renderHomeTasksTable();
+      }
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Bind Navigation Clicks
+    document.querySelectorAll('[data-portal-tab]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetTab = el.getAttribute('data-portal-tab');
+        switchPortalSubView(targetTab);
+      });
+    });
+
+    // Subfolder Toggle in Tree
+    const abcFolderToggle = document.getElementById('portalAbcFolderToggle');
+    const abcSublist = document.getElementById('portalAbcSublist');
+    if (abcFolderToggle && abcSublist) {
+      abcFolderToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isCollapsed = abcSublist.style.display === 'none';
+        abcSublist.style.display = isCollapsed ? 'block' : 'none';
+        const chevron = abcFolderToggle.querySelector('.portal-tree-chevron');
+        if (chevron) {
+          chevron.classList.toggle('is-down', isCollapsed);
+        }
+      });
+    }
+
+    // Tree Sidebar Collapse Toggle
+    const treeCollapseBtn = document.getElementById('portalTreeCollapseBtn');
+    const treeNavCard = document.querySelector('.portal-tree-nav-card');
+    if (treeCollapseBtn && treeNavCard) {
+      treeCollapseBtn.addEventListener('click', () => {
+        treeNavCard.classList.toggle('is-minimized');
+      });
+    }
+
+    // -----------------------------------------------------------------------
+    // C. INTERACTIVE CALENDAR ENGINE
+    // -----------------------------------------------------------------------
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    function renderInteractiveCalendar() {
+      const titleEl = document.getElementById('calendarCurrentMonthTitle');
+      const gridEl = document.getElementById('calendarDaysGrid');
+      if (!gridEl) return;
+
+      if (titleEl) {
+        titleEl.textContent = `${monthNames[currentCalMonth]} ${currentCalYear}`;
+      }
+
+      gridEl.innerHTML = '';
+
+      const firstDayIndex = new Date(currentCalYear, currentCalMonth, 1).getDay();
+      const totalDays = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+
+      // Empty cells before start of month
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'cal-day-cell empty-day';
+        gridEl.appendChild(emptyCell);
+      }
+
+      // Day cells 1 to totalDays
+      for (let d = 1; d <= totalDays; d++) {
+        const dayCell = document.createElement('div');
+        dayCell.className = 'cal-day-cell';
+
+        const monthStr = String(currentCalMonth + 1).padStart(2, '0');
+        const dayStr = String(d).padStart(2, '0');
+        const dateKey = `${currentCalYear}-${monthStr}-${dayStr}`;
+
+        if (dateKey === selectedCalDate) {
+          dayCell.classList.add('active-cal-day');
+        }
+
+        const events = portalCalendarEvents[dateKey] || [];
+        let eventDotsHtml = '';
+        if (events.length > 0) {
+          dayCell.classList.add('has-events');
+          eventDotsHtml = `
+            <div class="cal-day-dots">
+              ${events.slice(0, 3).map(ev => {
+                const typeClass = (ev.type || 'Deliverable').toLowerCase();
+                return `<span class="cal-dot ${typeClass}" title="${escapeHtml(ev.title)}"></span>`;
+              }).join('')}
+              ${events.length > 3 ? `<span class="cal-dot more">+${events.length - 3}</span>` : ''}
+            </div>
+          `;
+        }
+
+        dayCell.innerHTML = `
+          <div class="cal-day-number">${d}</div>
+          ${eventDotsHtml}
+        `;
+
+        dayCell.addEventListener('click', () => {
+          selectedCalDate = dateKey;
+          document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active-cal-day'));
+          dayCell.classList.add('active-cal-day');
+          renderSelectedDateDetails(dateKey);
+        });
+
+        gridEl.appendChild(dayCell);
+      }
+
+      renderSelectedDateDetails(selectedCalDate);
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function renderSelectedDateDetails(dateKey) {
+      const titleEl = document.getElementById('selectedDateDisplayTitle');
+      const countEl = document.getElementById('selectedDateEventsCount');
+      const listEl = document.getElementById('selectedDateEventsList');
+      if (!listEl) return;
+
+      const [y, m, d] = dateKey.split('-').map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      const formattedDate = dateObj.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+
+      if (titleEl) titleEl.textContent = formattedDate;
+
+      const events = portalCalendarEvents[dateKey] || [];
+      if (countEl) {
+        countEl.textContent = `${events.length} Item${events.length === 1 ? '' : 's'}`;
+      }
+
+      if (events.length === 0) {
+        listEl.innerHTML = `
+          <div class="no-events-placeholder">
+            <i data-lucide="calendar" style="width: 28px; height: 28px; color: #94a3b8; display: block; margin: 0 auto 0.4rem;"></i>
+            <p style="margin: 0; font-size: 0.85rem; color: #64748b;">No deliverables or shoots scheduled on this date.</p>
+            <span style="font-size: 0.78rem; color: #94a3b8; display: block; margin-top: 0.3rem;">Use the form below to add a date milestone.</span>
+          </div>
+        `;
+      } else {
+        listEl.innerHTML = events.map((ev, index) => {
+          const typeClass = (ev.type || 'Deliverable').toLowerCase();
+          let badgeColor = '#0284c7';
+          let iconName = 'sparkles';
+          if (typeClass === 'reel') { badgeColor = '#ea580c'; iconName = 'video'; }
+          else if (typeClass === 'shoot') { badgeColor = '#7c3aed'; iconName = 'camera'; }
+          else if (typeClass === 'sync') { badgeColor = '#10b981'; iconName = 'users'; }
+
+          return `
+            <div class="date-event-item">
+              <div class="event-item-top">
+                <span class="event-tag-badge" style="background: ${badgeColor}15; color: ${badgeColor}; border: 1px solid ${badgeColor}30;">
+                  <i data-lucide="${iconName}"></i> ${escapeHtml(ev.type || 'Deliverable')}
+                </span>
+                <span class="event-time-text">${escapeHtml(ev.time || 'All Day')}</span>
+              </div>
+              <h5 class="event-item-title">${escapeHtml(ev.title)}</h5>
+              ${ev.desc ? `<p class="event-item-desc">${escapeHtml(ev.desc)}</p>` : ''}
+              <div class="event-item-actions">
+                <button type="button" class="btn-event-quick-action" data-del-event-index="${index}" title="Remove milestone">
+                  <i data-lucide="trash-2"></i> Delete
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Bind delete event buttons
+        listEl.querySelectorAll('[data-del-event-index]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const idx = parseInt(btn.getAttribute('data-del-event-index'), 10);
+            portalCalendarEvents[dateKey].splice(idx, 1);
+            if (portalCalendarEvents[dateKey].length === 0) {
+              delete portalCalendarEvents[dateKey];
+            }
+            saveCalendarEvents(portalCalendarEvents);
+            renderInteractiveCalendar();
+            showPortalToast('Milestone removed from calendar');
+          });
+        });
+      }
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Calendar Month Navigation Buttons
+    const calPrevMonthBtn = document.getElementById('calPrevMonthBtn');
+    const calNextMonthBtn = document.getElementById('calNextMonthBtn');
+    const calTodayBtn = document.getElementById('calTodayBtn');
+
+    if (calPrevMonthBtn) {
+      calPrevMonthBtn.addEventListener('click', () => {
+        currentCalMonth--;
+        if (currentCalMonth < 0) {
+          currentCalMonth = 11;
+          currentCalYear--;
+        }
+        renderInteractiveCalendar();
+      });
+    }
+
+    if (calNextMonthBtn) {
+      calNextMonthBtn.addEventListener('click', () => {
+        currentCalMonth++;
+        if (currentCalMonth > 11) {
+          currentCalMonth = 0;
+          currentCalYear++;
+        }
+        renderInteractiveCalendar();
+      });
+    }
+
+    if (calTodayBtn) {
+      calTodayBtn.addEventListener('click', () => {
+        currentCalYear = 2026;
+        currentCalMonth = 9; // October 2026
+        selectedCalDate = '2026-10-12';
+        renderInteractiveCalendar();
+      });
+    }
+
+    // Admin Add Event Form
+    const adminAddEventForm = document.getElementById('adminAddEventForm');
+    const adminEventTitleInput = document.getElementById('adminEventTitleInput');
+    const adminEventTypeSelect = document.getElementById('adminEventTypeSelect');
+    const adminEventTimeInput = document.getElementById('adminEventTimeInput');
+
+    if (adminAddEventForm) {
+      adminAddEventForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = adminEventTitleInput.value.trim();
+        const type = adminEventTypeSelect.value;
+        const time = adminEventTimeInput.value.trim() || '2:00 PM EST';
+
+        if (!title) return;
+
+        if (!portalCalendarEvents[selectedCalDate]) {
+          portalCalendarEvents[selectedCalDate] = [];
+        }
+
+        portalCalendarEvents[selectedCalDate].push({
+          id: 'EV-' + Date.now().toString(36),
+          title: title,
+          type: type,
+          time: time,
+          desc: `Scheduled by Agency Admin for ${selectedCalDate}`
+        });
+
+        saveCalendarEvents(portalCalendarEvents);
+        renderInteractiveCalendar();
+        adminEventTitleInput.value = '';
+        adminEventTimeInput.value = '';
+        showPortalToast(`Saved info to ${selectedCalDate}!`);
+      });
+    }
+
+    // -----------------------------------------------------------------------
+    // D. CONTEXT-AWARE AI SEARCH ENGINE
+    // -----------------------------------------------------------------------
+    const portalAiSearchInput = document.getElementById('portalAiSearchInput');
+    const portalAiSearchBtn = document.getElementById('portalAiSearchBtn');
+    const portalAiAnswerCard = document.getElementById('portalAiAnswerCard');
+    const portalAiAnswerBody = document.getElementById('portalAiAnswerBody');
+    const portalAiAnswerCloseBtn = document.getElementById('portalAiAnswerCloseBtn');
+
+    function handleAiPortalSearch(query) {
+      if (!query || !portalAiAnswerCard || !portalAiAnswerBody) return;
+      const cleanQ = query.trim().toLowerCase();
+
+      // Show Answer Card with loading state
+      portalAiAnswerCard.style.display = 'block';
+      portalAiAnswerBody.innerHTML = `
+        <div class="ai-searching-state">
+          <div class="ai-pulse-dot"></div>
+          <span>Searching live portal data for <em>"${escapeHtml(query)}"</em>...</span>
+        </div>
+      `;
+
+      setTimeout(() => {
+        let answerTitle = '';
+        let answerSummary = '';
+        let matches = [];
+        let jumpTarget = 'home';
+        let jumpLabel = 'View Dashboard';
+
+        // Intent Matching
+        if (cleanQ.includes('task') || cleanQ.includes('todo') || cleanQ.includes('pending') || cleanQ.includes('footage') || cleanQ.includes('retainer') || cleanQ.includes('action')) {
+          jumpTarget = 'tasks';
+          jumpLabel = 'Go to Tasks Manager';
+          const pendingTasks = portalTasks.filter(t => t.status === 'Pending');
+          answerTitle = `You have ${pendingTasks.length} pending tasks requiring action:`;
+          answerSummary = `Your team currently has ${portalTasks.length} total tasks. ${pendingTasks.length} tasks are pending completion including raw footage delivery and monthly retainer confirmation.`;
+          matches = portalTasks.map(t => ({
+            tag: t.status === 'Pending' ? 'Action Required' : 'Completed',
+            badgeClass: t.status === 'Pending' ? 'warn' : 'success',
+            title: t.title,
+            meta: `Due: ${t.date} • Priority: ${t.priority}`
+          }));
+        } else if (cleanQ.includes('calendar') || cleanQ.includes('shoot') || cleanQ.includes('tiktok') || cleanQ.includes('reel') || cleanQ.includes('date') || cleanQ.includes('october') || cleanQ.includes('schedule') || cleanQ.includes('deadline')) {
+          jumpTarget = 'calendar';
+          jumpLabel = 'Open Full Calendar';
+          answerTitle = `Key Scheduled Dates & Deliverables:`;
+          answerSummary = `The content production roadmap features 7 milestone dates across October & November 2026, including the Italian Silk ASMR reel and Website Alpha Staging.`;
+          
+          Object.keys(portalCalendarEvents).forEach(date => {
+            portalCalendarEvents[date].forEach(ev => {
+              matches.push({
+                tag: ev.type,
+                badgeClass: 'info',
+                title: `${ev.title} (${date})`,
+                meta: `${ev.time} — ${ev.desc || ''}`
+              });
+            });
+          });
+        } else if (cleanQ.includes('idea') || cleanQ.includes('proposal') || cleanQ.includes('concept') || cleanQ.includes('lookbook') || cleanQ.includes('meta')) {
+          jumpTarget = 'ideas';
+          jumpLabel = 'Explore Idea Bank';
+          answerTitle = `Strategic Proposals & Concept Bank:`;
+          answerSummary = `MotaGrowth has proposed 4 high-impact growth concepts. 2 proposals are active and pending your approval (Interactive 3D Lookbook and NFC Authentication).`;
+          matches = [
+            { tag: 'Pending', badgeClass: 'warn', title: 'Interactive 3D Lookbook with Instant Swipe-to-Cart', meta: '+35% Mobile Conversion & $42k/mo Added GMV' },
+            { tag: 'Approved', badgeClass: 'success', title: 'Meta Advantage+ Dynamic Retargeting Architecture', meta: '3.8x Target ROAS & 22% Lower CAC' },
+            { tag: 'Approved', badgeClass: 'success', title: '15-Part Behind-The-Atelier Artisanal Documentary Reels', meta: '500k+ Organic Views' }
+          ];
+        } else if (cleanQ.includes('doc') || cleanQ.includes('contract') || cleanQ.includes('file') || cleanQ.includes('download') || cleanQ.includes('pdf') || cleanQ.includes('agreement') || cleanQ.includes('swot')) {
+          jumpTarget = 'documents';
+          jumpLabel = 'Open Documents Vault';
+          answerTitle = `Official Documents & Downloadable Files:`;
+          answerSummary = `All legal agreements, SOW retainers, and strategy presentations are stored securely in your client repository and available for instant 1-click download.`;
+          matches = [
+            { tag: 'Legal', badgeClass: 'info', title: 'Agency client contract.doc', meta: 'Official MotaGrowth Master Services Agreement (Word Doc)' },
+            { tag: 'Creative', badgeClass: 'info', title: 'Main concept.pdf', meta: 'Creative direction & 3D architecture brief (PDF)' },
+            { tag: 'Legal', badgeClass: 'info', title: 'Agreement.pdf', meta: 'Executed Retainer & SLA Schedule (PDF)' },
+            { tag: 'Strategy', badgeClass: 'info', title: 'SWOT Analysis & Project Plan', meta: 'Available inside the Abc Inc. subfolder' }
+          ];
+        } else if (cleanQ.includes('mood') || cleanQ.includes('color') || cleanQ.includes('palette') || cleanQ.includes('font') || cleanQ.includes('typography') || cleanQ.includes('hex')) {
+          jumpTarget = 'moodboard';
+          jumpLabel = 'View Brand Moodboard';
+          answerTitle = `Brand Aesthetic & Design Architecture:`;
+          answerSummary = `Visual identity is built on Obsidian Black (#0A0E1A), Electric Cobalt (#0066FF), Silk Azure (#F5F9FF), and Vance Amber (#EA580C) paired with Plus Jakarta Sans typography.`;
+          matches = [
+            { tag: 'Color', badgeClass: 'info', title: 'Obsidian Black (#0A0E1A) & Electric Cobalt (#0066FF)', meta: 'Primary luxury brand palette' },
+            { tag: 'Typography', badgeClass: 'info', title: 'Plus Jakarta Sans / Inter SemiBold', meta: 'Geometric sans-serif hierarchy' }
+          ];
+        } else if (cleanQ.includes('meet') || cleanQ.includes('call') || cleanQ.includes('sync') || cleanQ.includes('marcus') || cleanQ.includes('schedule')) {
+          jumpTarget = 'meeting';
+          jumpLabel = 'Schedule Meeting Now';
+          answerTitle = `Schedule Strategy Session:`;
+          answerSummary = `You can book a 15-min Sprint Sync, 30-min Growth Review, or 45-min Creative Strategy session directly with Marcus Vance & the MotaGrowth creative team.`;
+          matches = [
+            { tag: '15-Min', badgeClass: 'info', title: '15-Min Sprint Sync', meta: 'Rapid approvals and urgent blockers' },
+            { tag: '30-Min', badgeClass: 'info', title: '30-Min Growth Review', meta: 'Performance analytics and campaign optimization' },
+            { tag: '45-Min', badgeClass: 'info', title: '45-Min Strategy Session', meta: 'New campaign launch & creative brainstorming' }
+          ];
+        } else {
+          jumpTarget = 'home';
+          jumpLabel = 'Return to Overview';
+          answerTitle = `Portal Search Results for "${escapeHtml(query)}":`;
+          answerSummary = `Found matching items across your active project schedule, tasks tracker, and documents vault.`;
+          matches = [
+            { tag: 'Status', badgeClass: 'info', title: 'Project Progress: Stage 2 Active', meta: 'Research & Briefing in progress' },
+            { tag: 'Schedule', badgeClass: 'info', title: 'Website Alpha Staging Launch', meta: 'Scheduled for October 15, 2026' },
+            { tag: 'Download', badgeClass: 'info', title: 'Agency client contract.doc', meta: 'Available in bottom download center' }
+          ];
+        }
+
+        // Render Answer Markup
+        portalAiAnswerBody.innerHTML = `
+          <div class="ai-answer-content">
+            <div class="ai-answer-header">
+              <i data-lucide="sparkles" style="color: #0284c7;"></i>
+              <strong>${answerTitle}</strong>
+            </div>
+            <p class="ai-answer-text">${answerSummary}</p>
+            
+            <div class="ai-matches-list">
+              ${matches.slice(0, 4).map(m => `
+                <div class="ai-match-row">
+                  <span class="ai-match-badge badge-${m.badgeClass}">${escapeHtml(m.tag)}</span>
+                  <div class="ai-match-info">
+                    <strong>${escapeHtml(m.title)}</strong>
+                    <span>${escapeHtml(m.meta)}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="ai-answer-footer">
+              <button type="button" class="btn-ai-jump" id="btnAiJumpAction">
+                <span>${jumpLabel}</span>
+                <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        `;
+
+        if (window.lucide) window.lucide.createIcons();
+
+        const jumpBtn = document.getElementById('btnAiJumpAction');
+        if (jumpBtn) {
+          jumpBtn.addEventListener('click', () => {
+            if (jumpTarget === 'meeting') {
+              openPortalMeetingModal();
+            } else {
+              switchPortalSubView(jumpTarget);
+            }
+            portalAiAnswerCard.style.display = 'none';
+          });
+        }
+      }, 300);
+    }
+
+    if (portalAiSearchBtn && portalAiSearchInput) {
+      portalAiSearchBtn.addEventListener('click', () => {
+        handleAiPortalSearch(portalAiSearchInput.value);
+      });
+      portalAiSearchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleAiPortalSearch(portalAiSearchInput.value);
+        }
+      });
+    }
+
+    if (portalAiAnswerCloseBtn && portalAiAnswerCard) {
+      portalAiAnswerCloseBtn.addEventListener('click', () => {
+        portalAiAnswerCard.style.display = 'none';
+      });
+    }
+
+    document.querySelectorAll('.portal-query-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const query = chip.getAttribute('data-query');
+        if (portalAiSearchInput) portalAiSearchInput.value = query;
+        handleAiPortalSearch(query);
+      });
+    });
+
+    // -----------------------------------------------------------------------
+    // E. RIGHT-SIDE AI CHAT ASSISTANT
+    // -----------------------------------------------------------------------
+    const portalChatForm = document.getElementById('portalChatForm');
+    const portalChatInput = document.getElementById('portalChatInput');
+    const portalChatMessages = document.getElementById('portalChatMessages');
+
+    function appendUserChatMessage(text) {
+      if (!portalChatMessages) return;
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble user-bubble';
+      bubble.innerHTML = `
+        <div class="chat-bubble-sender">You</div>
+        <p>${escapeHtml(text)}</p>
+        <span class="chat-time">Just now</span>
+      `;
+      portalChatMessages.appendChild(bubble);
+      portalChatMessages.scrollTop = portalChatMessages.scrollHeight;
+    }
+
+    function appendBotChatMessage(text) {
+      if (!portalChatMessages) return;
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble bot-bubble';
+      bubble.innerHTML = `
+        <div class="chat-bubble-sender">MotaGrowth AI</div>
+        <p>${text}</p>
+        <span class="chat-time">Just now</span>
+      `;
+      portalChatMessages.appendChild(bubble);
+      portalChatMessages.scrollTop = portalChatMessages.scrollHeight;
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function handleChatSubmit(userText) {
+      if (!userText.trim()) return;
+      appendUserChatMessage(userText);
+
+      // Typing Indicator
+      const typingEl = document.createElement('div');
+      typingEl.className = 'chat-bubble bot-bubble typing-bubble';
+      typingEl.innerHTML = `
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+      `;
+      portalChatMessages.appendChild(typingEl);
+      portalChatMessages.scrollTop = portalChatMessages.scrollHeight;
+
+      setTimeout(() => {
+        typingEl.remove();
+        const cleanT = userText.toLowerCase();
+        let reply = '';
+
+        if (cleanT.includes('status') || cleanT.includes('progress') || cleanT.includes('sprint')) {
+          reply = `We are currently in <strong>Stage 2: Research & Briefing</strong>. The 3D interactive lookbook prototype is in staging, and the next major milestone is the <em>Website Alpha Staging Launch on Oct 15, 2026</em>.`;
+        } else if (cleanT.includes('task') || cleanT.includes('need') || cleanT.includes('attention') || cleanT.includes('todo')) {
+          const pending = portalTasks.filter(t => t.status === 'Pending');
+          reply = `You have <strong>${pending.length} pending tasks</strong>: <ul style="margin: 0.4rem 0 0 1rem; padding: 0;">${pending.map(p => `<li>${escapeHtml(p.title)}</li>`).join('')}</ul>`;
+        } else if (cleanT.includes('meeting') || cleanT.includes('sync') || cleanT.includes('call') || cleanT.includes('schedule')) {
+          reply = `Your next agency strategy sync is scheduled for <strong>Monday, October 12 at 4:30 PM EST</strong>. You can also click the <em>"Request meeting"</em> button on the top right to book a dedicated strategy session anytime.`;
+        } else if (cleanT.includes('contract') || cleanT.includes('download') || cleanT.includes('doc') || cleanT.includes('pdf')) {
+          reply = `All your agreements and briefs are ready in the <strong>Latest Docs</strong> card below. Click on <em>Agency client contract.doc</em> or <em>Main concept.pdf</em> to download them immediately.`;
+        } else if (cleanT.includes('shoot') || cleanT.includes('video') || cleanT.includes('tiktok') || cleanT.includes('reel')) {
+          reply = `Our first TikTok reel <em>"Behind The Silk"</em> is scheduled to drop on <strong>October 8 at 6:30 PM EST</strong>, followed by the Studio 4K fashion shoot on October 12. Check the dedicated <strong>Calendar</strong> tab for full details!`;
+        } else {
+          reply = `I have logged your request: "${escapeHtml(userText)}". The MotaGrowth production team is on standby. You can check the <strong>Calendar</strong>, review <strong>Idea Bank</strong> proposals, or request a direct meeting using the top button.`;
+        }
+
+        appendBotChatMessage(reply);
+      }, 600);
+    }
+
+    if (portalChatForm && portalChatInput) {
+      portalChatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = portalChatInput.value.trim();
+        if (text) {
+          handleChatSubmit(text);
+          portalChatInput.value = '';
+        }
+      });
+    }
+
+    document.querySelectorAll('.chat-suggestion-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const prompt = chip.getAttribute('data-chat-prompt');
+        if (prompt) {
+          handleChatSubmit(prompt);
+        }
+      });
+    });
+
+    // -----------------------------------------------------------------------
+    // F. CLIENT TASKS MANAGEMENT (HOME & DEDICATED VIEW)
+    // -----------------------------------------------------------------------
+    function updateTasksCounters() {
+      const completed = portalTasks.filter(t => t.status === 'Done').length;
+      const total = portalTasks.length;
+      const text = `${completed} of ${total} Completed`;
+
+      const counterEl = document.getElementById('portalTasksCounter');
+      if (counterEl) counterEl.textContent = text;
+
+      const miniCounterEl = document.getElementById('miniTasksCount');
+      if (miniCounterEl) miniCounterEl.textContent = total - completed;
+    }
+
+    function toggleTaskStatus(taskId) {
+      const task = portalTasks.find(t => t.id === taskId);
+      if (task) {
+        task.status = (task.status === 'Done') ? 'Pending' : 'Done';
+        saveStoredPortalTasks(portalTasks);
+        renderHomeTasksTable();
+        renderFullTasksList();
+        updateTasksCounters();
+        showPortalToast(task.status === 'Done' ? 'Task marked complete!' : 'Task reopened');
+      }
+    }
+
+    function renderHomeTasksTable() {
+      const listEl = document.getElementById('portalHomeTasksList');
+      if (!listEl) return;
+
+      listEl.innerHTML = portalTasks.map(task => {
+        const isDone = task.status === 'Done';
+        return `
+          <div class="task-table-row ${isDone ? 'is-completed' : ''}" data-task-id="${task.id}">
+            <div class="task-checkbox-wrap">
+              <input type="checkbox" class="task-checkbox" id="check_${task.id}" ${isDone ? 'checked' : ''} />
+              <label for="check_${task.id}"></label>
+            </div>
+            <div class="task-title-wrap">
+              <span class="task-name">${escapeHtml(task.title)}</span>
+              <span class="task-meta-tag">${escapeHtml(task.tag || 'Project')} • Due ${escapeHtml(task.date)}</span>
+            </div>
+            <div class="task-status-wrap">
+              <span class="task-status-pill ${isDone ? 'pill-done' : 'pill-pending'}">
+                <i data-lucide="${isDone ? 'check' : 'clock'}"></i>
+                ${isDone ? 'Completed' : 'Pending'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      listEl.querySelectorAll('.task-checkbox').forEach(box => {
+        box.addEventListener('change', (e) => {
+          const row = box.closest('.task-table-row');
+          const taskId = row.getAttribute('data-task-id');
+          toggleTaskStatus(taskId);
+        });
+      });
+
+      updateTasksCounters();
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function renderFullTasksList() {
+      const containerEl = document.getElementById('portalFullTasksContainer');
+      if (!containerEl) return;
+
+      let filtered = portalTasks;
+      if (tasksFilter === 'pending') filtered = portalTasks.filter(t => t.status === 'Pending');
+      else if (tasksFilter === 'completed') filtered = portalTasks.filter(t => t.status === 'Done');
+
+      if (filtered.length === 0) {
+        containerEl.innerHTML = `<div style="text-align: center; padding: 3rem; color: #64748b;">No tasks match this filter.</div>`;
+        return;
+      }
+
+      containerEl.innerHTML = filtered.map(task => {
+        const isDone = task.status === 'Done';
+        return `
+          <div class="task-full-card ${isDone ? 'is-completed' : ''}" data-task-id="${task.id}">
+            <div class="task-card-left">
+              <div class="task-checkbox-wrap">
+                <input type="checkbox" class="task-checkbox" id="fullcheck_${task.id}" ${isDone ? 'checked' : ''} />
+                <label for="fullcheck_${task.id}"></label>
+              </div>
+              <div class="task-card-info">
+                <h4>${escapeHtml(task.title)}</h4>
+                <div class="task-card-tags">
+                  <span class="task-tag-badge">${escapeHtml(task.tag || 'General')}</span>
+                  <span class="task-priority-badge priority-${(task.priority || 'Normal').toLowerCase()}">${escapeHtml(task.priority || 'Normal')} Priority</span>
+                  <span class="task-due-date"><i data-lucide="calendar"></i> Due ${escapeHtml(task.date)}</span>
+                </div>
+              </div>
+            </div>
+            <div class="task-card-right">
+              <span class="task-status-pill ${isDone ? 'pill-done' : 'pill-pending'}">
+                <i data-lucide="${isDone ? 'check' : 'clock'}"></i>
+                ${isDone ? 'Completed' : 'In Progress'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      containerEl.querySelectorAll('.task-checkbox').forEach(box => {
+        box.addEventListener('change', () => {
+          const card = box.closest('.task-full-card');
+          const taskId = card.getAttribute('data-task-id');
+          toggleTaskStatus(taskId);
+        });
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Tasks filter bar
+    document.querySelectorAll('[data-task-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-task-filter]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        tasksFilter = btn.getAttribute('data-task-filter');
+        renderFullTasksList();
+      });
+    });
+
+    // -----------------------------------------------------------------------
+    // G. IDEA BANK & PROPOSALS
+    // -----------------------------------------------------------------------
+    let portalIdeas = [
+      {
+        id: 'IDEA-1',
+        title: 'Interactive 3D Lookbook with Instant Swipe-to-Cart',
+        category: 'Website & 3D UX',
+        priority: 'High',
+        status: 'Pending',
+        impact: '+35% Mobile Conversion & $42k/mo Added GMV',
+        desc: 'VIP shoppers explore seasonal outfits with fluid 3D fabric physics and a 1-click sliding checkout drawer.',
+        date: 'Oct 04, 2026'
+      },
+      {
+        id: 'IDEA-2',
+        title: 'Meta Advantage+ Dynamic Retargeting Architecture',
+        category: 'Paid Growth & Ads',
+        priority: 'High',
+        status: 'Approved',
+        impact: '3.8x Target ROAS & 22% Lower CAC',
+        desc: 'Full revamp of Meta catalog ad sets using cinematic product overlays, urgency badges, and custom review carousels.',
+        date: 'Oct 03, 2026'
+      },
+      {
+        id: 'IDEA-3',
+        title: '15-Part Behind-The-Atelier Artisanal Documentary Reels',
+        category: 'Viral Video Production',
+        priority: 'Medium',
+        status: 'Approved',
+        impact: '500k+ Organic Views & Brand Prestige Elevation',
+        desc: 'Short-form episodic series documenting raw craftsmanship, Italian textiles, and studio design process.',
+        date: 'Oct 02, 2026'
+      },
+      {
+        id: 'IDEA-4',
+        title: 'Custom Unboxing NFC Smart Card Authentication',
+        category: 'Brand Strategy',
+        priority: 'Medium',
+        status: 'Pending',
+        impact: 'Premium Customer Retention & Anti-Counterfeit Verification',
+        desc: 'Embedded NFC micro-tags inside garment tags directing buyers to private editorial drops and authenticity certificates.',
+        date: 'Sep 29, 2026'
+      }
+    ];
+
+    function renderIdeasList() {
+      const container = document.getElementById('portalIdeasListContainer');
+      if (!container) return;
+
+      let filtered = portalIdeas;
+      if (ideasFilter === 'pending') filtered = portalIdeas.filter(i => i.status === 'Pending');
+      else if (ideasFilter === 'approved') filtered = portalIdeas.filter(i => i.status === 'Approved');
+
+      container.innerHTML = filtered.map(idea => {
+        const isApproved = idea.status === 'Approved';
+        return `
+          <div class="idea-proposal-card ${isApproved ? 'is-approved' : ''}" data-idea-id="${idea.id}">
+            <div class="idea-card-header">
+              <span class="idea-cat-tag">${escapeHtml(idea.category)}</span>
+              <span class="idea-status-badge ${isApproved ? 'badge-approved' : 'badge-pending'}">
+                <i data-lucide="${isApproved ? 'check-circle' : 'clock'}"></i>
+                ${isApproved ? 'Approved for Production' : 'Pending Client Review'}
+              </span>
+            </div>
+            <h4 class="idea-title">${escapeHtml(idea.title)}</h4>
+            <p class="idea-desc">${escapeHtml(idea.desc)}</p>
+            <div class="idea-impact-box">
+              <i data-lucide="trending-up"></i>
+              <span><strong>Projected Impact:</strong> ${escapeHtml(idea.impact)}</span>
+            </div>
+            <div class="idea-footer-actions">
+              <button type="button" class="btn-idea-approve ${isApproved ? 'is-active' : ''}" data-approve-id="${idea.id}">
+                <i data-lucide="${isApproved ? 'check' : 'thumbs-up'}"></i>
+                <span>${isApproved ? 'Approved ✓' : 'Approve Proposal'}</span>
+              </button>
+              <button type="button" class="btn-idea-feedback" data-feedback-id="${idea.id}">
+                <i data-lucide="message-square"></i>
+                <span>Request Revision</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.querySelectorAll('[data-approve-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-approve-id');
+          const item = portalIdeas.find(i => i.id === id);
+          if (item) {
+            item.status = (item.status === 'Approved') ? 'Pending' : 'Approved';
+            renderIdeasList();
+            showPortalToast(item.status === 'Approved' ? `Approved "${item.title}"!` : 'Status updated to pending');
+          }
+        });
+      });
+
+      container.querySelectorAll('[data-feedback-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          showPortalToast('Feedback note saved to creative director review queue.');
+        });
+      });
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    document.querySelectorAll('.ideas-filter-bar .btn-filter-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ideas-filter-bar .btn-filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        ideasFilter = btn.getAttribute('data-filter');
+        renderIdeasList();
+      });
+    });
+
+    // -----------------------------------------------------------------------
+    // H. DOCUMENTS VAULT & 1-CLICK DOWNLOADS
+    // -----------------------------------------------------------------------
+    const vaultDocs = [
+      { name: 'Agency client contract.doc', type: 'Word Document', size: '1.2 MB', date: 'Oct 01, 2026', downloadName: 'Agency client contract.doc' },
+      { name: 'Main concept.pdf', type: 'PDF Document', size: '4.8 MB', date: 'Oct 02, 2026', downloadName: 'Main concept.pdf' },
+      { name: 'Agreement.pdf', type: 'PDF Document', size: '850 KB', date: 'Sep 28, 2026', downloadName: 'Agreement.pdf' },
+      { name: 'Project Plan.doc', type: 'Word Document', size: '2.1 MB', date: 'Oct 03, 2026', downloadName: 'Project Plan.doc' },
+      { name: 'Sales Presentation.pdf', type: 'PDF Document', size: '14.5 MB', date: 'Oct 04, 2026', downloadName: 'Sales Presentation.pdf' },
+      { name: 'SWOT Analysis.pdf', type: 'PDF Document', size: '920 KB', date: 'Sep 30, 2026', downloadName: 'SWOT Analysis.pdf' }
+    ];
+
+    function renderVaultDocs() {
+      const tbody = document.getElementById('portalVaultFilesBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = vaultDocs.map(doc => `
+        <tr>
+          <td>
+            <div class="file-name-cell">
+              <div class="file-type-pill ${doc.name.endsWith('.pdf') ? 'pdf' : 'doc'}">
+                <i data-lucide="${doc.name.endsWith('.pdf') ? 'file-check' : 'file-text'}"></i>
+              </div>
+              <div class="file-meta-name">
+                <strong>${escapeHtml(doc.name)}</strong>
+                <span>MotaGrowth Verified Asset</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="category-tag">${escapeHtml(doc.type)}</span></td>
+          <td><span style="font-weight: 600; color: #475569;">${escapeHtml(doc.size)}</span></td>
+          <td><span style="color: #64748b; font-size: 0.84rem;">${escapeHtml(doc.date)}</span></td>
+          <td style="text-align: right;">
+            <button type="button" class="btn-file-action" data-download="${escapeHtml(doc.downloadName)}">
+              <i data-lucide="download"></i>
+              <span>Download</span>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      bindDownloadButtons();
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function triggerDocumentDownload(filename) {
+      if (!filename) filename = 'MotaGrowth_Document.pdf';
+
+      let fileType = 'text/plain';
+      let content = '';
+
+      if (filename.toLowerCase().endsWith('.doc') || filename.toLowerCase().endsWith('.docx')) {
+        fileType = 'application/msword';
+        content = `========================================================================\nMOTAGROWTH GROWTH AGENCY — EXECUTIVE CLIENT BRIEF\nDocument: ${filename}\nDate: October 2026\n========================================================================\n\n1. SCOPE OF ENGAGEMENT\n- High-conversion bespoke 3D web experience architecture\n- Organic viral TikTok & Reels content production engine\n- Advantage+ Meta retargeting & performance growth retainer\n\n2. DELIVERABLES & TIMELINE\n- Milestone 1: Stage 2 Briefing & Brand Visual Sign-Off (COMPLETED)\n- Milestone 2: Alpha Staging Launch (Scheduled: Oct 15, 2026)\n- Milestone 3: Live Campaign Dispersal & Ad Retargeting (Target: Nov 2026)\n\n3. SIGNATURES & AUTHORIZATION\nMotaGrowth Strategic Director: Marcus Vance\nClient Partner: Authorized Workspace Executive\n========================================================================`;
+      } else {
+        fileType = 'application/pdf';
+        content = `%PDF-1.4\n% MOTAGROWTH EXECUTIVE STRATEGY DOCUMENT: ${filename}\n% Generated for private client workspace session.\n\nPROJECT: Brand & Website Redesign\nSTATUS: Stage 2 Active (Research & Briefing)\nTARGET ROAS: 3.8x\nTARGET GMV GROWTH: +35% Mobile Conversion\n\n© 2026 MotaGrowth Agency. All rights reserved.`;
+      }
+
+      downloadBlob(content, filename, fileType);
+      showPortalToast(`Downloaded ${filename}`, 'download');
+    }
+
+    function bindDownloadButtons() {
+      document.querySelectorAll('[data-download]').forEach(el => {
+        el.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const docName = el.getAttribute('data-download');
+          triggerDocumentDownload(docName);
+        };
+      });
+    }
+
+    // -----------------------------------------------------------------------
+    // I. AESTHETIC MEETING MODAL SCHEDULER
+    // -----------------------------------------------------------------------
+    const portalRequestMeetingBtn = document.getElementById('portalRequestMeetingBtn');
+    const portalMeetingModal = document.getElementById('portalMeetingModal');
+    const closePortalMeetingModalBtn = document.getElementById('closePortalMeetingModalBtn');
+    const portalMeetingModalForm = document.getElementById('portalMeetingModalForm');
+    const portalMeetingSuccessBox = document.getElementById('portalMeetingSuccessBox');
+    const portalMeetingDoneBtn = document.getElementById('portalMeetingDoneBtn');
+    const portalBookedTimeText = document.getElementById('portalBookedTimeText');
+
+    function openPortalMeetingModal() {
+      if (!portalMeetingModal) return;
+      portalMeetingModal.style.display = 'flex';
+      
+      // Default date to next business day
+      const meetDateInput = document.getElementById('portalMeetDate');
+      if (meetDateInput && !meetDateInput.value) {
+        meetDateInput.value = '2026-10-12';
+      }
+
+      if (portalMeetingModalForm) portalMeetingModalForm.style.display = 'block';
+      if (portalMeetingSuccessBox) portalMeetingSuccessBox.style.display = 'none';
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function closePortalMeetingModal() {
+      if (portalMeetingModal) portalMeetingModal.style.display = 'none';
+    }
+
+    if (portalRequestMeetingBtn) {
+      portalRequestMeetingBtn.addEventListener('click', openPortalMeetingModal);
+    }
+
+    if (closePortalMeetingModalBtn) {
+      closePortalMeetingModalBtn.addEventListener('click', closePortalMeetingModal);
+    }
+
+    if (portalMeetingModal) {
+      portalMeetingModal.addEventListener('click', (e) => {
+        if (e.target === portalMeetingModal) closePortalMeetingModal();
+      });
+    }
+
+    if (portalMeetingModalForm) {
+      portalMeetingModalForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formatRadio = portalMeetingModalForm.querySelector('input[name="portalMeetType"]:checked');
+        const format = formatRadio ? formatRadio.value : '30-min Growth Review';
+        const date = document.getElementById('portalMeetDate').value || '2026-10-12';
+        const time = document.getElementById('portalMeetTime').value || '2:00 PM EST';
+        const agenda = document.getElementById('portalMeetAgenda').value.trim();
+
+        // Add to calendar events
+        if (!portalCalendarEvents[date]) portalCalendarEvents[date] = [];
+        portalCalendarEvents[date].push({
+          id: 'MEET-' + Date.now().toString(36),
+          title: `Strategy Session (${format})`,
+          type: 'Sync',
+          time: time,
+          desc: agenda || 'Scheduled directly from client meeting portal'
+        });
+        saveCalendarEvents(portalCalendarEvents);
+
+        // Show Success confirmation inside modal
+        if (portalMeetingModalForm) portalMeetingModalForm.style.display = 'none';
+        if (portalMeetingSuccessBox) {
+          portalMeetingSuccessBox.style.display = 'block';
+          if (portalBookedTimeText) {
+            portalBookedTimeText.textContent = `${format} on ${date} at ${time}`;
+          }
+        }
+
+        renderInteractiveCalendar();
+        showPortalToast(`Meeting confirmed for ${date} at ${time}!`);
+        if (window.lucide) window.lucide.createIcons();
+      });
+    }
+
+    if (portalMeetingDoneBtn) {
+      portalMeetingDoneBtn.addEventListener('click', closePortalMeetingModal);
+    }
+
+    // -----------------------------------------------------------------------
+    // J. MOODBOARD SWATCH COPY
+    // -----------------------------------------------------------------------
+    document.querySelectorAll('.mood-swatch-box').forEach(box => {
+      box.addEventListener('click', () => {
+        const hex = box.getAttribute('data-hex');
+        if (hex) {
+          navigator.clipboard.writeText(hex).then(() => {
+            showPortalToast(`Copied ${hex} to clipboard!`, 'copy');
+          }).catch(() => {
+            showPortalToast(`Selected ${hex}`, 'copy');
+          });
+        }
+      });
+    });
+
+    // -----------------------------------------------------------------------
+    // K. STATE PERSISTENCE HELPERS
+    // -----------------------------------------------------------------------
+    function loadStoredPortalTasks() {
+      try {
+        const raw = localStorage.getItem(STORAGE_PORTAL_TASKS);
+        if (raw) return JSON.parse(raw);
+      } catch (err) {
+        console.warn('Tasks storage fallback:', err);
+      }
+      return [
+        { id: 'T1', title: 'Send over all the raw footage for the next video', status: 'Pending', priority: 'High', date: 'Oct 09, 2026', tag: 'Deliverable' },
+        { id: 'T2', title: 'Pay monthly retainer by Oct 15th', status: 'Pending', priority: 'Urgent', date: 'Oct 15, 2026', tag: 'Finance' },
+        { id: 'T3', title: 'Approve final design concept for the site', status: 'Pending', priority: 'High', date: 'Oct 18, 2026', tag: 'Design' },
+        { id: 'T4', title: 'Review brand guidelines and moodboard', status: 'Done', priority: 'Normal', date: 'Oct 04, 2026', tag: 'Review' }
+      ];
+    }
+
+    function saveStoredPortalTasks(tasks) {
+      try {
+        localStorage.setItem(STORAGE_PORTAL_TASKS, JSON.stringify(tasks));
+      } catch (e) {}
+    }
+
+    function loadStoredCalendarEvents() {
+      try {
+        const raw = localStorage.getItem(STORAGE_CAL_EVENTS);
+        if (raw) return JSON.parse(raw);
+      } catch (err) {
+        console.warn('Calendar events storage fallback:', err);
+      }
+      return {
+        '2026-10-04': [
+          { id: 'E1', title: 'Brand Guidelines Sign-Off', type: 'Deliverable', time: '11:00 AM EST', desc: 'Approved Obsidian & Azure visual palette' }
+        ],
+        '2026-10-08': [
+          { id: 'E2', title: 'TikTok Reel 01: Behind The Silk Drop', type: 'Reel', time: '6:30 PM EST', desc: 'Italian atelier 38s ASMR craft reel' }
+        ],
+        '2026-10-12': [
+          { id: 'E3', title: 'Studio 4K B-Roll Fashion Shoot', type: 'Shoot', time: '2:00 PM EST', desc: 'Milan editorial model session with macro lighting' },
+          { id: 'E4', title: 'Strategy & Media Retargeting Sync', type: 'Sync', time: '4:30 PM EST', desc: 'Q4 Meta Advantage+ campaign review' }
+        ],
+        '2026-10-15': [
+          { id: 'E5', title: 'Website Alpha Staging Launch', type: 'Deliverable', time: '10:00 AM EST', desc: 'Private 3D interactive hero and sliding cart preview' }
+        ],
+        '2026-10-22': [
+          { id: 'E6', title: 'Autumn VIP Campaign Live Kickoff', type: 'Deliverable', time: '1:00 PM EST', desc: 'Meta dynamic retargeting & Creator Spark push' }
+        ],
+        '2026-10-28': [
+          { id: 'E7', title: 'TikTok Reel 02: Reverse Quality Test', type: 'Reel', time: '7:15 PM EST', desc: 'Macro stitch comparison viral video' }
+        ],
+        '2026-11-05': [
+          { id: 'E8', title: 'VIP Black Friday Early Drop Launch', type: 'Deliverable', time: '9:00 AM EST', desc: 'Gated preview launch for top 1,000 tier-1 VIP customers' }
+        ]
+      };
+    }
+
+    function saveCalendarEvents(events) {
+      try {
+        localStorage.setItem(STORAGE_CAL_EVENTS, JSON.stringify(events));
+      } catch (e) {}
+    }
+
+    // --- Initial Boot of Interactive Portal Components ---
+    renderHomeTasksTable();
+    bindDownloadButtons();
+    updateTasksCounters();
+  }
 });
+
