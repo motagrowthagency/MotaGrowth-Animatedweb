@@ -5179,6 +5179,12 @@ body.is-admin-route #adminPortalView {
   border: 1px solid #e2e8f0;
 }
 
+.type-chip.meeting {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
 .client-lead-meta {
   display: flex;
   align-items: center;

@@ -1425,10 +1425,13 @@ function initMotaGrowthApp() {
     if (inquiriesEmptyState) inquiriesEmptyState.style.display = 'none';
 
     inquiriesTableBody.innerHTML = filtered.map(item => {
-      const typeClass = (item.type || 'PRO').toUpperCase() === 'PRO' ? 'pro' : 
-                        (item.type || '').toUpperCase() === 'ENTERPRISE' ? 'enterprise' :
-                        (item.type || '').toUpperCase() === 'STARTUP' ? 'startup' : 'particulier';
-      const typeLabel = (item.type || 'PRO').toUpperCase();
+      const typeUpper = (item.type || 'PRO').toUpperCase();
+      let typeClass = 'pro';
+      if (typeUpper === 'ENTERPRISE') typeClass = 'enterprise';
+      else if (typeUpper === 'STARTUP') typeClass = 'startup';
+      else if (typeUpper === 'MEETING' || typeUpper === 'RDV') typeClass = 'meeting';
+      else if (typeUpper === 'PARTICULIER') typeClass = 'particulier';
+      const typeLabel = typeUpper;
 
       const initials = ((item.clientName || item.companyName || 'Lead').substring(0, 2)).toUpperCase();
 
@@ -3890,21 +3893,70 @@ function initMotaGrowthApp() {
 
         const client = getActiveClient();
         if (client) {
+          // 1. Add to client calendarEvents (for client portal calendar display)
           if (!client.calendarEvents) client.calendarEvents = {};
           if (!client.calendarEvents[date]) client.calendarEvents[date] = [];
+          const meetingId = 'MEET-' + Date.now().toString(36);
           client.calendarEvents[date].push({
-            id: 'MEET-' + Date.now().toString(36),
+            id: meetingId,
             title: `Strategy Session (${format})`,
             type: 'Sync',
             time: time,
             desc: agenda || 'Scheduled directly from client meeting portal'
           });
 
+          // 2. Add to client timeline (visible inside Admin Workspace modal)
+          if (!client.timeline) client.timeline = [];
+          const displayDate = typeof formatDisplayDate === 'function' ? formatDisplayDate(date) : date;
+          client.timeline.unshift({
+            id: meetingId,
+            date: displayDate,
+            rawDate: date,
+            title: `📅 Rendez-vous : ${format}`,
+            description: `${time}${agenda ? ` — Ordre du jour : ${agenda}` : ''}`,
+            type: 'Meeting',
+            status: 'Scheduled'
+          });
+
           const currentClients = loadClients();
           const cIdx = currentClients.findIndex(c => c.id === client.id);
           if (cIdx !== -1) {
             currentClients[cIdx].calendarEvents = client.calendarEvents;
+            currentClients[cIdx].timeline = client.timeline;
             saveClients(currentClients);
+          }
+
+          // 3. Register as an Inquiries / Demandes entry in Admin Dashboard main view
+          try {
+            const currentInquiries = loadInquiries();
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const dateDisplay = `${day}/${month}/${now.getFullYear()}<br><span style="color: #64748b; font-weight: 500;">${hours}:${minutes}</span>`;
+
+            currentInquiries.unshift({
+              id: 'MEET-' + Date.now().toString(36).toUpperCase(),
+              createdAt: now.toISOString(),
+              dateDisplay: dateDisplay,
+              type: 'MEETING',
+              clientName: client.clientName || client.companyName || 'Client',
+              companyName: client.companyName || client.clientName || 'Client Workspace',
+              clientEmail: client.email || '—',
+              clientPhone: client.phone || '—',
+              services: [`Rendez-vous : ${format}`],
+              sector: client.servicesTier || 'WORKSPACE CLIENT',
+              notes: `📅 Rendez-vous prévu le ${displayDate} à ${time}.${agenda ? `\nOrdre du jour : ${agenda}` : ''}`,
+              status: 'Nouveau RDV'
+            });
+
+            saveInquiries(currentInquiries);
+            inquiries = currentInquiries;
+            if (typeof updateAdminKPIs === 'function') updateAdminKPIs();
+            if (typeof renderInquiriesTable === 'function') renderInquiriesTable();
+          } catch (err) {
+            console.error('Error saving meeting to admin inquiries:', err);
           }
         }
 
