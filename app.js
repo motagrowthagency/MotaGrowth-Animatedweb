@@ -1536,6 +1536,37 @@ function initMotaGrowthApp() {
         e.stopPropagation();
         const id = btn.getAttribute('data-id');
         if (!id) return;
+
+        const targetInquiry = inquiries.find(i => i.id === id);
+        if (targetInquiry) {
+          // If it was a meeting request, delete from matching client timeline and calendarEvents
+          if (targetInquiry.type === 'MEETING' || (targetInquiry.notes && targetInquiry.notes.includes('Rendez-vous')) || (targetInquiry.services && targetInquiry.services.some(s => s && s.includes('Rendez-vous')))) {
+            let clientsChanged = false;
+            clients.forEach(c => {
+              const matches = (targetInquiry.clientEmail && c.email && targetInquiry.clientEmail.toLowerCase() === c.email.toLowerCase()) ||
+                              (targetInquiry.companyName && c.companyName && targetInquiry.companyName.toLowerCase() === c.companyName.toLowerCase()) ||
+                              (targetInquiry.clientName && c.clientName && targetInquiry.clientName.toLowerCase() === c.clientName.toLowerCase());
+              if (matches) {
+                if (Array.isArray(c.timeline)) {
+                  c.timeline = c.timeline.filter(t => t.type !== 'Meeting');
+                  clientsChanged = true;
+                }
+                if (c.calendarEvents && typeof c.calendarEvents === 'object') {
+                  Object.keys(c.calendarEvents).forEach(d => {
+                    if (Array.isArray(c.calendarEvents[d])) {
+                      c.calendarEvents[d] = c.calendarEvents[d].filter(ev => ev.type !== 'Sync' && !(ev.title && (ev.title.includes('Strategy Session') || ev.title.includes('Rendez-vous'))));
+                    }
+                  });
+                  clientsChanged = true;
+                }
+              }
+            });
+            if (clientsChanged) {
+              saveClients(clients);
+            }
+          }
+        }
+
         inquiries = inquiries.filter(i => i.id !== id);
         saveInquiries(inquiries);
         renderAdminPortal();
@@ -1694,12 +1725,32 @@ function initMotaGrowthApp() {
         if (confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')) {
           const client = clients.find(c => c.id === clientId);
           if (client) {
+            const meetingItem = (client.timeline || []).find(t => t.id === meetId);
+            const meetDate = meetingItem ? (meetingItem.rawDate || meetingItem.date) : '';
+
             client.timeline = (client.timeline || []).filter(t => t.id !== meetId);
             if (client.calendarEvents) {
               Object.keys(client.calendarEvents).forEach(d => {
-                client.calendarEvents[d] = client.calendarEvents[d].filter(ev => ev.id !== meetId);
+                client.calendarEvents[d] = (client.calendarEvents[d] || []).filter(ev => {
+                  if (ev.id === meetId) return false;
+                  if (meetDate && d === meetDate && (ev.type === 'Sync' || (ev.title && (ev.title.includes('Strategy Session') || ev.title.includes('Rendez-vous'))))) return false;
+                  return true;
+                });
               });
             }
+
+            // Also clean from inquiries
+            inquiries = inquiries.filter(inq => {
+              if (inq.type === 'MEETING') {
+                const matches = (inq.clientEmail && client.email && inq.clientEmail.toLowerCase() === client.email.toLowerCase()) ||
+                                (inq.companyName && client.companyName && inq.companyName.toLowerCase() === client.companyName.toLowerCase());
+                if (matches && meetDate && inq.notes && inq.notes.includes(meetDate)) return false;
+                if (inq.id === meetId || inq.id.toLowerCase() === meetId.toLowerCase()) return false;
+              }
+              return true;
+            });
+            saveInquiries(inquiries);
+
             saveClients(clients);
             renderAdminPortal();
           }
@@ -2166,9 +2217,24 @@ function initMotaGrowthApp() {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const id = btn.getAttribute('data-id');
+        const eventItem = (client.timeline || []).find(t => t.id === id);
+        const eventDate = eventItem ? (eventItem.rawDate || eventItem.date) : '';
+
         client.timeline = client.timeline.filter(t => t.id !== id);
+
+        if (client.calendarEvents) {
+          Object.keys(client.calendarEvents).forEach(d => {
+            client.calendarEvents[d] = (client.calendarEvents[d] || []).filter(ev => {
+              if (ev.id === id) return false;
+              if (eventDate && d === eventDate && (ev.title === eventItem?.title || ev.desc === eventItem?.description)) return false;
+              return true;
+            });
+          });
+        }
+
         saveClients(clients);
         renderAdminInteractiveCalendar(client);
+        renderAdminCalendarList(client);
       });
     });
 
@@ -2278,17 +2344,36 @@ function initMotaGrowthApp() {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const id = btn.getAttribute('data-id');
+        const meetingItem = (client.timeline || []).find(t => t.id === id);
+        const meetDate = meetingItem ? (meetingItem.rawDate || meetingItem.date) : '';
+
         client.timeline = client.timeline.filter(t => t.id !== id);
         
         if (client.calendarEvents) {
           Object.keys(client.calendarEvents).forEach(d => {
-            client.calendarEvents[d] = client.calendarEvents[d].filter(ev => ev.id !== id);
+            client.calendarEvents[d] = (client.calendarEvents[d] || []).filter(ev => {
+              if (ev.id === id) return false;
+              if (meetDate && d === meetDate && (ev.type === 'Sync' || (ev.title && (ev.title.includes('Strategy Session') || ev.title.includes('Rendez-vous'))))) return false;
+              return true;
+            });
           });
         }
+
+        inquiries = inquiries.filter(inq => {
+          if (inq.type === 'MEETING') {
+            const matches = (inq.clientEmail && client.email && inq.clientEmail.toLowerCase() === client.email.toLowerCase()) ||
+                            (inq.companyName && client.companyName && inq.companyName.toLowerCase() === client.companyName.toLowerCase());
+            if (matches && meetDate && inq.notes && inq.notes.includes(meetDate)) return false;
+            if (inq.id === id || inq.id.toLowerCase() === id.toLowerCase()) return false;
+          }
+          return true;
+        });
+        saveInquiries(inquiries);
 
         saveClients(clients);
         renderAdminMeetingsList(client);
         renderAdminInteractiveCalendar(client);
+        updateAdminKPIs();
       });
     });
 
@@ -3227,7 +3312,7 @@ function initMotaGrowthApp() {
               eventsMap[dKey].push({
                 id: item.id || 'EV-' + Math.random().toString(36).substr(2, 6),
                 title: item.title,
-                type: item.type || 'Deliverable',
+                type: item.type === 'Meeting' ? 'Sync' : (item.type || 'Deliverable'),
                 time: item.time || 'All Day',
                 desc: item.description || ''
               });
@@ -3240,8 +3325,14 @@ function initMotaGrowthApp() {
       if (client.calendarEvents && typeof client.calendarEvents === 'object') {
         Object.keys(client.calendarEvents).forEach(dKey => {
           if (Array.isArray(client.calendarEvents[dKey])) {
-            if (!eventsMap[dKey]) eventsMap[dKey] = [];
             client.calendarEvents[dKey].forEach(ev => {
+              // If it's a meeting/sync event, only include if it's confirmed in client.timeline
+              if (ev.type === 'Sync' || (ev.title && (ev.title.includes('Strategy Session') || ev.title.includes('Rendez-vous')))) {
+                const isInTimeline = Array.isArray(client.timeline) && client.timeline.some(t => t.id === ev.id || (t.type === 'Meeting' && (t.rawDate === dKey || t.date === dKey)));
+                if (!isInTimeline) return;
+              }
+
+              if (!eventsMap[dKey]) eventsMap[dKey] = [];
               if (!eventsMap[dKey].some(e => e.id === ev.id)) {
                 eventsMap[dKey].push(ev);
               }
