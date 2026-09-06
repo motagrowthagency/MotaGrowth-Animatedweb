@@ -14,7 +14,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <link rel="stylesheet" href="styles.css?v=31">
+  <link rel="stylesheet" href="styles.css?v=32">
 </head>
 <body class="theme-dark">
 
@@ -1170,6 +1170,17 @@
       </div>
 
       <div class="admin-kpi-card">
+        <div class="kpi-icon-box kpi-sky">
+          <i data-lucide="video"></i>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Rendez-vous Clients</span>
+          <h3 class="kpi-value" id="kpiTotalMeetings">0</h3>
+          <span class="kpi-subtext">Sessions stratégiques</span>
+        </div>
+      </div>
+
+      <div class="admin-kpi-card">
         <div class="kpi-icon-box kpi-purple">
           <i data-lucide="users"></i>
         </div>
@@ -1209,6 +1220,12 @@
         <i data-lucide="file-text"></i>
         <span>Demandes de devis</span>
         <span class="nav-count-badge" id="tabLeadCountBadge">4</span>
+      </button>
+
+      <button class="admin-nav-btn" id="tabMeetingsBtn">
+        <i data-lucide="video"></i>
+        <span>Rendez-vous & Meetings</span>
+        <span class="nav-count-badge" id="tabMeetingsCountBadge">0</span>
       </button>
 
       <button class="admin-nav-btn" id="tabClientsBtn">
@@ -1265,6 +1282,57 @@
           <div class="empty-icon-circle"><i data-lucide="inbox"></i></div>
           <p class="empty-title">Aucune demande trouvée</p>
           <span class="empty-sub">Les nouvelles demandes soumises via le formulaire apparaîtront ici automatiquement.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECTION B: MEETINGS & STRATEGY SYNCS (TABLE VIEW) -->
+    <div class="admin-section" id="adminMeetingsSection" style="display: none;">
+      
+      <div class="orsap-table-card">
+        <div class="orsap-card-header">
+          <div>
+            <h2 id="meetingsCardTitle">Rendez-vous & Sessions Stratégiques (0)</h2>
+            <p class="section-subtitle-text">Consultez, rejoignez et gérez tous les rendez-vous pris par vos clients</p>
+          </div>
+
+          <div class="orsap-table-tools">
+            <div class="search-input-wrap">
+              <i data-lucide="search"></i>
+              <input type="text" id="meetingSearchInput" placeholder="Rechercher par client, type, date, statut...">
+            </div>
+            
+            <button class="btn-export-csv" id="exportMeetingsCsvBtn" title="Exporter en CSV">
+              <i data-lucide="download"></i>
+              <span>Export CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive-wrapper">
+          <table class="orsap-data-table">
+            <thead>
+              <tr>
+                <th>DATE & CRÉNEAU</th>
+                <th>CLIENT & WORKSPACE</th>
+                <th>COORDONNÉES</th>
+                <th>FORMAT SESSION</th>
+                <th>STATUT</th>
+                <th>ORDRE DU JOUR / NOTES</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="meetingsTableBody">
+              <!-- Injected dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-empty" id="meetingsEmptyState" style="display: none;">
+          <div class="empty-icon-circle"><i data-lucide="video-off"></i></div>
+          <p class="empty-title">Aucun rendez-vous client trouvé</p>
+          <span class="empty-sub">Les sessions réservées depuis l'espace client ou planifiées par vous apparaîtront ici.</span>
         </div>
       </div>
 
@@ -1705,6 +1773,6 @@
   </div>
 
   <!-- Scripts -->
-  <script src="app.js?v=31"></script>
+  <script src="app.js?v=32"></script>
 </body>
 </html>

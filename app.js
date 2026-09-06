@@ -118,14 +118,20 @@ function initMotaGrowthApp() {
   // DOM Elements - Admin Portal
   const adminHomeLink = document.getElementById('adminHomeLink');
   const tabInquiriesBtn = document.getElementById('tabInquiriesBtn');
+  const tabMeetingsBtn = document.getElementById('tabMeetingsBtn');
   const tabClientsBtn = document.getElementById('tabClientsBtn');
   const adminInquiriesSection = document.getElementById('adminInquiriesSection');
+  const adminMeetingsSection = document.getElementById('adminMeetingsSection');
   const adminClientsSection = document.getElementById('adminClientsSection');
   const inquiriesTableBody = document.getElementById('inquiriesTableBody');
   const inquiriesEmptyState = document.getElementById('inquiriesEmptyState');
   const inquirySearchInput = document.getElementById('inquirySearchInput');
   const inquiryStatusFilter = document.getElementById('inquiryStatusFilter');
   const exportCsvBtn = document.getElementById('exportCsvBtn');
+  const meetingsTableBody = document.getElementById('meetingsTableBody');
+  const meetingsEmptyState = document.getElementById('meetingsEmptyState');
+  const meetingSearchInput = document.getElementById('meetingSearchInput');
+  const exportMeetingsCsvBtn = document.getElementById('exportMeetingsCsvBtn');
   const openNewClientModalBtn = document.getElementById('openNewClientModalBtn');
   const adminClientsGrid = document.getElementById('adminClientsGrid');
 
@@ -1349,9 +1355,29 @@ function initMotaGrowthApp() {
   // 5. PRIVATE ADMIN CRM & CLIENT WORKSPACE MANAGEMENT
   // =========================================================================
 
+  function getAllAdminMeetings() {
+    const allMeetings = [];
+    clients.forEach(client => {
+      const timelineMeets = (Array.isArray(client.timeline) ? client.timeline : []).filter(e => e.type === 'Meeting');
+      timelineMeets.forEach(m => {
+        allMeetings.push({
+          ...m,
+          clientId: client.id,
+          clientName: client.clientName || client.companyName || 'Client',
+          companyName: client.companyName || client.clientName || 'Workspace',
+          clientEmail: client.email || '—',
+          clientPhone: client.phone || '—',
+          clientLogo: client.logo || ''
+        });
+      });
+    });
+    return allMeetings;
+  }
+
   function renderAdminPortal() {
     updateAdminKPIs();
     renderInquiriesTable();
+    renderMeetingsTable();
     renderClientsGrid();
   }
 
@@ -1360,6 +1386,7 @@ function initMotaGrowthApp() {
     const totalClients = clients.length;
     const totalApprovals = clients.reduce((sum, c) => sum + (c.approvals || []).length, 0);
     const totalIdeas = clients.reduce((sum, c) => sum + (c.ideas || []).length, 0);
+    const totalMeetings = getAllAdminMeetings().length;
 
     const countBadge = document.getElementById('tabLeadCountBadge');
     if (countBadge) countBadge.textContent = totalInquiries;
@@ -1367,11 +1394,20 @@ function initMotaGrowthApp() {
     const inquiriesTitle = document.getElementById('inquiriesCardTitle');
     if (inquiriesTitle) inquiriesTitle.textContent = `Demandes de Devis Reçues (${totalInquiries})`;
 
+    const meetBadge = document.getElementById('tabMeetingsCountBadge');
+    if (meetBadge) meetBadge.textContent = totalMeetings;
+
+    const meetingsTitle = document.getElementById('meetingsCardTitle');
+    if (meetingsTitle) meetingsTitle.textContent = `Rendez-vous & Sessions Stratégiques (${totalMeetings})`;
+
     const clientBadge = document.getElementById('tabClientCountBadge');
     if (clientBadge) clientBadge.textContent = totalClients;
 
     const kpiInq = document.getElementById('kpiTotalInquiries');
     if (kpiInq) kpiInq.textContent = totalInquiries;
+
+    const kpiMeet = document.getElementById('kpiTotalMeetings');
+    if (kpiMeet) kpiMeet.textContent = totalMeetings;
 
     const kpiCli = document.getElementById('kpiTotalClients');
     if (kpiCli) kpiCli.textContent = totalClients;
@@ -1533,6 +1569,147 @@ function initMotaGrowthApp() {
     if (window.lucide) window.lucide.createIcons();
   }
 
+  function renderMeetingsTable() {
+    if (!meetingsTableBody) return;
+    const search = (meetingSearchInput ? meetingSearchInput.value : '').toLowerCase().trim();
+    const allMeetings = getAllAdminMeetings();
+
+    const filtered = allMeetings.filter(m => {
+      if (!search) return true;
+      const title = (m.title || '').toLowerCase();
+      const client = (m.clientName || '').toLowerCase();
+      const company = (m.companyName || '').toLowerCase();
+      const email = (m.clientEmail || '').toLowerCase();
+      const phone = (m.clientPhone || '').toLowerCase();
+      const date = (m.date || m.rawDate || '').toLowerCase();
+      const desc = (m.description || '').toLowerCase();
+      const status = (m.status || '').toLowerCase();
+
+      return title.includes(search) || client.includes(search) || company.includes(search) ||
+             email.includes(search) || phone.includes(search) || date.includes(search) ||
+             desc.includes(search) || status.includes(search);
+    });
+
+    if (filtered.length === 0) {
+      meetingsTableBody.innerHTML = '';
+      if (meetingsEmptyState) meetingsEmptyState.style.display = 'block';
+      return;
+    }
+
+    if (meetingsEmptyState) meetingsEmptyState.style.display = 'none';
+
+    meetingsTableBody.innerHTML = filtered.map(m => {
+      const initials = (m.clientName || 'CL').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      const meetLink = m.link || 'https://meet.google.com/new';
+      const cleanTitle = (m.title || 'Rendez-vous Stratégique').replace('📅 Rendez-vous : ', '').trim();
+      const dateStr = m.date || m.rawDate || '—';
+
+      return `
+        <tr>
+          <td>
+            <div class="date-stamp" style="font-weight: 700; color: #0f172a;">
+              📅 ${escapeHtml(dateStr)}
+            </div>
+          </td>
+          <td>
+            <div class="client-cell">
+              <div class="client-avatar" style="${m.clientLogo ? `background-image: url('${m.clientLogo}'); background-size: cover;` : ''}">
+                ${!m.clientLogo ? initials : ''}
+              </div>
+              <div class="client-names">
+                <strong>${escapeHtml(m.clientName)}</strong>
+                <span>${escapeHtml(m.companyName)}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="contact-cell">
+              <a href="mailto:${escapeHtml(m.clientEmail)}" class="contact-link">
+                <i data-lucide="mail"></i>
+                <span>${escapeHtml(m.clientEmail)}</span>
+              </a>
+              ${m.clientPhone && m.clientPhone !== '—' ? `
+                <a href="tel:${escapeHtml(m.clientPhone)}" class="contact-link">
+                  <i data-lucide="phone"></i>
+                  <span>${escapeHtml(m.clientPhone)}</span>
+                </a>
+              ` : ''}
+            </div>
+          </td>
+          <td>
+            <span class="type-chip meeting" style="padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; background: #e0f2fe; color: #0284c7; display: inline-flex; align-items: center; gap: 0.3rem;">
+              <i data-lucide="video" style="width: 12px; height: 12px;"></i>
+              ${escapeHtml(cleanTitle)}
+            </span>
+          </td>
+          <td>
+            <span class="status-tag scheduled" style="font-size: 0.75rem;">${escapeHtml(m.status || 'Planifié')}</span>
+          </td>
+          <td>
+            <div class="inquiry-message" style="max-width: 320px; font-size: 0.82rem; color: #475569;" title="${escapeHtml(m.description || 'Session 1-on-1')}">
+              ${escapeHtml(m.description || 'Session 1-on-1 de stratégie de croissance')}
+            </div>
+          </td>
+          <td>
+            <div class="action-btn-group" style="display: flex; align-items: center; gap: 0.4rem;">
+              <a href="${escapeHtml(meetLink)}" target="_blank" rel="noopener noreferrer" class="btn-table-action" style="background: #0088ff; color: #ffffff; padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;" title="Rejoindre l'appel vidéo">
+                <i data-lucide="video" style="width: 12px; height: 12px;"></i>
+                <span>Rejoindre</span>
+              </a>
+              <button class="btn-table-action manage-meet-client-btn" data-client-id="${m.clientId}" style="background: #f1f5f9; color: #334155; padding: 0.35rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;" title="Ouvrir le Workspace client">
+                <i data-lucide="external-link" style="width: 12px; height: 12px;"></i>
+              </button>
+              <button class="btn-delete-row delete-admin-meeting-btn" data-client-id="${m.clientId}" data-meet-id="${m.id}" title="Supprimer ce rendez-vous">
+                <i data-lucide="trash-2"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Bind Manage Workspace button
+    meetingsTableBody.querySelectorAll('.manage-meet-client-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const clientId = btn.getAttribute('data-client-id');
+        if (clientId) {
+          openManageClientModal(clientId);
+          document.querySelectorAll('.client-editor-tabs .editor-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.client-editor-content .editor-pane').forEach(p => p.classList.remove('active'));
+          document.querySelector('.client-editor-tabs .editor-tab[data-tab="meetings"]')?.classList.add('active');
+          document.getElementById('paneMeetings')?.classList.add('active');
+          if (window.lucide) window.lucide.createIcons();
+        }
+      });
+    });
+
+    // Bind Delete Meeting button
+    meetingsTableBody.querySelectorAll('.delete-admin-meeting-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const clientId = btn.getAttribute('data-client-id');
+        const meetId = btn.getAttribute('data-meet-id');
+        if (!clientId || !meetId) return;
+
+        if (confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')) {
+          const client = clients.find(c => c.id === clientId);
+          if (client) {
+            client.timeline = (client.timeline || []).filter(t => t.id !== meetId);
+            if (client.calendarEvents) {
+              Object.keys(client.calendarEvents).forEach(d => {
+                client.calendarEvents[d] = client.calendarEvents[d].filter(ev => ev.id !== meetId);
+              });
+            }
+            saveClients(clients);
+            renderAdminPortal();
+          }
+        }
+      });
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
   function renderClientsGrid() {
     if (!clients || clients.length === 0) {
       adminClientsGrid.innerHTML = `
@@ -1647,23 +1824,59 @@ function initMotaGrowthApp() {
   }
 
   // Admin Tab Switcher
-  tabInquiriesBtn.addEventListener('click', () => {
-    tabInquiriesBtn.classList.add('active');
-    tabClientsBtn.classList.remove('active');
-    adminInquiriesSection.style.display = 'block';
-    adminClientsSection.style.display = 'none';
-  });
+  function switchAdminTab(activeTab) {
+    if (tabInquiriesBtn) tabInquiriesBtn.classList.toggle('active', activeTab === 'inquiries');
+    if (tabMeetingsBtn) tabMeetingsBtn.classList.toggle('active', activeTab === 'meetings');
+    if (tabClientsBtn) tabClientsBtn.classList.toggle('active', activeTab === 'clients');
 
-  tabClientsBtn.addEventListener('click', () => {
-    tabClientsBtn.classList.add('active');
-    tabInquiriesBtn.classList.remove('active');
-    adminInquiriesSection.style.display = 'none';
-    adminClientsSection.style.display = 'block';
-    renderClientsGrid();
-  });
+    if (adminInquiriesSection) adminInquiriesSection.style.display = (activeTab === 'inquiries') ? 'block' : 'none';
+    if (adminMeetingsSection) adminMeetingsSection.style.display = (activeTab === 'meetings') ? 'block' : 'none';
+    if (adminClientsSection) adminClientsSection.style.display = (activeTab === 'clients') ? 'block' : 'none';
+
+    if (activeTab === 'inquiries') renderInquiriesTable();
+    if (activeTab === 'meetings') renderMeetingsTable();
+    if (activeTab === 'clients') renderClientsGrid();
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  if (tabInquiriesBtn) {
+    tabInquiriesBtn.addEventListener('click', () => switchAdminTab('inquiries'));
+  }
+  if (tabMeetingsBtn) {
+    tabMeetingsBtn.addEventListener('click', () => switchAdminTab('meetings'));
+  }
+  if (tabClientsBtn) {
+    tabClientsBtn.addEventListener('click', () => switchAdminTab('clients'));
+  }
 
   if (inquirySearchInput) {
     inquirySearchInput.addEventListener('input', renderInquiriesTable);
+  }
+
+  if (meetingSearchInput) {
+    meetingSearchInput.addEventListener('input', renderMeetingsTable);
+  }
+
+  // Meetings CSV Export
+  if (exportMeetingsCsvBtn) {
+    exportMeetingsCsvBtn.addEventListener('click', () => {
+      const allMeetings = getAllAdminMeetings();
+      if (allMeetings.length === 0) { alert('Aucun rendez-vous à exporter.'); return; }
+      const headers = ['DATE', 'CLIENT', 'ENTREPRISE', 'EMAIL', 'TELEPHONE', 'FORMAT', 'STATUT', 'NOTES', 'LIEN_MEET'];
+      const rows = allMeetings.map(m => [
+        `"${m.date || m.rawDate || '—'}"`,
+        `"${m.clientName || '—'}"`,
+        `"${m.companyName || '—'}"`,
+        `"${m.clientEmail || '—'}"`,
+        `"${m.clientPhone || '—'}"`,
+        `"${(m.title || 'Session').replace('📅 Rendez-vous : ', '')}"`,
+        `"${m.status || 'Planifié'}"`,
+        `"${(m.description || '—').replace(/"/g, '""')}"`,
+        `"${m.link || '—'}"`
+      ]);
+      const csv = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      downloadBlob(csv, `motagrowth_meetings_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
+    });
   }
 
   // CSV Export
