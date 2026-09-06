@@ -14,7 +14,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body class="theme-dark">
 
@@ -39,7 +39,7 @@
     <header class="headpage-header">
       <div class="headpage-header-left">
         <a href="#" class="brand-title" id="mainBrandLink">
-          <span class="brand-mota">Mota</span><span class="brand-growth">Growth</span>
+          <img src="logo.png" alt="MotaGrowth Agency" class="site-brand-logo-img">
         </a>
         <a href="#client-space" class="client-portal-link" id="clientSpaceNavBtn" title="Client Portal Workspace">
           <i data-lucide="user"></i>
@@ -78,7 +78,9 @@
     <div class="intake-card">
       <div class="intake-top-bar">
         <div class="intake-brand">
-          <span class="brand-mota">Mota</span><span class="brand-growth">Growth</span>
+          <a href="#" class="brand-title">
+            <img src="logo.png" alt="MotaGrowth Agency" class="modal-brand-logo-img">
+          </a>
           <span class="intake-tagline">Client Vision & Project Brief</span>
         </div>
         <button class="modal-close-icon" id="closeIntakeBtn" aria-label="Close">
@@ -322,144 +324,410 @@
   </div>
 
   <!-- =========================================================================
-       3. CLIENT SPACE PORTAL (#client-space)
+       3. CLIENT SPACE PORTAL (#client-space) - Wireframe Design Implementation
        ========================================================================= -->
   <div class="client-portal-view" id="clientPortalView" style="display: none;">
     
-    <!-- Portal Navigation Bar -->
-    <header class="portal-header">
-      <div class="portal-header-left">
-        <a href="#" class="brand-title" id="portalHomeLink">
-          <span class="brand-mota">Mota</span><span class="brand-growth">Growth</span>
-          <span class="portal-badge">Client Space</span>
+    <!-- Top Header Bar -->
+    <header class="portal-top-bar">
+      <div class="portal-logo-container">
+        <a href="#" class="portal-logo-box" id="portalHomeLink" title="Return to Home">
+          <img src="logo.png" alt="Mota Growth" class="portal-brand-logo-img">
         </a>
       </div>
 
-      <div class="portal-header-right" id="portalAuthControls">
-        <button class="btn-ghost" id="clientLogoutBtn" style="display: none;">
-          <i data-lucide="log-out"></i>
-          <span>Log Out</span>
+      <div class="portal-top-right-actions">
+        <button class="portal-btn-request-meeting" type="button" id="portalRequestMeetingBtn">
+          REQUEST MEETING
         </button>
+        <div class="portal-user-profile-circle" title="User Profile"></div>
       </div>
     </header>
 
-    <!-- Client Login Screen -->
-    <div class="client-login-card" id="clientLoginScreen">
-      <div class="login-intro">
-        <div class="login-icon"><i data-lucide="lock"></i></div>
-        <h2>Client Portal Login</h2>
-        <p>Enter your private client credentials created by MotaGrowth to access your project workspace.</p>
-      </div>
-
-      <form id="clientLoginForm" class="login-form">
-        <div class="field-wrap">
-          <label for="clientLoginUser">Username or Business Email</label>
-          <input type="text" id="clientLoginUser" placeholder="e.g. elena@velourclothing.co" required>
-        </div>
-
-        <div class="field-wrap">
-          <label for="clientLoginPass">Access Password</label>
-          <input type="password" id="clientLoginPass" placeholder="Enter password" required>
-        </div>
-
-        <span class="error-msg" id="clientLoginError"></span>
-
-        <button type="submit" class="btn-gold-pill full-btn">
-          <span>Sign In to Client Space</span>
-          <i data-lucide="arrow-right"></i>
-        </button>
-      </form>
-
-      <div class="demo-client-hints">
-        <span>Demo Account Credentials:</span>
-        <div class="demo-pill" id="fillDemoClient1">
-          <strong>Velour Apparel:</strong> <code>elena@velourclothing.co</code> / <code>growth2026</code>
+    <!-- Center Hero Section -->
+    <div class="portal-hero-header">
+      <h1 class="portal-hero-title">WELCOME<br>USER</h1>
+      <div class="portal-search-bar-wrap">
+        <div class="portal-search-bar">
+          <input type="text" class="portal-search-input" placeholder="SEARCH BAR FOR AI" />
         </div>
       </div>
     </div>
 
-    <!-- Active Client Workspace Dashboard -->
-    <div class="client-dashboard" id="clientDashboardScreen" style="display: none;">
+    <!-- Main 3-Column Portal Layout -->
+    <div class="portal-main-layout">
       
-      <!-- Welcome Banner -->
-      <div class="client-welcome-banner">
-        <div class="welcome-text">
-          <span class="client-badge" id="clientTagTier">Active Client Workspace</span>
-          <h1 id="clientWelcomeHeading">Welcome, <span id="clientBrandName">Client</span></h1>
-          <p id="clientProjectSummary">Your dedicated roadmap, creative ideas, calendar schedule, and approval items.</p>
+      <!-- LEFT COLUMN -->
+      <aside class="portal-col portal-col-left">
+        <!-- Card 1: Mini Nav Menu -->
+        <div class="portal-white-card portal-mini-menu-card">
+          <ul class="portal-menu-list">
+            <li class="portal-menu-item active">
+              <span class="portal-menu-icon"><i data-lucide="home"></i></span>
+              <span class="portal-menu-text">Home</span>
+            </li>
+            <li class="portal-menu-item">
+              <span class="portal-menu-icon"><i data-lucide="wand-2"></i></span>
+              <span class="portal-menu-text">Studio</span>
+            </li>
+            <li class="portal-menu-item">
+              <span class="portal-menu-icon"><i data-lucide="users"></i></span>
+              <span class="portal-menu-text">Community</span>
+            </li>
+            <li class="portal-menu-item">
+              <span class="portal-menu-icon"><i data-lucide="folder"></i></span>
+              <span class="portal-menu-text">Collections</span>
+            </li>
+            <li class="portal-menu-item">
+              <span class="portal-menu-icon"><i data-lucide="grid"></i></span>
+              <span class="portal-menu-text">Library</span>
+            </li>
+            <li class="portal-menu-item">
+              <span class="portal-menu-icon"><i data-lucide="bell"></i></span>
+              <span class="portal-menu-text">Notifications</span>
+              <span class="portal-menu-badge">8</span>
+            </li>
+            <li class="portal-menu-item">
+              <span class="portal-menu-icon"><i data-lucide="settings"></i></span>
+              <span class="portal-menu-text">Settings</span>
+            </li>
+          </ul>
         </div>
-        <div class="welcome-actions">
-          <a href="mailto:team@motagrowth.agency" class="btn-gold-pill btn-small">
-            <i data-lucide="message-square"></i>
-            <span>Message Agency</span>
-          </a>
-        </div>
-      </div>
 
-      <!-- Client Workspace Grid -->
-      <div class="client-grid">
-        
-        <!-- 1. Things Needing Your Approval -->
-        <div class="client-card approvals-card">
-          <div class="card-header">
-            <div class="card-title-wrap">
-              <i data-lucide="check-square" class="gold-text"></i>
-              <h3>Items Needing Your Approval</h3>
+        <!-- Card 2: Tree Navigation -->
+        <div class="portal-white-card portal-tree-nav-card">
+          <div class="portal-tree-top-toggle">
+            <button class="portal-collapse-btn" title="Collapse sidebar"><i data-lucide="chevrons-left"></i></button>
+          </div>
+          
+          <ul class="portal-tree-list">
+            <li class="portal-tree-row">
+              <div class="portal-tree-row-left">
+                <span class="portal-tree-icon"><i data-lucide="home"></i></span>
+                <span class="portal-tree-label">Home page</span>
+              </div>
+            </li>
+            <li class="portal-tree-row">
+              <div class="portal-tree-row-left">
+                <span class="portal-tree-icon"><i data-lucide="check-square"></i></span>
+                <span class="portal-tree-label">Tasks</span>
+              </div>
+            </li>
+            <li class="portal-tree-row has-arrow">
+              <div class="portal-tree-row-left">
+                <span class="portal-tree-icon"><i data-lucide="folder"></i></span>
+                <span class="portal-tree-label">Analytics</span>
+              </div>
+              <span class="portal-tree-chevron"><i data-lucide="play"></i></span>
+            </li>
+            <li class="portal-tree-row has-arrow">
+              <div class="portal-tree-row-left">
+                <span class="portal-tree-icon"><i data-lucide="folder"></i></span>
+                <span class="portal-tree-label">Documents</span>
+              </div>
+              <span class="portal-tree-chevron"><i data-lucide="play"></i></span>
+            </li>
+            <li class="portal-tree-row is-folder-expanded">
+              <div class="portal-tree-row-header">
+                <div class="portal-tree-row-left">
+                  <span class="portal-tree-icon"><i data-lucide="folder"></i></span>
+                  <span class="portal-tree-label">Abc Inc.</span>
+                </div>
+                <span class="portal-tree-chevron is-down"><i data-lucide="chevron-down"></i></span>
+              </div>
+              <ul class="portal-tree-sublist">
+                <li class="portal-tree-subrow">
+                  <span class="portal-sub-file-icon">📝</span>
+                  <span class="portal-sub-label">Project Plan</span>
+                </li>
+                <li class="portal-tree-subrow">
+                  <span class="portal-sub-file-icon">📄</span>
+                  <span class="portal-sub-label">Sales Presentation</span>
+                </li>
+                <li class="portal-tree-subrow">
+                  <span class="portal-sub-file-icon">📄</span>
+                  <span class="portal-sub-label">SWOT</span>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- CENTER COLUMN -->
+      <main class="portal-col portal-col-center">
+        <!-- Card 1: Project Progress -->
+        <div class="portal-white-card portal-progress-card">
+          <div class="portal-card-header-group">
+            <h3 class="portal-card-title">Project Progress</h3>
+            <p class="portal-card-sub">Brand & Website Redesign Project - Project Status</p>
+          </div>
+
+          <div class="portal-progress-stepper">
+            <div class="portal-stepper-bar-container">
+              <div class="portal-stepper-line fill-half"></div>
             </div>
-            <span class="count-badge" id="clientPendingCount">0 Pending</span>
-          </div>
-
-          <div class="approvals-list" id="clientApprovalsList">
-            <!-- Injected via JS -->
-          </div>
-        </div>
-
-        <!-- 2. Project Calendar & Deliverables Timeline -->
-        <div class="client-card calendar-card">
-          <div class="card-header">
-            <div class="card-title-wrap">
-              <i data-lucide="calendar" class="gold-text"></i>
-              <h3>Project Calendar & Milestones</h3>
+            <div class="portal-stepper-nodes">
+              <div class="portal-step-node completed">
+                <div class="portal-node-circle"><i data-lucide="check"></i></div>
+                <span class="portal-node-text">Getting started</span>
+              </div>
+              <div class="portal-step-node current">
+                <div class="portal-node-circle">2</div>
+                <span class="portal-node-text">Research and Briefing</span>
+              </div>
+              <div class="portal-step-node upcoming">
+                <div class="portal-node-circle">3</div>
+                <span class="portal-node-text">Launch Stage</span>
+              </div>
             </div>
           </div>
-
-          <div class="timeline-list" id="clientTimelineList">
-            <!-- Injected via JS -->
-          </div>
         </div>
 
-        <!-- 3. Shared Ideas & Creative Concepts -->
-        <div class="client-card ideas-card">
-          <div class="card-header">
-            <div class="card-title-wrap">
-              <i data-lucide="lightbulb" class="gold-text"></i>
-              <h3>Creative Ideas & Strategic Concepts</h3>
+        <!-- Card 2: Client Tasks -->
+        <div class="portal-white-card portal-tasks-card">
+          <div class="portal-tasks-header-row">
+            <h3 class="portal-card-title">Client Tasks</h3>
+            <button class="portal-btn-icon-dots" title="Options"><i data-lucide="more-vertical"></i></button>
+          </div>
+
+          <div class="portal-tasks-table">
+            <!-- Task 1 -->
+            <div class="portal-task-item">
+              <div class="portal-task-radio-col">
+                <span class="portal-radio-ring"></span>
+              </div>
+              <div class="portal-task-title-col">
+                <span class="portal-task-name">Define the target market and audience</span>
+                <span class="portal-pill-badge badge-dark">Analytics</span>
+              </div>
+              <div class="portal-task-date-col">08/12/2023</div>
+              <div class="portal-task-avatar-col">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="Assignee" class="portal-avatar-img" />
+              </div>
+            </div>
+
+            <!-- Task 2 -->
+            <div class="portal-task-item">
+              <div class="portal-task-radio-col">
+                <span class="portal-radio-ring"></span>
+              </div>
+              <div class="portal-task-title-col">
+                <span class="portal-task-name">Handover the design assets and specifications</span>
+              </div>
+              <div class="portal-task-date-col">08/12/2023</div>
+              <div class="portal-task-avatar-col">
+                <div class="portal-avatar-stack">
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" alt="Assignee 1" class="portal-avatar-img" />
+                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="Assignee 2" class="portal-avatar-img avatar-overlap" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Task 3 -->
+            <div class="portal-task-item is-done">
+              <div class="portal-task-radio-col">
+                <span class="portal-radio-ring is-checked"></span>
+              </div>
+              <div class="portal-task-title-col">
+                <span class="portal-task-name strike">Conduct competitor analysis</span>
+                <span class="portal-pill-badge badge-dark">Analytics</span>
+                <span class="portal-pill-badge badge-orange">High</span>
+              </div>
+              <div class="portal-task-date-col">08/18/2023</div>
+              <div class="portal-task-avatar-col">
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=60&auto=format&fit=crop&q=80" alt="Assignee" class="portal-avatar-img" />
+              </div>
+            </div>
+
+            <!-- Task 4 -->
+            <div class="portal-task-item">
+              <div class="portal-task-radio-col">
+                <span class="portal-radio-ring"></span>
+              </div>
+              <div class="portal-task-title-col">
+                <span class="portal-task-name">Update KPIs goals</span>
+              </div>
+              <div class="portal-task-date-col">08/18/2023</div>
+              <div class="portal-task-avatar-col">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80" alt="Assignee" class="portal-avatar-img" />
+              </div>
             </div>
           </div>
+        </div>
+      </main>
 
-          <div class="ideas-list" id="clientIdeasList">
-            <!-- Injected via JS -->
-          </div>
+      <!-- RIGHT COLUMN -->
+      <aside class="portal-col portal-col-right">
+        <!-- Card 1: Chat History -->
+        <div class="portal-white-card portal-chat-card">
+          <h2 class="portal-chat-title">CHAT<br>HISTORY</h2>
+          <div class="portal-chat-content-area"></div>
         </div>
 
-        <!-- 4. Project Info & Deliverables -->
-        <div class="client-card info-card">
-          <div class="card-header">
-            <div class="card-title-wrap">
-              <i data-lucide="folder" class="gold-text"></i>
-              <h3>Project Info & Assets</h3>
+        <!-- Card 2: Latest Docs -->
+        <div class="portal-white-card portal-docs-card">
+          <h4 class="portal-docs-heading">Latest Docs</h4>
+          <div class="portal-docs-stack">
+            <div class="portal-doc-tile">
+              <span class="portal-doc-icon"><i data-lucide="file-text"></i></span>
+              <span class="portal-doc-filename">Agency client contract.doc</span>
+            </div>
+            <div class="portal-doc-tile">
+              <span class="portal-doc-icon"><i data-lucide="file-text"></i></span>
+              <span class="portal-doc-filename">Main concept.pdf</span>
+            </div>
+            <div class="portal-doc-tile">
+              <span class="portal-doc-icon"><i data-lucide="file-text"></i></span>
+              <span class="portal-doc-filename">Agreement.pdf</span>
             </div>
           </div>
-
-          <div class="project-info-body" id="clientInfoBody">
-            <!-- Injected via JS -->
-          </div>
         </div>
-
-      </div>
+      </aside>
 
     </div>
+  </div>
 
+  <!-- =========================================================================
+       MODAL: UPLOAD CLIENT ASSET
+       ========================================================================= -->
+  <div class="modal-backdrop" id="uploadFileModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Upload Client Asset</h3>
+          <span style="font-size: 0.85rem; color: #64748b;">Share files directly with the MotaGrowth creative & strategy team.</span>
+        </div>
+        <button class="modal-close" id="closeUploadFileModalBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <form id="uploadFileForm" class="modal-form">
+        <div class="field-wrap full-span">
+          <label for="uploadFileName">File Title / Asset Name <span class="gold-text">*</span></label>
+          <input type="text" id="uploadFileName" placeholder="e.g. Autumn 2026 Raw 4K Video Footage.zip" required>
+        </div>
+
+        <div class="form-row-grid">
+          <div class="field-wrap">
+            <label for="uploadFileCategory">Destination Folder <span class="gold-text">*</span></label>
+            <select id="uploadFileCategory" required>
+              <option value="01_Brand_Identity">01_Brand_Identity</option>
+              <option value="02_Web_Prototypes">02_Web_Prototypes</option>
+              <option value="03_Video_Assets_4K" selected>03_Video_Assets_4K</option>
+              <option value="04_Ad_Creatives_Copy">04_Ad_Creatives_Copy</option>
+              <option value="05_Contracts_Invoices">05_Contracts_Invoices</option>
+            </select>
+          </div>
+
+          <div class="field-wrap">
+            <label for="uploadFileSize">Estimated Size</label>
+            <input type="text" id="uploadFileSize" placeholder="e.g. 1.2 GB" value="25.4 MB">
+          </div>
+        </div>
+
+        <div class="field-wrap full-span">
+          <label for="uploadFileLink">Cloud Link / File URL (Drive, Dropbox, WeTransfer, etc.) <span class="gold-text">*</span></label>
+          <input type="url" id="uploadFileLink" placeholder="https://drive.google.com/..." required>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelUploadFileBtn">Cancel</button>
+          <button type="submit" class="btn-gold-pill">Add to Asset Vault</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: NEED MORE DETAIL / FEEDBACK MODAL
+       ========================================================================= -->
+  <div class="modal-backdrop" id="ideaDetailModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Request More Details</h3>
+          <span class="gold-text" id="detailModalIdeaTitle" style="font-size: 0.9rem; font-weight: 600;"></span>
+        </div>
+        <button class="modal-close" id="closeIdeaDetailModalBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <form id="ideaDetailForm" class="modal-form">
+        <div class="field-wrap full-span">
+          <label for="detailTopicSelect">What clarification is needed? <span class="gold-text">*</span></label>
+          <select id="detailTopicSelect" required>
+            <option value="Visual / Design Variations">Visual / Design Mockup Variations</option>
+            <option value="Budget & Resource Impact">Budget & Resource Scope Breakdown</option>
+            <option value="Timeline & Rollout Schedule">Timeline & Rollout Schedule Details</option>
+            <option value="Copywriting & Messaging Adjustments">Copywriting & Messaging Adjustments</option>
+            <option value="Technical Specifications">Technical & Platform Specifications</option>
+            <option value="Other Specific Questions">Other Specific Questions</option>
+          </select>
+        </div>
+
+        <div class="field-wrap full-span">
+          <label for="detailClientNote">Your Questions / Adjustment Notes <span class="gold-text">*</span></label>
+          <textarea id="detailClientNote" rows="4" placeholder="e.g. Could we see an alternative color palette version for mobile, and what is the expected turnaround time for this batch?" required></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelIdeaDetailBtn">Cancel</button>
+          <button type="submit" class="btn-gold-pill">Submit Detail Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: PROPOSE CLIENT IDEA
+       ========================================================================= -->
+  <div class="modal-backdrop" id="proposeIdeaModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Propose New Idea to Agency</h3>
+          <span style="font-size: 0.85rem; color: #64748b;">Submit a campaign concept or feature request directly to our creative directors.</span>
+        </div>
+        <button class="modal-close" id="closeProposeIdeaModalBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <form id="proposeIdeaForm" class="modal-form">
+        <div class="field-wrap full-span">
+          <label for="proposeIdeaTitle">Idea / Proposal Title <span class="gold-text">*</span></label>
+          <input type="text" id="proposeIdeaTitle" placeholder="e.g. Black Friday VIP Early Access Landing Page" required>
+        </div>
+
+        <div class="form-row-grid">
+          <div class="field-wrap">
+            <label for="proposeIdeaCategory">Category</label>
+            <select id="proposeIdeaCategory">
+              <option value="Website & UX">Website & UX</option>
+              <option value="Video & Reels">Video & Reels</option>
+              <option value="Paid Growth">Paid Growth</option>
+              <option value="Brand Strategy">Brand Strategy</option>
+            </select>
+          </div>
+
+          <div class="field-wrap">
+            <label for="proposeIdeaPriority">Priority Ranking</label>
+            <select id="proposeIdeaPriority">
+              <option value="High">🔥 High Priority (Critical)</option>
+              <option value="Medium" selected>⚡ Medium Priority</option>
+              <option value="Low">✦ Low Priority</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-wrap full-span">
+          <label for="proposeIdeaDesc">Description & Objectives <span class="gold-text">*</span></label>
+          <textarea id="proposeIdeaDesc" rows="4" placeholder="Explain the concept, references, or goal for this proposal..." required></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelProposeIdeaBtn">Cancel</button>
+          <button type="submit" class="btn-gold-pill">Add to Ideas Queue</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- =========================================================================
@@ -470,110 +738,87 @@
     <!-- Admin Top Header -->
     <header class="admin-top-bar">
       <div class="admin-bar-left">
-        <a href="#" class="btn-ghost" id="adminHomeLink">
-          <i data-lucide="arrow-left"></i>
-          <span>Exit to Website</span>
+        <a href="#" class="admin-logo-link" id="adminLogoHomeLink">
+          <img src="logo.png" alt="MotaGrowth Agency" class="admin-brand-logo-img">
         </a>
         <div class="admin-branding">
-          <h2><span class="brand-mota">Mota</span><span class="brand-growth">Growth</span> <span class="private-tag">Agency Private CRM</span></h2>
+          <h2>MotaGrowth — Administration</h2>
+          <span class="admin-subheading">Private Agency Control Panel & Client Workspaces CRM</span>
         </div>
-      </div>
-
-      <!-- Admin Tab Switcher -->
-      <div class="admin-nav-tabs">
-        <button class="tab-btn active" id="tabInquiriesBtn">
-          <i data-lucide="inbox"></i>
-          <span>Lead Inquiries</span>
-          <span class="tab-badge" id="tabLeadCountBadge">0</span>
-        </button>
-        <button class="tab-btn" id="tabClientsBtn">
-          <i data-lucide="users"></i>
-          <span>Client Workspaces</span>
-          <span class="tab-badge" id="tabClientCountBadge">0</span>
-        </button>
       </div>
 
       <div class="admin-bar-right">
-        <button class="btn-gold-pill btn-small" id="openNewClientModalBtn">
-          <i data-lucide="user-plus"></i>
-          <span>+ Create Client Account</span>
-        </button>
+        <div class="storage-status-pill">
+          <span class="status-dot-amber">●</span>
+          <span>Stockage Fichier JSON (Sécurisé)</span>
+        </div>
+        <a href="#" class="btn-logout-pill" id="adminHomeLink">
+          <i data-lucide="log-out"></i>
+          <span>DÉCONNEXION</span>
+        </a>
       </div>
     </header>
 
-    <!-- SECTION A: INQUIRIES & SUBMISSIONS -->
+    <!-- Admin Navigation Tabs Row -->
+    <div class="admin-nav-bar-row">
+      <button class="admin-nav-btn active" id="tabInquiriesBtn">
+        <i data-lucide="file-text"></i>
+        <span>Demandes de devis</span>
+        <span class="nav-count-badge" id="tabLeadCountBadge">4</span>
+      </button>
+
+      <button class="admin-nav-btn" id="tabClientsBtn">
+        <i data-lucide="users"></i>
+        <span>Workspaces Clients</span>
+        <span class="nav-count-badge" id="tabClientCountBadge">1</span>
+      </button>
+    </div>
+
+    <!-- SECTION A: INQUIRIES & SUBMISSIONS (TABLE VIEW) -->
     <div class="admin-section" id="adminInquiriesSection">
       
-      <!-- KPI Stats -->
-      <div class="kpi-banner">
-        <div class="kpi-box">
-          <span class="kpi-title">Total Submissions</span>
-          <span class="kpi-num" id="kpiSubmissionsTotal">0</span>
-        </div>
-        <div class="kpi-box">
-          <span class="kpi-title">New Inquiries</span>
-          <span class="kpi-num gold-text" id="kpiSubmissionsNew">0</span>
-        </div>
-        <div class="kpi-box">
-          <span class="kpi-title">In Discussion</span>
-          <span class="kpi-num" id="kpiSubmissionsDiscuss">0</span>
-        </div>
-        <div class="kpi-box">
-          <span class="kpi-title">Deals Closed</span>
-          <span class="kpi-num" id="kpiSubmissionsClosed">0</span>
-        </div>
-        <div class="kpi-box">
-          <span class="kpi-title">Est. Pipeline Value</span>
-          <span class="kpi-num gold-text" id="kpiSubmissionsPipeline">$0</span>
-        </div>
-      </div>
+      <div class="orsap-table-card">
+        <div class="orsap-card-header">
+          <h2 id="inquiriesCardTitle">Demandes de Devis Reçues (4)</h2>
 
-      <!-- Controls & Actions -->
-      <div class="admin-action-row">
-        <div class="search-input-wrap">
-          <i data-lucide="search"></i>
-          <input type="text" id="inquirySearchInput" placeholder="Search inquiries by name, email, company...">
+          <div class="orsap-table-tools">
+            <div class="search-input-wrap">
+              <i data-lucide="search"></i>
+              <input type="text" id="inquirySearchInput" placeholder="Rechercher par nom, email, entreprise, téléphone, secteur...">
+            </div>
+            
+            <button class="btn-export-csv" id="exportCsvBtn" title="Exporter en CSV">
+              <i data-lucide="download"></i>
+              <span>Export CSV</span>
+            </button>
+          </div>
         </div>
 
-        <div class="right-actions">
-          <select id="inquiryStatusFilter">
-            <option value="all">All Statuses</option>
-            <option value="New">New</option>
-            <option value="Contacted">Contacted</option>
-            <option value="Proposal Sent">Proposal Sent</option>
-            <option value="Closed Won">Closed Won</option>
-            <option value="Closed Lost">Closed Lost</option>
-          </select>
-
-          <button class="btn-ghost-small" id="exportCsvBtn" title="Export to CSV">
-            <i data-lucide="download"></i>
-            <span>Export CSV</span>
-          </button>
+        <div class="table-responsive-wrapper">
+          <table class="orsap-data-table">
+            <thead>
+              <tr>
+                <th>DATE</th>
+                <th>TYPE</th>
+                <th>NOM</th>
+                <th>ENTREPRISE</th>
+                <th>EMAIL</th>
+                <th>TÉLÉPHONE</th>
+                <th>SOLUTIONS SOUHAITÉES</th>
+                <th>SECTEURS D'ACTIVITÉ</th>
+                <th>MESSAGE</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="inquiriesTableBody">
+              <!-- Injected dynamically via JS -->
+            </tbody>
+          </table>
         </div>
-      </div>
 
-      <!-- Inquiries Table -->
-      <div class="admin-table-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Date & ID</th>
-              <th>Client & Company</th>
-              <th>Services</th>
-              <th>Budget</th>
-              <th>Timeline</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="inquiriesTableBody">
-            <!-- Injected via JS -->
-          </tbody>
-        </table>
-        
         <div class="table-empty" id="inquiriesEmptyState" style="display: none;">
           <i data-lucide="inbox"></i>
-          <p>No client inquiries found matching your filters.</p>
+          <p>Aucune demande trouvée.</p>
         </div>
       </div>
 
@@ -582,16 +827,18 @@
     <!-- SECTION B: CLIENT WORKSPACES MANAGER -->
     <div class="admin-section" id="adminClientsSection" style="display: none;">
       
-      <div class="clients-manager-header">
-        <div>
-          <h2>Client Accounts & Workspaces</h2>
-          <p>Manage client spaces, post creative ideas, set calendar updates, and request client approvals.</p>
+      <div class="orsap-table-card">
+        <div class="orsap-card-header">
+          <h2>Workspaces & Comptes Clients</h2>
+          <button class="btn-gold-pill btn-small" id="openNewClientModalBtn">
+            <i data-lucide="user-plus"></i>
+            <span>+ Créer un compte client</span>
+          </button>
         </div>
-      </div>
 
-      <!-- Client Accounts Grid -->
-      <div class="clients-cards-grid" id="adminClientsGrid">
-        <!-- Injected via JS -->
+        <div class="clients-cards-grid" id="adminClientsGrid">
+          <!-- Injected via JS -->
+        </div>
       </div>
 
     </div>
@@ -752,6 +999,6 @@
   </div>
 
   <!-- Scripts -->
-  <script src="app.js"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
