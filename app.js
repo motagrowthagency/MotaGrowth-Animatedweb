@@ -1758,18 +1758,10 @@ function initMotaGrowthApp() {
       summary: document.getElementById('newClientSummary').value.trim(),
       approvals: [],
       timeline: [],
-      ideas: [
-        {
-          id: 'IDEA-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
-          category: 'Stratégie de Marque',
-          title: `Roadmap Stratégique & Croissance (${companyVal})`,
-          description: `Plan d'action personnalisé, charte visuelle et acquisition de conversion pour ${companyVal}.`,
-          impact: '+120% Notoriété & Acquisition',
-          status: 'Pending',
-          date: 'Oct 08, 2026'
-        }
-      ],
+      ideas: [],
       files: [],
+      tasks: [],
+      calendarEvents: {},
       links: []
     };
 
@@ -2775,25 +2767,89 @@ function initMotaGrowthApp() {
     if (isClientPortalInitialized) return;
     isClientPortalInitialized = true;
 
-    // --- State Storage Keys & In-Memory State ---
+    // --- Dynamic Current Date & Calendar State ---
+    const today = new Date();
+    let currentCalYear = today.getFullYear();
+    let currentCalMonth = today.getMonth(); // 0-indexed (e.g. 8 for September)
+    let selectedCalDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    let currentActiveTab = 'home';
+    let ideasFilter = 'all';
+    let tasksFilter = 'all';
+
+    // --- State Storage Keys ---
     const STORAGE_CAL_EVENTS = 'motagrowth_client_calendar_events_v2';
     const STORAGE_PORTAL_TASKS = 'motagrowth_client_tasks_v2';
 
     let portalTasks = loadStoredPortalTasks();
     let portalCalendarEvents = loadStoredCalendarEvents();
-    let currentCalYear = 2026;
-    let currentCalMonth = 9; // October (0-indexed)
-    let selectedCalDate = '2026-10-12';
-    let currentActiveTab = 'home';
-    let ideasFilter = 'all';
-    let tasksFilter = 'all';
+
+    // --- Data Isolation Helpers for Custom Clients vs Demo ---
+    function getActiveCalendarEvents() {
+      if (loggedInClient) {
+        if (loggedInClient.id === 'CLI-VELOUR') {
+          return portalCalendarEvents;
+        }
+        const eventsMap = {};
+        if (loggedInClient.calendarEvents && typeof loggedInClient.calendarEvents === 'object') {
+          Object.assign(eventsMap, loggedInClient.calendarEvents);
+        }
+        if (Array.isArray(loggedInClient.timeline)) {
+          loggedInClient.timeline.forEach(item => {
+            const dKey = item.rawDate || (item.date ? item.date : '');
+            if (dKey) {
+              if (!eventsMap[dKey]) eventsMap[dKey] = [];
+              if (!eventsMap[dKey].some(e => e.id === item.id)) {
+                eventsMap[dKey].push({
+                  id: item.id || 'EV-' + Math.random().toString(36).substr(2, 6),
+                  title: item.title,
+                  type: item.type || 'Deliverable',
+                  time: item.time || 'All Day',
+                  desc: item.description || ''
+                });
+              }
+            }
+          });
+        }
+        return eventsMap;
+      }
+      return portalCalendarEvents;
+    }
+
+    function getActiveTasks() {
+      if (loggedInClient) {
+        if (loggedInClient.id === 'CLI-VELOUR') {
+          return portalTasks;
+        }
+        return Array.isArray(loggedInClient.tasks) ? loggedInClient.tasks : [];
+      }
+      return portalTasks;
+    }
+
+    function getActiveIdeas() {
+      if (loggedInClient) {
+        if (loggedInClient.id === 'CLI-VELOUR') {
+          return (loggedInClient.ideas && loggedInClient.ideas.length > 0) ? loggedInClient.ideas : portalIdeas;
+        }
+        return Array.isArray(loggedInClient.ideas) ? loggedInClient.ideas : [];
+      }
+      return portalIdeas;
+    }
+
+    function getActiveDocs() {
+      if (loggedInClient) {
+        if (loggedInClient.id === 'CLI-VELOUR') {
+          return (loggedInClient.files && loggedInClient.files.length > 0) ? loggedInClient.files : defaultVaultDocs;
+        }
+        return Array.isArray(loggedInClient.files) ? loggedInClient.files : [];
+      }
+      return defaultVaultDocs;
+    }
 
     // --- DOM Elements ---
     const portalSubViews = {
       'home': document.getElementById('portalSubViewHome'),
       'calendar': document.getElementById('portalSubViewCalendar'),
       'ideas': document.getElementById('portalSubViewIdeas'),
-      'moodboard': document.getElementById('portalSubViewMoodboard'),
       'tasks': document.getElementById('portalSubViewTasks'),
       'documents': document.getElementById('portalSubViewDocs')
     };
@@ -2882,6 +2938,7 @@ function initMotaGrowthApp() {
         renderHomeTasksTable();
       }
 
+      updateTasksCounters();
       if (window.lucide) window.lucide.createIcons();
     }
 
@@ -2893,10 +2950,6 @@ function initMotaGrowthApp() {
         switchPortalSubView(targetTab);
       });
     });
-
-    // -----------------------------------------------------------------------
-    // C. INTERACTIVE CALENDAR ENGINE
-    // -----------------------------------------------------------------------
 
     // -----------------------------------------------------------------------
     // C. INTERACTIVE CALENDAR ENGINE
@@ -2919,6 +2972,7 @@ function initMotaGrowthApp() {
 
       const firstDayIndex = new Date(currentCalYear, currentCalMonth, 1).getDay();
       const totalDays = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+      const activeCalendar = getActiveCalendarEvents();
 
       // Empty cells before start of month
       for (let i = 0; i < firstDayIndex; i++) {
@@ -2940,7 +2994,7 @@ function initMotaGrowthApp() {
           dayCell.classList.add('active-cal-day');
         }
 
-        const events = portalCalendarEvents[dateKey] || [];
+        const events = activeCalendar[dateKey] || [];
         let eventDotsHtml = '';
         if (events.length > 0) {
           dayCell.classList.add('has-events');
@@ -2981,17 +3035,18 @@ function initMotaGrowthApp() {
       if (!listEl) return;
 
       const [y, m, d] = dateKey.split('-').map(Number);
-      const dateObj = new Date(y, m - 1, d);
-      const formattedDate = dateObj.toLocaleDateString('en-US', {
+      const dateObj = new Date(y, (m || 1) - 1, d || 1);
+      const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString('en-US', {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
         year: 'numeric'
-      });
+      }) : dateKey;
 
       if (titleEl) titleEl.textContent = formattedDate;
 
-      const events = portalCalendarEvents[dateKey] || [];
+      const activeCalendar = getActiveCalendarEvents();
+      const events = activeCalendar[dateKey] || [];
       if (countEl) {
         countEl.textContent = `${events.length} Item${events.length === 1 ? '' : 's'}`;
       }
@@ -3001,11 +3056,10 @@ function initMotaGrowthApp() {
           <div class="no-events-placeholder">
             <i data-lucide="calendar" style="width: 28px; height: 28px; color: #94a3b8; display: block; margin: 0 auto 0.4rem;"></i>
             <p style="margin: 0; font-size: 0.85rem; color: #64748b;">No deliverables or shoots scheduled on this date.</p>
-            <span style="font-size: 0.78rem; color: #94a3b8; display: block; margin-top: 0.3rem;">Use the form below to add a date milestone.</span>
           </div>
         `;
       } else {
-        listEl.innerHTML = events.map((ev, index) => {
+        listEl.innerHTML = events.map((ev) => {
           const typeClass = (ev.type || 'Deliverable').toLowerCase();
           let badgeColor = '#0284c7';
           let iconName = 'sparkles';
@@ -3023,29 +3077,9 @@ function initMotaGrowthApp() {
               </div>
               <h5 class="event-item-title">${escapeHtml(ev.title)}</h5>
               ${ev.desc ? `<p class="event-item-desc">${escapeHtml(ev.desc)}</p>` : ''}
-              <div class="event-item-actions">
-                <button type="button" class="btn-event-quick-action" data-del-event-index="${index}" title="Remove milestone">
-                  <i data-lucide="trash-2"></i> Delete
-                </button>
-              </div>
             </div>
           `;
         }).join('');
-
-        // Bind delete event buttons
-        listEl.querySelectorAll('[data-del-event-index]').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const idx = parseInt(btn.getAttribute('data-del-event-index'), 10);
-            portalCalendarEvents[dateKey].splice(idx, 1);
-            if (portalCalendarEvents[dateKey].length === 0) {
-              delete portalCalendarEvents[dateKey];
-            }
-            saveCalendarEvents(portalCalendarEvents);
-            renderInteractiveCalendar();
-            showPortalToast('Milestone removed from calendar');
-          });
-        });
       }
 
       if (window.lucide) window.lucide.createIcons();
@@ -3080,45 +3114,11 @@ function initMotaGrowthApp() {
 
     if (calTodayBtn) {
       calTodayBtn.addEventListener('click', () => {
-        currentCalYear = 2026;
-        currentCalMonth = 9; // October 2026
-        selectedCalDate = '2026-10-12';
+        const now = new Date();
+        currentCalYear = now.getFullYear();
+        currentCalMonth = now.getMonth();
+        selectedCalDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         renderInteractiveCalendar();
-      });
-    }
-
-    // Admin Add Event Form
-    const adminAddEventForm = document.getElementById('adminAddEventForm');
-    const adminEventTitleInput = document.getElementById('adminEventTitleInput');
-    const adminEventTypeSelect = document.getElementById('adminEventTypeSelect');
-    const adminEventTimeInput = document.getElementById('adminEventTimeInput');
-
-    if (adminAddEventForm) {
-      adminAddEventForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const title = adminEventTitleInput.value.trim();
-        const type = adminEventTypeSelect.value;
-        const time = adminEventTimeInput.value.trim() || '2:00 PM EST';
-
-        if (!title) return;
-
-        if (!portalCalendarEvents[selectedCalDate]) {
-          portalCalendarEvents[selectedCalDate] = [];
-        }
-
-        portalCalendarEvents[selectedCalDate].push({
-          id: 'EV-' + Date.now().toString(36),
-          title: title,
-          type: type,
-          time: time,
-          desc: `Scheduled by Agency Admin for ${selectedCalDate}`
-        });
-
-        saveCalendarEvents(portalCalendarEvents);
-        renderInteractiveCalendar();
-        adminEventTitleInput.value = '';
-        adminEventTimeInput.value = '';
-        showPortalToast(`Saved info to ${selectedCalDate}!`);
       });
     }
 
@@ -3134,6 +3134,10 @@ function initMotaGrowthApp() {
     function handleAiPortalSearch(query) {
       if (!query || !portalAiAnswerCard || !portalAiAnswerBody) return;
       const cleanQ = query.trim().toLowerCase();
+      const currentTasks = getActiveTasks();
+      const currentCalendar = getActiveCalendarEvents();
+      const currentIdeas = getActiveIdeas();
+      const currentDocs = getActiveDocs();
 
       // Show Answer Card with loading state
       portalAiAnswerCard.style.display = 'block';
@@ -3152,69 +3156,61 @@ function initMotaGrowthApp() {
         let jumpLabel = 'View Dashboard';
 
         // Intent Matching
-        if (cleanQ.includes('task') || cleanQ.includes('todo') || cleanQ.includes('pending') || cleanQ.includes('footage') || cleanQ.includes('retainer') || cleanQ.includes('action')) {
+        if (cleanQ.includes('task') || cleanQ.includes('todo') || cleanQ.includes('pending') || cleanQ.includes('footage') || cleanQ.includes('action')) {
           jumpTarget = 'tasks';
           jumpLabel = 'Go to Tasks Manager';
-          const pendingTasks = portalTasks.filter(t => t.status === 'Pending');
-          answerTitle = `You have ${pendingTasks.length} pending tasks requiring action:`;
-          answerSummary = `Your team currently has ${portalTasks.length} total tasks. ${pendingTasks.length} tasks are pending completion including raw footage delivery and monthly retainer confirmation.`;
-          matches = portalTasks.map(t => ({
+          const pendingTasks = currentTasks.filter(t => t.status === 'Pending');
+          answerTitle = `You have ${pendingTasks.length} pending tasks:`;
+          answerSummary = `Your team currently has ${currentTasks.length} total tasks tracked in this workspace.`;
+          matches = currentTasks.map(t => ({
             tag: t.status === 'Pending' ? 'Action Required' : 'Completed',
             badgeClass: t.status === 'Pending' ? 'warn' : 'success',
             title: t.title,
-            meta: `Due: ${t.date} • Priority: ${t.priority}`
+            meta: `Due: ${t.date || 'TBD'} • Priority: ${t.priority || 'Normal'}`
           }));
-        } else if (cleanQ.includes('calendar') || cleanQ.includes('shoot') || cleanQ.includes('tiktok') || cleanQ.includes('reel') || cleanQ.includes('date') || cleanQ.includes('october') || cleanQ.includes('schedule') || cleanQ.includes('deadline')) {
+        } else if (cleanQ.includes('calendar') || cleanQ.includes('shoot') || cleanQ.includes('tiktok') || cleanQ.includes('reel') || cleanQ.includes('date') || cleanQ.includes('schedule') || cleanQ.includes('deadline')) {
           jumpTarget = 'calendar';
           jumpLabel = 'Open Full Calendar';
           answerTitle = `Key Scheduled Dates & Deliverables:`;
-          answerSummary = `The content production roadmap features 7 milestone dates across October & November 2026, including the Italian Silk ASMR reel and Website Alpha Staging.`;
+          answerSummary = `Review your active timeline and production schedule in the calendar.`;
           
-          Object.keys(portalCalendarEvents).forEach(date => {
-            portalCalendarEvents[date].forEach(ev => {
+          Object.keys(currentCalendar).forEach(date => {
+            (currentCalendar[date] || []).forEach(ev => {
               matches.push({
-                tag: ev.type,
+                tag: ev.type || 'Deliverable',
                 badgeClass: 'info',
                 title: `${ev.title} (${date})`,
-                meta: `${ev.time} — ${ev.desc || ''}`
+                meta: `${ev.time || 'All Day'} — ${ev.desc || ''}`
               });
             });
           });
-        } else if (cleanQ.includes('idea') || cleanQ.includes('proposal') || cleanQ.includes('concept') || cleanQ.includes('lookbook') || cleanQ.includes('meta')) {
+        } else if (cleanQ.includes('idea') || cleanQ.includes('proposal') || cleanQ.includes('concept')) {
           jumpTarget = 'ideas';
           jumpLabel = 'Explore Idea Bank';
           answerTitle = `Strategic Proposals & Concept Bank:`;
-          answerSummary = `MotaGrowth has proposed 4 high-impact growth concepts. 2 proposals are active and pending your approval (Interactive 3D Lookbook and NFC Authentication).`;
-          matches = [
-            { tag: 'Pending', badgeClass: 'warn', title: 'Interactive 3D Lookbook with Instant Swipe-to-Cart', meta: '+35% Mobile Conversion & $42k/mo Added GMV' },
-            { tag: 'Approved', badgeClass: 'success', title: 'Meta Advantage+ Dynamic Retargeting Architecture', meta: '3.8x Target ROAS & 22% Lower CAC' },
-            { tag: 'Approved', badgeClass: 'success', title: '15-Part Behind-The-Atelier Artisanal Documentary Reels', meta: '500k+ Organic Views' }
-          ];
-        } else if (cleanQ.includes('doc') || cleanQ.includes('contract') || cleanQ.includes('file') || cleanQ.includes('download') || cleanQ.includes('pdf') || cleanQ.includes('agreement') || cleanQ.includes('swot')) {
+          answerSummary = `MotaGrowth has proposed ${currentIdeas.length} strategic concepts for review.`;
+          matches = currentIdeas.map(idea => ({
+            tag: idea.status || 'Pending',
+            badgeClass: (idea.status === 'Approved') ? 'success' : 'warn',
+            title: idea.title,
+            meta: idea.impact || idea.desc || ''
+          }));
+        } else if (cleanQ.includes('doc') || cleanQ.includes('contract') || cleanQ.includes('file') || cleanQ.includes('download') || cleanQ.includes('pdf')) {
           jumpTarget = 'documents';
           jumpLabel = 'Open Documents Vault';
           answerTitle = `Official Documents & Downloadable Files:`;
-          answerSummary = `All legal agreements, SOW retainers, and strategy presentations are stored securely in your client repository and available for instant 1-click download.`;
-          matches = [
-            { tag: 'Legal', badgeClass: 'info', title: 'Agency client contract.doc', meta: 'Official MotaGrowth Master Services Agreement (Word Doc)' },
-            { tag: 'Creative', badgeClass: 'info', title: 'Main concept.pdf', meta: 'Creative direction & 3D architecture brief (PDF)' },
-            { tag: 'Legal', badgeClass: 'info', title: 'Agreement.pdf', meta: 'Executed Retainer & SLA Schedule (PDF)' },
-            { tag: 'Strategy', badgeClass: 'info', title: 'SWOT Analysis & Project Plan', meta: 'Available inside the Abc Inc. subfolder' }
-          ];
-        } else if (cleanQ.includes('mood') || cleanQ.includes('color') || cleanQ.includes('palette') || cleanQ.includes('font') || cleanQ.includes('typography') || cleanQ.includes('hex')) {
-          jumpTarget = 'moodboard';
-          jumpLabel = 'View Brand Moodboard';
-          answerTitle = `Brand Aesthetic & Design Architecture:`;
-          answerSummary = `Visual identity is built on Obsidian Black (#0A0E1A), Electric Cobalt (#0066FF), Silk Azure (#F5F9FF), and Vance Amber (#EA580C) paired with Plus Jakarta Sans typography.`;
-          matches = [
-            { tag: 'Color', badgeClass: 'info', title: 'Obsidian Black (#0A0E1A) & Electric Cobalt (#0066FF)', meta: 'Primary luxury brand palette' },
-            { tag: 'Typography', badgeClass: 'info', title: 'Plus Jakarta Sans / Inter SemiBold', meta: 'Geometric sans-serif hierarchy' }
-          ];
-        } else if (cleanQ.includes('meet') || cleanQ.includes('call') || cleanQ.includes('sync') || cleanQ.includes('marcus') || cleanQ.includes('schedule')) {
+          answerSummary = `All official legal agreements, retainers, and strategy briefs are stored in your secure vault.`;
+          matches = currentDocs.map(doc => ({
+            tag: doc.category || 'Document',
+            badgeClass: 'info',
+            title: doc.name || doc.title || 'Document.pdf',
+            meta: `${doc.size || '1.0 MB'} • ${doc.date || 'Active'}`
+          }));
+        } else if (cleanQ.includes('meet') || cleanQ.includes('call') || cleanQ.includes('sync') || cleanQ.includes('schedule')) {
           jumpTarget = 'meeting';
           jumpLabel = 'Schedule Meeting Now';
           answerTitle = `Schedule Strategy Session:`;
-          answerSummary = `You can book a 15-min Sprint Sync, 30-min Growth Review, or 45-min Creative Strategy session directly with Marcus Vance & the MotaGrowth creative team.`;
+          answerSummary = `You can book a 15-min Sprint Sync, 30-min Growth Review, or 45-min Creative Strategy session with Marcus Vance and the MotaGrowth team.`;
           matches = [
             { tag: '15-Min', badgeClass: 'info', title: '15-Min Sprint Sync', meta: 'Rapid approvals and urgent blockers' },
             { tag: '30-Min', badgeClass: 'info', title: '30-Min Growth Review', meta: 'Performance analytics and campaign optimization' },
@@ -3224,11 +3220,9 @@ function initMotaGrowthApp() {
           jumpTarget = 'home';
           jumpLabel = 'Return to Overview';
           answerTitle = `Portal Search Results for "${escapeHtml(query)}":`;
-          answerSummary = `Found matching items across your active project schedule, tasks tracker, and documents vault.`;
+          answerSummary = `Found active items across your project schedule, tasks tracker, and documents vault.`;
           matches = [
-            { tag: 'Status', badgeClass: 'info', title: 'Project Progress: Stage 2 Active', meta: 'Research & Briefing in progress' },
-            { tag: 'Schedule', badgeClass: 'info', title: 'Website Alpha Staging Launch', meta: 'Scheduled for October 15, 2026' },
-            { tag: 'Download', badgeClass: 'info', title: 'Agency client contract.doc', meta: 'Available in bottom download center' }
+            { tag: 'Status', badgeClass: 'info', title: 'Project Progress: Stage 2 Active', meta: 'Research & Briefing in progress' }
           ];
         }
 
@@ -3356,21 +3350,24 @@ function initMotaGrowthApp() {
       setTimeout(() => {
         typingEl.remove();
         const cleanT = userText.toLowerCase();
+        const currentTasks = getActiveTasks();
         let reply = '';
 
         if (cleanT.includes('status') || cleanT.includes('progress') || cleanT.includes('sprint')) {
-          reply = `We are currently in <strong>Stage 2: Research & Briefing</strong>. The 3D interactive lookbook prototype is in staging, and the next major milestone is the <em>Website Alpha Staging Launch on Oct 15, 2026</em>.`;
+          reply = `We are currently in <strong>Stage 2: Research & Briefing</strong>. Your creative deliverables and roadmap milestones are continuously updated by MotaGrowth.`;
         } else if (cleanT.includes('task') || cleanT.includes('need') || cleanT.includes('attention') || cleanT.includes('todo')) {
-          const pending = portalTasks.filter(t => t.status === 'Pending');
-          reply = `You have <strong>${pending.length} pending tasks</strong>: <ul style="margin: 0.4rem 0 0 1rem; padding: 0;">${pending.map(p => `<li>${escapeHtml(p.title)}</li>`).join('')}</ul>`;
+          const pending = currentTasks.filter(t => t.status === 'Pending');
+          if (pending.length > 0) {
+            reply = `You have <strong>${pending.length} pending tasks</strong>: <ul style="margin: 0.4rem 0 0 1rem; padding: 0;">${pending.map(p => `<li>${escapeHtml(p.title)}</li>`).join('')}</ul>`;
+          } else {
+            reply = `You have <strong>0 pending tasks</strong>! Everything in your workspace is currently up to date.`;
+          }
         } else if (cleanT.includes('meeting') || cleanT.includes('sync') || cleanT.includes('call') || cleanT.includes('schedule')) {
-          reply = `Your next agency strategy sync is scheduled for <strong>Monday, October 12 at 4:30 PM EST</strong>. You can also click the <em>"Request meeting"</em> button on the top right to book a dedicated strategy session anytime.`;
+          reply = `You can click the <em>"Request Meeting"</em> button on the top right to book a dedicated 1-on-1 strategy session with the MotaGrowth team anytime.`;
         } else if (cleanT.includes('contract') || cleanT.includes('download') || cleanT.includes('doc') || cleanT.includes('pdf')) {
-          reply = `All your agreements and briefs are ready in the <strong>Latest Docs</strong> card below. Click on <em>Agency client contract.doc</em> or <em>Main concept.pdf</em> to download them immediately.`;
-        } else if (cleanT.includes('shoot') || cleanT.includes('video') || cleanT.includes('tiktok') || cleanT.includes('reel')) {
-          reply = `Our first TikTok reel <em>"Behind The Silk"</em> is scheduled to drop on <strong>October 8 at 6:30 PM EST</strong>, followed by the Studio 4K fashion shoot on October 12. Check the dedicated <strong>Calendar</strong> tab for full details!`;
+          reply = `All your agreements, briefs, and deliverables are stored in the <strong>Documents</strong> tab for instant 1-click download.`;
         } else {
-          reply = `I have logged your request: "${escapeHtml(userText)}". The MotaGrowth production team is on standby. You can check the <strong>Calendar</strong>, review <strong>Idea Bank</strong> proposals, or request a direct meeting using the top button.`;
+          reply = `I have logged your request: "${escapeHtml(userText)}". The MotaGrowth account team is at your service. You can check the <strong>Calendar</strong>, review <strong>Idea Bank</strong> proposals, or request a meeting above.`;
         }
 
         appendBotChatMessage(reply);
@@ -3401,8 +3398,9 @@ function initMotaGrowthApp() {
     // F. CLIENT TASKS MANAGEMENT (HOME & DEDICATED VIEW)
     // -----------------------------------------------------------------------
     function updateTasksCounters() {
-      const completed = portalTasks.filter(t => t.status === 'Done').length;
-      const total = portalTasks.length;
+      const currentTasks = getActiveTasks();
+      const completed = currentTasks.filter(t => t.status === 'Done').length;
+      const total = currentTasks.length;
       const text = `${completed} of ${total} Completed`;
 
       const counterEl = document.getElementById('portalTasksCounter');
@@ -3410,13 +3408,43 @@ function initMotaGrowthApp() {
 
       const miniCounterEl = document.getElementById('miniTasksCount');
       if (miniCounterEl) miniCounterEl.textContent = total - completed;
+
+      const miniIdeaEl = document.getElementById('miniIdeaCount');
+      if (miniIdeaEl) {
+        const ideas = getActiveIdeas();
+        miniIdeaEl.textContent = ideas.length;
+      }
+
+      const miniDocsEl = document.getElementById('miniDocsCount');
+      if (miniDocsEl) {
+        const docs = getActiveDocs();
+        miniDocsEl.textContent = docs.length;
+      }
+
+      const miniCalEl = document.getElementById('miniCalCount');
+      if (miniCalEl) {
+        const cal = getActiveCalendarEvents();
+        let totalEvents = 0;
+        Object.values(cal).forEach(arr => { if (Array.isArray(arr)) totalEvents += arr.length; });
+        miniCalEl.textContent = totalEvents;
+      }
     }
 
     function toggleTaskStatus(taskId) {
-      const task = portalTasks.find(t => t.id === taskId);
+      const currentTasks = getActiveTasks();
+      const task = currentTasks.find(t => t.id === taskId);
       if (task) {
         task.status = (task.status === 'Done') ? 'Pending' : 'Done';
-        saveStoredPortalTasks(portalTasks);
+        if (loggedInClient && loggedInClient.id !== 'CLI-VELOUR') {
+          const currentClients = loadClients();
+          const cIdx = currentClients.findIndex(c => c.id === loggedInClient.id);
+          if (cIdx !== -1) {
+            currentClients[cIdx].tasks = loggedInClient.tasks;
+            saveClients(currentClients);
+          }
+        } else {
+          saveStoredPortalTasks(portalTasks);
+        }
         renderHomeTasksTable();
         renderFullTasksList();
         updateTasksCounters();
@@ -3428,7 +3456,21 @@ function initMotaGrowthApp() {
       const listEl = document.getElementById('portalHomeTasksList');
       if (!listEl) return;
 
-      listEl.innerHTML = portalTasks.map(task => {
+      const currentTasks = getActiveTasks();
+      if (currentTasks.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align: center; padding: 2.5rem 1rem; color: #64748b; background: #ffffff; border-radius: 0.75rem; border: 1px dashed #e2e8f0;">
+            <i data-lucide="check-circle" style="width: 28px; height: 28px; color: #0088ff; margin: 0 auto 0.4rem; display: block; opacity: 0.7;"></i>
+            <strong style="color: #0f172a; display: block; margin-bottom: 0.2rem;">All caught up!</strong>
+            <span style="font-size: 0.84rem;">No pending tasks assigned to your workspace.</span>
+          </div>
+        `;
+        updateTasksCounters();
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+
+      listEl.innerHTML = currentTasks.map(task => {
         const isDone = task.status === 'Done';
         return `
           <div class="task-table-row ${isDone ? 'is-completed' : ''}" data-task-id="${task.id}">
@@ -3438,7 +3480,7 @@ function initMotaGrowthApp() {
             </div>
             <div class="task-title-wrap">
               <span class="task-name">${escapeHtml(task.title)}</span>
-              <span class="task-meta-tag">${escapeHtml(task.tag || 'Project')} • Due ${escapeHtml(task.date)}</span>
+              <span class="task-meta-tag">${escapeHtml(task.tag || 'Project')} • Due ${escapeHtml(task.date || 'Upcoming')}</span>
             </div>
             <div class="task-status-wrap">
               <span class="task-status-pill ${isDone ? 'pill-done' : 'pill-pending'}">
@@ -3451,7 +3493,7 @@ function initMotaGrowthApp() {
       }).join('');
 
       listEl.querySelectorAll('.task-checkbox').forEach(box => {
-        box.addEventListener('change', (e) => {
+        box.addEventListener('change', () => {
           const row = box.closest('.task-table-row');
           const taskId = row.getAttribute('data-task-id');
           toggleTaskStatus(taskId);
@@ -3466,12 +3508,13 @@ function initMotaGrowthApp() {
       const containerEl = document.getElementById('portalFullTasksContainer');
       if (!containerEl) return;
 
-      let filtered = portalTasks;
-      if (tasksFilter === 'pending') filtered = portalTasks.filter(t => t.status === 'Pending');
-      else if (tasksFilter === 'completed') filtered = portalTasks.filter(t => t.status === 'Done');
+      const currentTasks = getActiveTasks();
+      let filtered = currentTasks;
+      if (tasksFilter === 'pending') filtered = currentTasks.filter(t => t.status === 'Pending');
+      else if (tasksFilter === 'completed') filtered = currentTasks.filter(t => t.status === 'Done');
 
       if (filtered.length === 0) {
-        containerEl.innerHTML = `<div style="text-align: center; padding: 3rem; color: #64748b;">No tasks match this filter.</div>`;
+        containerEl.innerHTML = `<div style="text-align: center; padding: 3rem; color: #64748b; background: #ffffff; border-radius: 0.75rem; border: 1px dashed #e2e8f0;">No tasks match this filter.</div>`;
         return;
       }
 
@@ -3489,7 +3532,7 @@ function initMotaGrowthApp() {
                 <div class="task-card-tags">
                   <span class="task-tag-badge">${escapeHtml(task.tag || 'General')}</span>
                   <span class="task-priority-badge priority-${(task.priority || 'Normal').toLowerCase()}">${escapeHtml(task.priority || 'Normal')} Priority</span>
-                  <span class="task-due-date"><i data-lucide="calendar"></i> Due ${escapeHtml(task.date)}</span>
+                  <span class="task-due-date"><i data-lucide="calendar"></i> Due ${escapeHtml(task.date || 'Upcoming')}</span>
                 </div>
               </div>
             </div>
@@ -3570,13 +3613,6 @@ function initMotaGrowthApp() {
       }
     ];
 
-    function getActiveIdeas() {
-      if (loggedInClient && Array.isArray(loggedInClient.ideas)) {
-        return loggedInClient.ideas;
-      }
-      return portalIdeas;
-    }
-
     function renderIdeasList() {
       const container = document.getElementById('portalIdeasListContainer');
       if (!container) return;
@@ -3590,8 +3626,8 @@ function initMotaGrowthApp() {
         container.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: #64748b; background: #ffffff; border-radius: 1rem; border: 1px dashed #e2e8f0;">
             <i data-lucide="lightbulb" style="width: 32px; height: 32px; color: #0088ff; margin-bottom: 0.5rem; opacity: 0.6;"></i>
-            <h4 style="font-size: 1rem; color: #0f172a; margin-bottom: 0.25rem;">Aucune proposition dans cette catégorie</h4>
-            <p style="font-size: 0.85rem;">Votre directeur de croissance MotaGrowth partagera de nouveaux concepts sous peu.</p>
+            <h4 style="font-size: 1rem; color: #0f172a; margin-bottom: 0.25rem;">No proposals in this category</h4>
+            <p style="font-size: 0.85rem;">Your MotaGrowth growth director will share new strategy concepts here.</p>
           </div>
         `;
         if (window.lucide) window.lucide.createIcons();
@@ -3603,7 +3639,7 @@ function initMotaGrowthApp() {
         return `
           <div class="idea-proposal-card ${isApproved ? 'is-approved' : ''}" data-idea-id="${idea.id}">
             <div class="idea-card-header">
-              <span class="idea-cat-tag">${escapeHtml(idea.category || 'Stratégie')}</span>
+              <span class="idea-cat-tag">${escapeHtml(idea.category || 'Strategy')}</span>
               <span class="idea-status-badge ${isApproved ? 'badge-approved' : 'badge-pending'}">
                 <i data-lucide="${isApproved ? 'check-circle' : 'clock'}"></i>
                 ${isApproved ? 'Approved for Production' : 'Pending Client Review'}
@@ -3682,18 +3718,25 @@ function initMotaGrowthApp() {
       { name: 'SWOT Analysis.pdf', category: 'PDF Document', size: '920 KB', date: 'Sep 30, 2026', downloadName: 'SWOT Analysis.pdf' }
     ];
 
-    function getActiveDocs() {
-      if (loggedInClient && Array.isArray(loggedInClient.files) && loggedInClient.files.length > 0) {
-        return loggedInClient.files;
-      }
-      return defaultVaultDocs;
-    }
-
     function renderVaultDocs() {
       const tbody = document.getElementById('portalVaultFilesBody');
       if (!tbody) return;
 
       const activeDocs = getActiveDocs();
+
+      if (activeDocs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 2.5rem 1rem; color: #64748b;">
+              <i data-lucide="folder-open" style="width: 28px; height: 28px; color: #0088ff; margin: 0 auto 0.5rem; display: block; opacity: 0.7;"></i>
+              <strong style="color: #0f172a; display: block; margin-bottom: 0.25rem;">No documents uploaded yet</strong>
+              <span style="font-size: 0.85rem;">Official deliverables, strategy briefs, and contracts will appear here once uploaded by MotaGrowth.</span>
+            </td>
+          </tr>
+        `;
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
 
       tbody.innerHTML = activeDocs.map(doc => {
         const docName = doc.name || doc.title || 'Document.pdf';
@@ -3716,7 +3759,7 @@ function initMotaGrowthApp() {
             </td>
             <td><span class="category-tag">${escapeHtml(cat)}</span></td>
             <td><span style="font-weight: 600; color: #475569;">${escapeHtml(doc.size || '1.0 MB')}</span></td>
-            <td><span style="color: #64748b; font-size: 0.84rem;">${escapeHtml(doc.date || 'Oct 2026')}</span></td>
+            <td><span style="color: #64748b; font-size: 0.84rem;">${escapeHtml(doc.date || 'Active')}</span></td>
             <td style="text-align: right;">
               <button type="button" class="btn-file-action" data-download="${escapeHtml(dlName)}">
                 <i data-lucide="download"></i>
@@ -3728,8 +3771,6 @@ function initMotaGrowthApp() {
       }).join('');
 
       bindDownloadButtons();
-      if (window.lucide) window.lucide.createIcons();
-    }
       if (window.lucide) window.lucide.createIcons();
     }
 
@@ -3777,10 +3818,9 @@ function initMotaGrowthApp() {
       if (!portalMeetingModal) return;
       portalMeetingModal.style.display = 'flex';
       
-      // Default date to next business day
       const meetDateInput = document.getElementById('portalMeetDate');
       if (meetDateInput && !meetDateInput.value) {
-        meetDateInput.value = '2026-10-12';
+        meetDateInput.value = selectedCalDate;
       }
 
       if (portalMeetingModalForm) portalMeetingModalForm.style.display = 'block';
@@ -3811,20 +3851,38 @@ function initMotaGrowthApp() {
         e.preventDefault();
         const formatRadio = portalMeetingModalForm.querySelector('input[name="portalMeetType"]:checked');
         const format = formatRadio ? formatRadio.value : '30-min Growth Review';
-        const date = document.getElementById('portalMeetDate').value || '2026-10-12';
+        const date = document.getElementById('portalMeetDate').value || selectedCalDate;
         const time = document.getElementById('portalMeetTime').value || '2:00 PM EST';
         const agenda = document.getElementById('portalMeetAgenda').value.trim();
 
-        // Add to calendar events
-        if (!portalCalendarEvents[date]) portalCalendarEvents[date] = [];
-        portalCalendarEvents[date].push({
-          id: 'MEET-' + Date.now().toString(36),
-          title: `Strategy Session (${format})`,
-          type: 'Sync',
-          time: time,
-          desc: agenda || 'Scheduled directly from client meeting portal'
-        });
-        saveCalendarEvents(portalCalendarEvents);
+        if (loggedInClient) {
+          if (!loggedInClient.calendarEvents) loggedInClient.calendarEvents = {};
+          if (!loggedInClient.calendarEvents[date]) loggedInClient.calendarEvents[date] = [];
+          loggedInClient.calendarEvents[date].push({
+            id: 'MEET-' + Date.now().toString(36),
+            title: `Strategy Session (${format})`,
+            type: 'Sync',
+            time: time,
+            desc: agenda || 'Scheduled directly from client meeting portal'
+          });
+
+          const currentClients = loadClients();
+          const cIdx = currentClients.findIndex(c => c.id === loggedInClient.id);
+          if (cIdx !== -1) {
+            currentClients[cIdx].calendarEvents = loggedInClient.calendarEvents;
+            saveClients(currentClients);
+          }
+        } else {
+          if (!portalCalendarEvents[date]) portalCalendarEvents[date] = [];
+          portalCalendarEvents[date].push({
+            id: 'MEET-' + Date.now().toString(36),
+            title: `Strategy Session (${format})`,
+            type: 'Sync',
+            time: time,
+            desc: agenda || 'Scheduled directly from client meeting portal'
+          });
+          saveCalendarEvents(portalCalendarEvents);
+        }
 
         // Show Success confirmation inside modal
         if (portalMeetingModalForm) portalMeetingModalForm.style.display = 'none';
@@ -3846,23 +3904,7 @@ function initMotaGrowthApp() {
     }
 
     // -----------------------------------------------------------------------
-    // J. MOODBOARD SWATCH COPY
-    // -----------------------------------------------------------------------
-    document.querySelectorAll('.mood-swatch-box').forEach(box => {
-      box.addEventListener('click', () => {
-        const hex = box.getAttribute('data-hex');
-        if (hex) {
-          navigator.clipboard.writeText(hex).then(() => {
-            showPortalToast(`Copied ${hex} to clipboard!`, 'copy');
-          }).catch(() => {
-            showPortalToast(`Selected ${hex}`, 'copy');
-          });
-        }
-      });
-    });
-
-    // -----------------------------------------------------------------------
-    // K. STATE PERSISTENCE HELPERS
+    // J. STATE PERSISTENCE HELPERS
     // -----------------------------------------------------------------------
     function loadStoredPortalTasks() {
       try {
@@ -3875,7 +3917,7 @@ function initMotaGrowthApp() {
         { id: 'T1', title: 'Send over all the raw footage for the next video', status: 'Pending', priority: 'High', date: 'Oct 09, 2026', tag: 'Deliverable' },
         { id: 'T2', title: 'Pay monthly retainer by Oct 15th', status: 'Pending', priority: 'Urgent', date: 'Oct 15, 2026', tag: 'Finance' },
         { id: 'T3', title: 'Approve final design concept for the site', status: 'Pending', priority: 'High', date: 'Oct 18, 2026', tag: 'Design' },
-        { id: 'T4', title: 'Review brand guidelines and moodboard', status: 'Done', priority: 'Normal', date: 'Oct 04, 2026', tag: 'Review' }
+        { id: 'T4', title: 'Review brand guidelines and visual direction', status: 'Done', priority: 'Normal', date: 'Oct 04, 2026', tag: 'Review' }
       ];
     }
 
@@ -3945,6 +3987,7 @@ function initMotaGrowthApp() {
     bindDownloadButtons();
     updateTasksCounters();
   }
+}
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initMotaGrowthApp);

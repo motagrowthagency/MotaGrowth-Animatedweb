@@ -14,7 +14,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <link rel="stylesheet" href="styles.css?v=27">
+  <link rel="stylesheet" href="styles.css?v=28">
 </head>
 <body class="theme-dark">
 
@@ -477,26 +477,22 @@
             <li class="portal-menu-item" data-portal-tab="ideas">
               <span class="portal-menu-icon"><i data-lucide="lightbulb"></i></span>
               <span class="portal-menu-text">Idea bank</span>
-              <span class="portal-menu-badge gold-badge" id="miniIdeaCount">4</span>
+              <span class="portal-menu-badge gold-badge" id="miniIdeaCount">0</span>
             </li>
             <li class="portal-menu-item" data-portal-tab="calendar">
               <span class="portal-menu-icon"><i data-lucide="calendar"></i></span>
               <span class="portal-menu-text">Calendar</span>
-              <span class="portal-menu-badge" id="miniCalCount">5</span>
-            </li>
-            <li class="portal-menu-item" data-portal-tab="moodboard">
-              <span class="portal-menu-icon"><i data-lucide="palette"></i></span>
-              <span class="portal-menu-text">Mood board</span>
+              <span class="portal-menu-badge" id="miniCalCount">0</span>
             </li>
             <li class="portal-menu-item" data-portal-tab="tasks">
               <span class="portal-menu-icon"><i data-lucide="check-square"></i></span>
               <span class="portal-menu-text">Tasks</span>
-              <span class="portal-menu-badge" id="miniTasksCount">4</span>
+              <span class="portal-menu-badge" id="miniTasksCount">0</span>
             </li>
             <li class="portal-menu-item" data-portal-tab="documents">
               <span class="portal-menu-icon"><i data-lucide="folder"></i></span>
               <span class="portal-menu-text">Documents</span>
-              <span class="portal-menu-badge" id="miniDocsCount">6</span>
+              <span class="portal-menu-badge" id="miniDocsCount">0</span>
             </li>
           </ul>
         </div>
@@ -582,10 +578,6 @@
                   <button type="button" class="btn-cal-nav today-btn" id="calTodayBtn">Today</button>
                   <button type="button" class="btn-cal-nav" id="calNextMonthBtn" title="Next Month"><i data-lucide="chevron-right"></i></button>
                 </div>
-                <button type="button" class="btn-admin-add-event" id="openAdminEventBtn">
-                  <i data-lucide="plus-circle"></i>
-                  <span>Admin: Add Date Info</span>
-                </button>
               </div>
             </div>
 
@@ -615,32 +607,11 @@
                     <span class="details-label">SELECTED DATE</span>
                     <h4 id="selectedDateDisplayTitle">October 12, 2026</h4>
                   </div>
-                  <span class="events-count-badge" id="selectedDateEventsCount">2 Items</span>
+                  <span class="events-count-badge" id="selectedDateEventsCount">0 Items</span>
                 </div>
 
                 <div class="date-events-list" id="selectedDateEventsList">
                   <!-- Injected via JS -->
-                </div>
-
-                <!-- Admin Quick Add Info Form for this Date -->
-                <div class="admin-date-input-box" id="adminDateInputBox">
-                  <h5><i data-lucide="edit-3"></i> Add Project Info for This Date</h5>
-                  <form id="adminAddEventForm" class="admin-quick-event-form">
-                    <input type="text" id="adminEventTitleInput" placeholder="e.g. 4K Drone Shoot or TikTok Ad Launch" required />
-                    <div class="admin-form-row">
-                      <select id="adminEventTypeSelect" required>
-                        <option value="Reel">TikTok / Reel Launch</option>
-                        <option value="Deliverable">Key Deliverable</option>
-                        <option value="Shoot">Video / Photo Shoot</option>
-                        <option value="Sync">Agency Strategy Sync</option>
-                      </select>
-                      <input type="text" id="adminEventTimeInput" placeholder="e.g. 2:00 PM EST" />
-                    </div>
-                    <button type="submit" class="btn-save-event">
-                      <i data-lucide="check"></i>
-                      <span>Save Info to Date</span>
-                    </button>
-                  </form>
                 </div>
 
               </div>
@@ -661,9 +632,9 @@
                 <p class="portal-card-sub">Review creative concepts proposed by MotaGrowth. Approve proposals to greenlight production.</p>
               </div>
               <div class="ideas-filter-bar">
-                <button type="button" class="btn-filter-chip active" data-filter="all">All (4)</button>
-                <button type="button" class="btn-filter-chip" data-filter="pending">Pending (2)</button>
-                <button type="button" class="btn-filter-chip" data-filter="approved">Approved (2)</button>
+                <button type="button" class="btn-filter-chip active" data-filter="all">All</button>
+                <button type="button" class="btn-filter-chip" data-filter="pending">Pending</button>
+                <button type="button" class="btn-filter-chip" data-filter="approved">Approved</button>
               </div>
             </div>
 
@@ -674,70 +645,7 @@
         </section>
 
         <!-- ===================================================================
-             SUBVIEW 4: MOOD BOARD
-             =================================================================== -->
-        <section class="portal-subview" id="portalSubViewMoodboard">
-          <div class="portal-white-card portal-moodboard-card">
-            <div class="view-header-row">
-              <div>
-                <h3 class="portal-card-title">Brand Aesthetics & Social Moodboard</h3>
-                <p class="portal-card-sub">Visual language, color harmony, typography mood, and storytelling directives.</p>
-              </div>
-            </div>
-
-            <!-- Color Palette Section -->
-            <div class="mood-section">
-              <h4 class="mood-section-title"><i data-lucide="palette"></i> Color Architecture (Click to copy HEX)</h4>
-              <div class="mood-swatches-grid">
-                <div class="mood-swatch-box" data-hex="#0A0E1A" style="background-color: #0a0e1a;">
-                  <span class="swatch-name">Obsidian Black</span>
-                  <span class="swatch-code">#0A0E1A</span>
-                </div>
-                <div class="mood-swatch-box" data-hex="#0066FF" style="background-color: #0066ff;">
-                  <span class="swatch-name">Electric Cobalt</span>
-                  <span class="swatch-code">#0066FF</span>
-                </div>
-                <div class="mood-swatch-box" data-hex="#F5F9FF" style="background-color: #f5f9ff; color: #0a0e1a; border: 1px solid #cbd5e1;">
-                  <span class="swatch-name">Silk Azure</span>
-                  <span class="swatch-code">#F5F9FF</span>
-                </div>
-                <div class="mood-swatch-box" data-hex="#EA580C" style="background-color: #ea580c;">
-                  <span class="swatch-name">Vance Amber</span>
-                  <span class="swatch-code">#EA580C</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Typography & Creative Directives -->
-            <div class="mood-cards-split">
-              <div class="mood-subcard">
-                <div class="mood-subcard-header">
-                  <i data-lucide="type"></i>
-                  <h5>Typography & Editorial Voice</h5>
-                </div>
-                <p>Geometric sans-serif hierarchy tailored for high-converting European luxury digital presence.</p>
-                <div class="type-preview-quote">"Bold Ideas That Start With Vision."</div>
-                <span class="type-meta-tag">Primary: Plus Jakarta Sans / Inter SemiBold</span>
-              </div>
-
-              <div class="mood-subcard">
-                <div class="mood-subcard-header">
-                  <i data-lucide="video"></i>
-                  <h5>Video & Reel Motion Rules</h5>
-                </div>
-                <ul class="mood-rules-bullets">
-                  <li><strong>0:00 - 0:02:</strong> High-speed macro sensory hook (fabric, texture, lighting).</li>
-                  <li><strong>Audio:</strong> Minimalist deep house beats + ASMR ambient soundscapes.</li>
-                  <li><strong>Pacing:</strong> Rapid hook transition into smooth, deliberate lifestyle shots.</li>
-                </ul>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        <!-- ===================================================================
-             SUBVIEW 5: TASKS MANAGEMENT
+             SUBVIEW 4: TASKS MANAGEMENT
              =================================================================== -->
         <section class="portal-subview" id="portalSubViewTasks">
           <div class="portal-white-card portal-tasks-full-page">
@@ -1638,6 +1546,6 @@
   </div>
 
   <!-- Scripts -->
-  <script src="app.js?v=27"></script>
+  <script src="app.js?v=28"></script>
 </body>
 </html>
