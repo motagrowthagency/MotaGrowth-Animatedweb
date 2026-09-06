@@ -1817,6 +1817,7 @@ function initMotaGrowthApp() {
     document.getElementById('paneCalendar')?.classList.add('active');
 
     renderAdminInteractiveCalendar(client);
+    renderAdminMeetingsList(client);
     renderAdminIdeasList(client);
     renderAdminDocsList(client);
     renderEditorApprovals(client);
@@ -1841,6 +1842,7 @@ function initMotaGrowthApp() {
       tab.classList.add('active');
       const target = tab.getAttribute('data-tab');
       if (target === 'calendar') document.getElementById('paneCalendar')?.classList.add('active');
+      if (target === 'meetings') document.getElementById('paneMeetings')?.classList.add('active');
       if (target === 'ideas') document.getElementById('paneIdeas')?.classList.add('active');
       if (target === 'documents') document.getElementById('paneDocuments')?.classList.add('active');
       if (target === 'approvals') document.getElementById('paneApprovals')?.classList.add('active');
@@ -2022,6 +2024,130 @@ function initMotaGrowthApp() {
       } else {
         adminCalMonth++;
       }
+      renderAdminInteractiveCalendar(client);
+    });
+  }
+
+  // 1.5 ADMIN MEETINGS & STRATEGY SYNCS
+  function renderAdminMeetingsList(client) {
+    const list = document.getElementById('editorMeetingsList');
+    if (!list) return;
+
+    if (!client.timeline) client.timeline = [];
+    const meetings = client.timeline.filter(item => item.type === 'Meeting');
+
+    if (meetings.length === 0) {
+      list.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem 0;">Aucun rendez-vous planifié pour ce client.</p>`;
+      return;
+    }
+
+    list.innerHTML = meetings.map(item => `
+      <div class="editor-row-item">
+        <div style="flex: 1;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <strong style="color: #0f172a; font-size: 0.88rem;">${escapeHtml(item.title)}</strong>
+            <span class="type-chip meeting" style="font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 9999px; background: #e0f2fe; color: #0284c7; font-weight: 700;">RDV</span>
+            <span class="status-tag scheduled" style="font-size: 0.72rem;">${escapeHtml(item.status || 'Planifié')}</span>
+          </div>
+          <div style="font-size: 0.8rem; color: #0284c7; font-weight: 600; margin-top: 0.2rem;">
+            📅 ${escapeHtml(item.date || item.rawDate || 'Date non spécifiée')}
+          </div>
+          ${item.description ? `<p style="font-size: 0.82rem; color: var(--text-gray); margin-top: 0.2rem; margin-bottom: 0;">${escapeHtml(item.description)}</p>` : ''}
+          ${item.link ? `<div style="margin-top: 0.3rem;"><a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" style="font-size: 0.78rem; color: #0088ff; text-decoration: underline; display: inline-flex; align-items: center; gap: 0.25rem;"><i data-lucide="video" style="width:12px;height:12px;"></i> Ouvrir le lien de réunion</a></div>` : ''}
+        </div>
+        <button type="button" class="btn-ghost-small delete-meet-btn" data-id="${item.id}" title="Supprimer ce rendez-vous">
+          <i data-lucide="trash-2"></i>
+        </button>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.delete-meet-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        client.timeline = client.timeline.filter(t => t.id !== id);
+        
+        if (client.calendarEvents) {
+          Object.keys(client.calendarEvents).forEach(d => {
+            client.calendarEvents[d] = client.calendarEvents[d].filter(ev => ev.id !== id);
+          });
+        }
+
+        saveClients(clients);
+        renderAdminMeetingsList(client);
+        renderAdminInteractiveCalendar(client);
+      });
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  const saveAdminMeetBtn = document.getElementById('saveAdminMeetBtn');
+  if (saveAdminMeetBtn) {
+    saveAdminMeetBtn.addEventListener('click', () => {
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (!client) return;
+
+      const titleInput = document.getElementById('adminMeetTitle');
+      const typeInput = document.getElementById('adminMeetType');
+      const dateInput = document.getElementById('adminMeetDate');
+      const timeInput = document.getElementById('adminMeetTime');
+      const linkInput = document.getElementById('adminMeetLink');
+      const agendaInput = document.getElementById('adminMeetAgenda');
+
+      const title = (titleInput?.value || '').trim();
+      const format = typeInput?.value || '30-min Growth Review';
+      const date = dateInput?.value || selectedAdminDate;
+      const time = (timeInput?.value || '').trim() || '14:30';
+      const link = (linkInput?.value || '').trim();
+      const agenda = (agendaInput?.value || '').trim();
+
+      if (!title) {
+        alert('Veuillez entrer un titre pour la session.');
+        return;
+      }
+      if (!date) {
+        alert('Veuillez sélectionner une date pour le rendez-vous.');
+        return;
+      }
+
+      if (!client.timeline) client.timeline = [];
+      if (!client.calendarEvents) client.calendarEvents = {};
+      if (!client.calendarEvents[date]) client.calendarEvents[date] = [];
+
+      const meetId = 'MEET-' + Date.now().toString(36);
+      const displayDate = typeof formatDisplayDate === 'function' ? formatDisplayDate(date) : date;
+
+      // Add to timeline
+      client.timeline.unshift({
+        id: meetId,
+        date: displayDate,
+        rawDate: date,
+        title: `📅 Rendez-vous : ${title} (${format})`,
+        description: `${time}${agenda ? ` — ${agenda}` : ''}`,
+        link: link,
+        type: 'Meeting',
+        status: 'Scheduled'
+      });
+
+      // Add to calendarEvents
+      client.calendarEvents[date].push({
+        id: meetId,
+        title: `${title} (${format})`,
+        type: 'Sync',
+        time: time,
+        desc: agenda || 'Session planifiée par l\'administrateur',
+        link: link
+      });
+
+      if (titleInput) titleInput.value = '';
+      if (dateInput) dateInput.value = '';
+      if (timeInput) timeInput.value = '';
+      if (linkInput) linkInput.value = '';
+      if (agendaInput) agendaInput.value = '';
+
+      saveClients(clients);
+      renderAdminMeetingsList(client);
       renderAdminInteractiveCalendar(client);
     });
   }
@@ -2936,6 +3062,7 @@ function initMotaGrowthApp() {
     const portalSubViews = {
       'home': document.getElementById('portalSubViewHome'),
       'calendar': document.getElementById('portalSubViewCalendar'),
+      'meetings': document.getElementById('portalSubViewMeetings'),
       'ideas': document.getElementById('portalSubViewIdeas'),
       'tasks': document.getElementById('portalSubViewTasks'),
       'documents': document.getElementById('portalSubViewDocs')
@@ -3015,6 +3142,8 @@ function initMotaGrowthApp() {
       // Render tab-specific dynamic content
       if (tabName === 'calendar') {
         renderInteractiveCalendar();
+      } else if (tabName === 'meetings') {
+        renderMeetingsList();
       } else if (tabName === 'tasks') {
         renderFullTasksList();
       } else if (tabName === 'ideas') {
@@ -3515,6 +3644,17 @@ function initMotaGrowthApp() {
         Object.values(cal).forEach(arr => { if (Array.isArray(arr)) totalEvents += arr.length; });
         miniCalEl.textContent = totalEvents;
       }
+
+      const miniMeetingsEl = document.getElementById('miniMeetingsCount');
+      if (miniMeetingsEl) {
+        const client = getActiveClient();
+        let count = 0;
+        if (client) {
+          const timelineMeets = Array.isArray(client.timeline) ? client.timeline.filter(e => e.type === 'Meeting') : [];
+          count = timelineMeets.length;
+        }
+        miniMeetingsEl.textContent = count;
+      }
     }
 
     function toggleTaskStatus(taskId) {
@@ -3970,6 +4110,8 @@ function initMotaGrowthApp() {
         }
 
         renderInteractiveCalendar();
+        renderMeetingsList();
+        updateTasksCounters();
         showPortalToast(`Meeting confirmed for ${date} at ${time}!`);
         if (window.lucide) window.lucide.createIcons();
       });
@@ -3979,12 +4121,203 @@ function initMotaGrowthApp() {
       portalMeetingDoneBtn.addEventListener('click', closePortalMeetingModal);
     }
 
+    // -----------------------------------------------------------------------
+    // J. DEDICATED MEETINGS SUBVIEW & DIRECT SCHEDULER
+    // -----------------------------------------------------------------------
+    function renderMeetingsList() {
+      const container = document.getElementById('portalScheduledMeetingsList');
+      const countSub = document.getElementById('meetingsTabCountSub');
+      if (!container) return;
+
+      const client = getActiveClient();
+      if (!client) {
+        container.innerHTML = `
+          <div class="empty-state-card" style="text-align:center; padding: 2.5rem 1rem; color: #64748b; background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 0.85rem;">
+            <i data-lucide="video-off" style="width: 36px; height: 36px; color: #94a3b8; margin-bottom: 0.8rem;"></i>
+            <h4 style="color: #0f172a; font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem;">No Active Client Session</h4>
+            <p style="font-size: 0.85rem; max-width: 320px; margin: 0 auto;">Please sign in with your client account to view and book strategy sessions.</p>
+          </div>
+        `;
+        if (countSub) countSub.textContent = '0 upcoming meetings';
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+
+      const meetings = (Array.isArray(client.timeline) ? client.timeline : []).filter(e => e.type === 'Meeting');
+
+      if (countSub) {
+        countSub.textContent = `${meetings.length} upcoming session${meetings.length === 1 ? '' : 's'}`;
+      }
+
+      if (meetings.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-card" style="text-align:center; padding: 2.5rem 1rem; color: #64748b; background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 0.85rem;">
+            <i data-lucide="calendar" style="width: 36px; height: 36px; color: #0088ff; margin-bottom: 0.8rem;"></i>
+            <h4 style="color: #0f172a; font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem;">No Scheduled Sessions Yet</h4>
+            <p style="font-size: 0.85rem; max-width: 320px; margin: 0 auto; line-height: 1.45;">Select a format on the left and book your next 1-on-1 strategy sync with your dedicated MotaGrowth team.</p>
+          </div>
+        `;
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = meetings.map((meet, idx) => {
+        const meetLink = meet.link || 'https://meet.google.com/new';
+        return `
+          <div class="meeting-feed-card">
+            <div class="meeting-feed-top">
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span class="type-chip meeting" style="padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; background: #e0f2fe; color: #0284c7;">
+                  <i data-lucide="video" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 3px;"></i>
+                  ${escapeHtml(meet.title.replace('📅 Rendez-vous : ', ''))}
+                </span>
+                <span class="status-tag scheduled" style="font-size: 0.72rem;">${escapeHtml(meet.status || 'Confirmed')}</span>
+              </div>
+              <span style="font-size: 0.78rem; font-weight: 700; color: #0088ff; background: rgba(0,136,255,0.08); padding: 0.2rem 0.5rem; border-radius: 6px;">
+                Session #${idx + 1}
+              </span>
+            </div>
+
+            <div class="meeting-feed-body">
+              <div style="font-size: 0.88rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">
+                📅 ${escapeHtml(meet.date || meet.rawDate || 'Date to be confirmed')}
+              </div>
+              <div style="font-size: 0.82rem; color: #475569; line-height: 1.45;">
+                ${escapeHtml(meet.description || 'Dedicated 1-on-1 strategy alignment session with Mohamed Tazi.')}
+              </div>
+            </div>
+
+            <div class="meeting-feed-footer" style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 0.4rem; padding-top: 0.6rem; border-top: 1px solid #f1f5f9; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: #64748b;">
+                <i data-lucide="user" style="width: 13px; height: 13px; color: #0088ff;"></i>
+                <span>Host: <strong>Mohamed Tazi (Lead Strategist)</strong></span>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <a href="${escapeHtml(meetLink)}" target="_blank" rel="noopener noreferrer" class="btn-meeting-join" style="padding: 0.45rem 0.9rem; background: #0088ff; color: #fff; border-radius: 6px; font-size: 0.78rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; transition: background 0.2s;">
+                  <i data-lucide="video" style="width: 13px; height: 13px;"></i>
+                  <span>Join Call</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Handle session type card selection highlight in Meetings tab
+    document.querySelectorAll('#meetingsTabBookingForm .meet-type-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('#meetingsTabBookingForm .meet-type-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+      });
+    });
+
+    const meetingsTabBookingForm = document.getElementById('meetingsTabBookingForm');
+    if (meetingsTabBookingForm) {
+      const tabMeetDate = document.getElementById('tabMeetDate');
+      if (tabMeetDate && !tabMeetDate.value) {
+        tabMeetDate.value = selectedCalDate || new Date().toISOString().split('T')[0];
+      }
+
+      meetingsTabBookingForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formatRadio = meetingsTabBookingForm.querySelector('input[name="tabMeetType"]:checked');
+        const format = formatRadio ? formatRadio.value : '30-min Growth Review';
+        const date = document.getElementById('tabMeetDate')?.value || selectedCalDate;
+        const time = document.getElementById('tabMeetTime')?.value || '2:00 PM EST';
+        const agenda = document.getElementById('tabMeetAgenda')?.value.trim();
+
+        const client = getActiveClient();
+        if (!client) {
+          showPortalToast('Please sign in to book a session.', 'alert-circle');
+          return;
+        }
+
+        // Add to calendarEvents
+        if (!client.calendarEvents) client.calendarEvents = {};
+        if (!client.calendarEvents[date]) client.calendarEvents[date] = [];
+        const meetingId = 'MEET-' + Date.now().toString(36);
+        client.calendarEvents[date].push({
+          id: meetingId,
+          title: `Strategy Session (${format})`,
+          type: 'Sync',
+          time: time,
+          desc: agenda || 'Scheduled directly from client meeting portal'
+        });
+
+        // Add to timeline
+        if (!client.timeline) client.timeline = [];
+        const displayDate = typeof formatDisplayDate === 'function' ? formatDisplayDate(date) : date;
+        client.timeline.unshift({
+          id: meetingId,
+          date: displayDate,
+          rawDate: date,
+          title: `📅 Rendez-vous : ${format}`,
+          description: `${time}${agenda ? ` — Ordre du jour : ${agenda}` : ''}`,
+          type: 'Meeting',
+          status: 'Scheduled'
+        });
+
+        const currentClients = loadClients();
+        const cIdx = currentClients.findIndex(c => c.id === client.id);
+        if (cIdx !== -1) {
+          currentClients[cIdx].calendarEvents = client.calendarEvents;
+          currentClients[cIdx].timeline = client.timeline;
+          saveClients(currentClients);
+        }
+
+        // Add to admin inquiries
+        try {
+          const currentInquiries = loadInquiries();
+          const now = new Date();
+          const day = String(now.getDate()).padStart(2, '0');
+          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const dateDisplay = `${day}/${month}/${now.getFullYear()}<br><span style="color: #64748b; font-weight: 500;">${hours}:${minutes}</span>`;
+
+          currentInquiries.unshift({
+            id: 'MEET-' + Date.now().toString(36).toUpperCase(),
+            createdAt: now.toISOString(),
+            dateDisplay: dateDisplay,
+            type: 'MEETING',
+            clientName: client.clientName || client.companyName || 'Client',
+            companyName: client.companyName || client.clientName || 'Client Workspace',
+            clientEmail: client.email || '—',
+            clientPhone: client.phone || '—',
+            services: [`Rendez-vous : ${format}`],
+            sector: client.servicesTier || 'WORKSPACE CLIENT',
+            notes: `📅 Rendez-vous prévu le ${displayDate} à ${time}.${agenda ? `\nOrdre du jour : ${agenda}` : ''}`,
+            status: 'Nouveau RDV'
+          });
+
+          saveInquiries(currentInquiries);
+          inquiries = currentInquiries;
+          if (typeof updateAdminKPIs === 'function') updateAdminKPIs();
+          if (typeof renderInquiriesTable === 'function') renderInquiriesTable();
+        } catch (err) {
+          console.error('Error saving meeting to admin inquiries:', err);
+        }
+
+        renderMeetingsList();
+        renderInteractiveCalendar();
+        updateTasksCounters();
+        showPortalToast(`Meeting booked for ${date} at ${time}! Admin notified.`);
+        if (document.getElementById('tabMeetAgenda')) document.getElementById('tabMeetAgenda').value = '';
+      });
+    }
+
     // Expose portal refresher for dynamic switching & account logins
     window._motaSwitchPortalTab = switchPortalSubView;
     window._motaRefreshPortal = function() {
       try {
         renderHomeTasksTable();
         renderInteractiveCalendar();
+        renderMeetingsList();
         renderIdeasList();
         renderVaultDocs();
         updateTasksCounters();

@@ -14,7 +14,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <link rel="stylesheet" href="styles.css?v=30">
+  <link rel="stylesheet" href="styles.css?v=31">
 </head>
 <body class="theme-dark">
 
@@ -494,6 +494,11 @@
               <span class="portal-menu-text">Documents</span>
               <span class="portal-menu-badge" id="miniDocsCount">0</span>
             </li>
+            <li class="portal-menu-item" data-portal-tab="meetings">
+              <span class="portal-menu-icon"><i data-lucide="video"></i></span>
+              <span class="portal-menu-text">Meetings</span>
+              <span class="portal-menu-badge" id="miniMeetingsCount">0</span>
+            </li>
           </ul>
         </div>
       </aside>
@@ -719,6 +724,107 @@
                   <!-- Populated via JS -->
                 </tbody>
               </table>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SUBVIEW 5: MEETINGS & STRATEGY SYNCS
+             =================================================================== -->
+        <section class="portal-subview" id="portalSubViewMeetings">
+          <div class="portal-white-card portal-meetings-page-card">
+            
+            <div class="view-header-row">
+              <div>
+                <h3 class="portal-card-title">1-on-1 Strategy Syncs & Meetings</h3>
+                <p class="portal-card-sub">Schedule dedicated growth reviews, creative brainstorms, or join your confirmed video calls.</p>
+              </div>
+            </div>
+
+            <div class="portal-meetings-grid-layout">
+              <!-- Left Column: Scheduler Card -->
+              <div class="portal-meeting-scheduler-box">
+                <div class="scheduler-box-header">
+                  <i data-lucide="calendar-plus"></i>
+                  <h4>Book a Strategy Call</h4>
+                </div>
+                <p class="scheduler-box-sub">Choose a session format and select your preferred date & time.</p>
+
+                <form id="meetingsTabBookingForm">
+                  <div class="form-group-block">
+                    <label class="block-label">SELECT SESSION FORMAT</label>
+                    <div class="meet-type-picker">
+                      <label class="meet-type-card active">
+                        <input type="radio" name="tabMeetType" value="15-min Sprint Sync" checked />
+                        <div class="type-icon-circle"><i data-lucide="zap"></i></div>
+                        <div class="type-text-meta">
+                          <strong>15-Min Sprint Sync</strong>
+                          <span>Urgent blockers, rapid reviews & decisions</span>
+                        </div>
+                      </label>
+                      <label class="meet-type-card">
+                        <input type="radio" name="tabMeetType" value="30-min Growth Review" />
+                        <div class="type-icon-circle"><i data-lucide="trending-up"></i></div>
+                        <div class="type-text-meta">
+                          <strong>30-Min Growth Review</strong>
+                          <span>Performance analytics & Meta ad scaling</span>
+                        </div>
+                      </label>
+                      <label class="meet-type-card">
+                        <input type="radio" name="tabMeetType" value="45-min Creative Strategy" />
+                        <div class="type-icon-circle"><i data-lucide="sparkles"></i></div>
+                        <div class="type-text-meta">
+                          <strong>45-Min Creative Strategy</strong>
+                          <span>New campaign launch & creative brainstorming</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="form-row-2col">
+                    <div class="form-group-block">
+                      <label for="tabMeetDate" class="block-label">PREFERRED DATE</label>
+                      <input type="date" id="tabMeetDate" class="portal-date-input" required />
+                    </div>
+                    <div class="form-group-block">
+                      <label for="tabMeetTime" class="block-label">TIME SLOT</label>
+                      <select id="tabMeetTime" class="portal-select-input">
+                        <option value="10:00 AM EST">10:00 AM EST</option>
+                        <option value="11:30 AM EST">11:30 AM EST</option>
+                        <option value="2:00 PM EST" selected>2:00 PM EST</option>
+                        <option value="3:30 PM EST">3:30 PM EST</option>
+                        <option value="4:30 PM EST">4:30 PM EST</option>
+                        <option value="6:00 PM EST">6:00 PM EST</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group-block">
+                    <label for="tabMeetAgenda" class="block-label">AGENDA / DISCUSSION TOPICS (OPTIONAL)</label>
+                    <textarea id="tabMeetAgenda" rows="2" class="portal-textarea-input" placeholder="e.g. Discuss Q4 TikTok content calendar and review new ad creative concepts..."></textarea>
+                  </div>
+
+                  <button type="submit" class="btn-portal-book-confirm">
+                    <i data-lucide="check"></i>
+                    <span>Confirm & Send to Admin</span>
+                  </button>
+                </form>
+              </div>
+
+              <!-- Right Column: Scheduled Meetings List -->
+              <div class="portal-meetings-list-box">
+                <div class="meetings-list-header">
+                  <div>
+                    <h4 class="box-title" style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0;">Scheduled Sessions</h4>
+                    <span class="box-sub" id="meetingsTabCountSub" style="font-size: 0.82rem; color: #64748b;">0 upcoming meetings</span>
+                  </div>
+                </div>
+
+                <div class="portal-scheduled-meetings-feed" id="portalScheduledMeetingsList">
+                  <!-- Dynamically rendered via JS -->
+                </div>
+              </div>
             </div>
 
           </div>
@@ -1298,6 +1404,10 @@
           <i data-lucide="calendar"></i>
           <span>Calendrier & Événements</span>
         </button>
+        <button class="editor-tab" data-tab="meetings">
+          <i data-lucide="video"></i>
+          <span>Rendez-vous</span>
+        </button>
         <button class="editor-tab" data-tab="ideas">
           <i data-lucide="lightbulb"></i>
           <span>Idées & Notes</span>
@@ -1371,7 +1481,56 @@
           </div>
         </div>
 
-        <!-- Tab 2: Ideas & Notes Bank -->
+        <!-- Tab 2: Meetings & Strategy Syncs -->
+        <div class="editor-pane" id="paneMeetings">
+          <div class="admin-quick-add-box" style="margin-bottom: 1.5rem;">
+            <h4>Planifier ou Confirmer un Rendez-vous avec le Client</h4>
+            <div class="form-row-grid" style="margin-top: 0.8rem;">
+              <div class="field-wrap">
+                <label for="adminMeetTitle">Titre de la Session *</label>
+                <input type="text" id="adminMeetTitle" placeholder="ex: Revue Stratégique Q4 & Ads Scaling">
+              </div>
+              <div class="field-wrap">
+                <label for="adminMeetType">Format de Session</label>
+                <select id="adminMeetType">
+                  <option value="15-min Sprint Sync">15-Min Sprint Sync</option>
+                  <option value="30-min Growth Review" selected>30-Min Growth Review</option>
+                  <option value="45-min Creative Strategy">45-Min Creative Strategy</option>
+                  <option value="Stratégie Trimestrielle">Stratégie Trimestrielle</option>
+                </select>
+              </div>
+              <div class="field-wrap">
+                <label for="adminMeetDate">Date du Rendez-vous *</label>
+                <input type="date" id="adminMeetDate">
+              </div>
+              <div class="field-wrap">
+                <label for="adminMeetTime">Créneau Horaire</label>
+                <input type="text" id="adminMeetTime" placeholder="ex: 14:30 (Paris / UTC+1)">
+              </div>
+              <div class="field-wrap full-span">
+                <label for="adminMeetLink">Lien Google Meet / Vidéo (Optionnel)</label>
+                <input type="url" id="adminMeetLink" placeholder="ex: https://meet.google.com/abc-defg-hij">
+              </div>
+              <div class="field-wrap full-span">
+                <label for="adminMeetAgenda">Ordre du jour & Instructions</label>
+                <textarea id="adminMeetAgenda" rows="2" placeholder="Objectifs de la session, livrables à examiner..."></textarea>
+              </div>
+            </div>
+            <button type="button" class="btn-blue-pill btn-small" id="saveAdminMeetBtn" style="margin-top: 0.8rem;">
+              <i data-lucide="plus"></i>
+              <span>Ajouter le Rendez-vous</span>
+            </button>
+          </div>
+
+          <div class="pane-action-bar">
+            <h4>Rendez-vous Planifiés pour ce Client</h4>
+          </div>
+          <div class="editor-items-list" id="editorMeetingsList">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Ideas & Notes Bank -->
         <div class="editor-pane" id="paneIdeas">
           <div class="admin-quick-add-box" style="margin-bottom: 1.5rem;">
             <h4>Ajouter une Nouvelle Proposition ou Note Stratégique</h4>
@@ -1546,6 +1705,6 @@
   </div>
 
   <!-- Scripts -->
-  <script src="app.js?v=30"></script>
+  <script src="app.js?v=31"></script>
 </body>
 </html>
