@@ -1177,11 +1177,9 @@ function initMotaGrowthApp() {
         const id = btn.getAttribute('data-id');
         const target = (client.ideas || []).find(i => i.id === id);
         if (target) {
-          if (confirm(`Are you sure you want to decline the proposal "${target.title}"?`)) {
-            target.status = 'Denied';
-            saveClients(clients);
-            renderClientDashboard(client);
-          }
+          target.status = 'Denied';
+          saveClients(clients);
+          renderClientDashboard(client);
         }
       };
     });
@@ -1722,38 +1720,36 @@ function initMotaGrowthApp() {
         const meetId = btn.getAttribute('data-meet-id');
         if (!clientId || !meetId) return;
 
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')) {
-          const client = clients.find(c => c.id === clientId);
-          if (client) {
-            const meetingItem = (client.timeline || []).find(t => t.id === meetId);
-            const meetDate = meetingItem ? (meetingItem.rawDate || meetingItem.date) : '';
+        const client = clients.find(c => c.id === clientId);
+        if (client) {
+          const meetingItem = (client.timeline || []).find(t => t.id === meetId);
+          const meetDate = meetingItem ? (meetingItem.rawDate || meetingItem.date) : '';
 
-            client.timeline = (client.timeline || []).filter(t => t.id !== meetId);
-            if (client.calendarEvents) {
-              Object.keys(client.calendarEvents).forEach(d => {
-                client.calendarEvents[d] = (client.calendarEvents[d] || []).filter(ev => {
-                  if (ev.id === meetId) return false;
-                  if (meetDate && d === meetDate && (ev.type === 'Sync' || (ev.title && (ev.title.includes('Strategy Session') || ev.title.includes('Rendez-vous'))))) return false;
-                  return true;
-                });
+          client.timeline = (client.timeline || []).filter(t => t.id !== meetId);
+          if (client.calendarEvents) {
+            Object.keys(client.calendarEvents).forEach(d => {
+              client.calendarEvents[d] = (client.calendarEvents[d] || []).filter(ev => {
+                if (ev.id === meetId) return false;
+                if (meetDate && d === meetDate && (ev.type === 'Sync' || (ev.title && (ev.title.includes('Strategy Session') || ev.title.includes('Rendez-vous'))))) return false;
+                return true;
               });
-            }
-
-            // Also clean from inquiries
-            inquiries = inquiries.filter(inq => {
-              if (inq.type === 'MEETING') {
-                const matches = (inq.clientEmail && client.email && inq.clientEmail.toLowerCase() === client.email.toLowerCase()) ||
-                                (inq.companyName && client.companyName && inq.companyName.toLowerCase() === client.companyName.toLowerCase());
-                if (matches && meetDate && inq.notes && inq.notes.includes(meetDate)) return false;
-                if (inq.id === meetId || inq.id.toLowerCase() === meetId.toLowerCase()) return false;
-              }
-              return true;
             });
-            saveInquiries(inquiries);
-
-            saveClients(clients);
-            renderAdminPortal();
           }
+
+          // Also clean from inquiries
+          inquiries = inquiries.filter(inq => {
+            if (inq.type === 'MEETING') {
+              const matches = (inq.clientEmail && client.email && inq.clientEmail.toLowerCase() === client.email.toLowerCase()) ||
+                              (inq.companyName && client.companyName && inq.companyName.toLowerCase() === client.companyName.toLowerCase());
+              if (matches && meetDate && inq.notes && inq.notes.includes(meetDate)) return false;
+              if (inq.id === meetId || inq.id.toLowerCase() === meetId.toLowerCase()) return false;
+            }
+            return true;
+          });
+          saveInquiries(inquiries);
+
+          saveClients(clients);
+          renderAdminPortal();
         }
       });
     });
@@ -1864,7 +1860,6 @@ function initMotaGrowthApp() {
         e.stopPropagation();
         const id = btn.getAttribute('data-id');
         if (!id) return;
-        if (!confirm('Supprimer ce compte client ?')) return;
         clients = loadClients().filter(c => c.id !== id);
         saveClients(clients);
         renderAdminPortal();
@@ -2545,11 +2540,9 @@ function initMotaGrowthApp() {
     clearPremadeIdeasBtn.addEventListener('click', () => {
       const client = clients.find(c => c.id === activeEditingClientId);
       if (!client) return;
-      if (confirm('Voulez-vous supprimer toutes les idées et propositions pour ce client ?')) {
-        client.ideas = [];
-        saveClients(clients);
-        renderAdminIdeasList(client);
-      }
+      client.ideas = [];
+      saveClients(clients);
+      renderAdminIdeasList(client);
     });
   }
 
@@ -2832,17 +2825,17 @@ function initMotaGrowthApp() {
   function loadInquiries() {
     try {
       const data = localStorage.getItem(STORAGE_INQUIRIES);
-      if (data) {
+      if (data !== null) {
         const parsed = JSON.parse(data);
-        const hasLegacy = Array.isArray(parsed) && parsed.some(item => 
-          item.companyName === 'Orsap' || 
-          item.companyName === 'ORSAP' || 
-          (item.sector && item.sector.includes('BTP')) || 
-          (item.services && JSON.stringify(item.services).includes('PROTECTION')) ||
-          item.type === 'PARTICULIER'
-        );
-        if (Array.isArray(parsed) && parsed.length > 0 && !hasLegacy) {
-          return parsed;
+        if (Array.isArray(parsed)) {
+          return parsed.filter(item => 
+            item &&
+            item.companyName !== 'Orsap' && 
+            item.companyName !== 'ORSAP' && 
+            !(item.sector && item.sector.includes('BTP')) && 
+            !(item.services && JSON.stringify(item.services).includes('PROTECTION')) &&
+            item.type !== 'PARTICULIER'
+          );
         }
       }
     } catch (e) { console.error(e); }
@@ -2859,9 +2852,14 @@ function initMotaGrowthApp() {
   function loadClients() {
     try {
       const data = localStorage.getItem(STORAGE_CLIENTS);
-      if (data) return JSON.parse(data);
+      if (data !== null) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch (e) { console.error(e); }
-    return getSeedClients();
+    const seeds = getSeedClients();
+    saveClients(seeds);
+    return seeds;
   }
 
   function saveClients(arr) {
