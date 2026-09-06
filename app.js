@@ -6,18 +6,51 @@
  * 4. Private Agency Admin CRM (Leads, Client Account Creator, Workspace Manager)
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+function initMotaGrowthApp() {
   // Initialize Icons
   if (window.lucide) window.lucide.createIcons();
 
   // Storage Keys
   const STORAGE_INQUIRIES = 'motagrowth_v6_inquiries_db';
   const STORAGE_CLIENTS = 'motagrowth_v6_clients_db';
+  const STORAGE_ACTIVE_CLIENT_SESSION = 'motagrowth_active_client_session_v1';
+
+  function saveActiveSession(client) {
+    try {
+      if (client && client.id) {
+        sessionStorage.setItem(STORAGE_ACTIVE_CLIENT_SESSION, client.id);
+        localStorage.setItem(STORAGE_ACTIVE_CLIENT_SESSION, client.id);
+        sessionStorage.setItem('motagrowth_active_client_obj', JSON.stringify(client));
+        localStorage.setItem('motagrowth_active_client_obj', JSON.stringify(client));
+      } else {
+        sessionStorage.removeItem(STORAGE_ACTIVE_CLIENT_SESSION);
+        localStorage.removeItem(STORAGE_ACTIVE_CLIENT_SESSION);
+        sessionStorage.removeItem('motagrowth_active_client_obj');
+        localStorage.removeItem('motagrowth_active_client_obj');
+      }
+    } catch (e) {}
+  }
+
+  function getActiveSessionClient() {
+    try {
+      const activeId = sessionStorage.getItem(STORAGE_ACTIVE_CLIENT_SESSION) || localStorage.getItem(STORAGE_ACTIVE_CLIENT_SESSION);
+      const allClients = loadClients();
+      if (activeId && Array.isArray(allClients)) {
+        const found = allClients.find(c => c.id === activeId);
+        if (found) return found;
+      }
+      const rawObj = sessionStorage.getItem('motagrowth_active_client_obj') || localStorage.getItem('motagrowth_active_client_obj');
+      if (rawObj) {
+        return JSON.parse(rawObj);
+      }
+    } catch (e) {}
+    return null;
+  }
 
   // Load Initial State
   let inquiries = loadInquiries();
   let clients = loadClients();
-  let loggedInClient = null;
+  let loggedInClient = getActiveSessionClient();
   let activeEditingClientId = null;
   let currentWizardStep = 1;
   let activeClientTab = 'home';
@@ -25,11 +58,18 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeCalendarPlatform = 'all';
   let activeIdeasFilter = 'all';
   let activeDetailIdeaId = null;
+  let isClientPortalInitialized = false;
 
   // DOM Elements - Views
   const landingView = document.getElementById('landingView');
+  const clientSignInView = document.getElementById('clientSignInView');
   const clientPortalView = document.getElementById('clientPortalView');
   const adminPortalView = document.getElementById('adminPortalView');
+  const clientSignInForm = document.getElementById('clientSignInForm');
+  const clientSignInUsername = document.getElementById('clientSignInUsername');
+  const clientSignInPassword = document.getElementById('clientSignInPassword');
+  const clientSignInError = document.getElementById('clientSignInError');
+  const clientSignInHomeLink = document.getElementById('clientSignInHomeLink');
 
   // DOM Elements - Hero & Motion Animation
   const getInTouchBtn = document.getElementById('getInTouchBtn');
@@ -105,11 +145,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
 
   function handleRoute() {
-    const hash = window.location.hash.toLowerCase();
+    const hash = (window.location.hash || '').toLowerCase();
+    const href = (window.location.href || '').toLowerCase();
 
-    if (hash === '#admin') {
+    if (hash === '#admin' || href.includes('#admin')) {
       showAdminView();
-    } else if (hash === '#client-space') {
+    } else if (hash === '#client-space' || href.includes('#client-space')) {
       showClientSpaceView();
     } else {
       showLandingView();
@@ -120,8 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('is-admin-route');
     document.body.classList.remove('is-client-route');
     landingView.style.display = 'flex';
-    clientPortalView.style.display = 'none';
-    adminPortalView.style.display = 'none';
+    if (clientSignInView) clientSignInView.style.display = 'none';
+    if (clientPortalView) clientPortalView.style.display = 'none';
+    if (adminPortalView) adminPortalView.style.display = 'none';
     if (window.lucide) window.lucide.createIcons();
   }
 
@@ -129,10 +171,58 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('is-admin-route');
     document.body.classList.add('is-client-route');
     landingView.style.display = 'none';
-    adminPortalView.style.display = 'none';
-    clientPortalView.style.display = 'block';
+    if (adminPortalView) adminPortalView.style.display = 'none';
 
-    initMotaGrowthClientSpace();
+    // Synchronize session state from storage if not in memory
+    if (!loggedInClient) {
+      loggedInClient = getActiveSessionClient();
+    }
+
+    // Gate Client Portal behind Sign In
+    if (!loggedInClient) {
+      if (clientPortalView) clientPortalView.style.display = 'none';
+      if (clientSignInView) {
+        clientSignInView.style.display = 'flex';
+        if (clientSignInError) {
+          clientSignInError.style.display = 'none';
+          clientSignInError.textContent = '';
+        }
+      }
+    } else {
+      if (clientSignInView) clientSignInView.style.display = 'none';
+      if (clientPortalView) clientPortalView.style.display = 'block';
+
+      // Inject Active Client Details into header / dropdown / avatars
+      const clientNameEl = document.getElementById('portalHeroUserName');
+      if (clientNameEl) clientNameEl.textContent = loggedInClient.companyName || loggedInClient.clientName || 'Client';
+
+      const dropdownName = document.getElementById('dropdownClientName');
+      if (dropdownName) dropdownName.textContent = loggedInClient.companyName || loggedInClient.clientName || 'Client';
+
+      const dropdownEmail = document.getElementById('dropdownClientEmail');
+      if (dropdownEmail) dropdownEmail.textContent = loggedInClient.email || '';
+
+      const nameToInit = loggedInClient.companyName || loggedInClient.clientName || 'Client';
+      const initials = nameToInit.substring(0, 2).toUpperCase();
+      
+      const portalAvatarBtn = document.getElementById('portalUserAvatarBtn');
+      const dropdownAvatar = document.querySelector('.profile-dropdown-avatar');
+
+      if (loggedInClient.logo) {
+        if (portalAvatarBtn) portalAvatarBtn.innerHTML = `<img src="${loggedInClient.logo}" class="portal-header-avatar-img" alt="${escapeHtml(nameToInit)}" />`;
+        if (dropdownAvatar) dropdownAvatar.innerHTML = `<img src="${loggedInClient.logo}" class="portal-header-avatar-img" alt="${escapeHtml(nameToInit)}" />`;
+      } else {
+        if (portalAvatarBtn) portalAvatarBtn.innerHTML = `<span class="portal-avatar-inner-text">${initials}</span>`;
+        if (dropdownAvatar) dropdownAvatar.innerHTML = initials;
+      }
+
+      // Initialize portal engine and refresh current views
+      initMotaGrowthClientSpace();
+      if (typeof window._motaRefreshPortal === 'function') {
+        window._motaRefreshPortal();
+      }
+    }
+
     if (window.lucide) window.lucide.createIcons();
   }
 
@@ -140,8 +230,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('is-client-route');
     document.body.classList.add('is-admin-route');
     landingView.style.display = 'none';
-    clientPortalView.style.display = 'none';
-    adminPortalView.style.display = 'block';
+    if (clientSignInView) clientSignInView.style.display = 'none';
+    if (clientPortalView) clientPortalView.style.display = 'none';
+    if (adminPortalView) adminPortalView.style.display = 'block';
     renderAdminPortal();
     if (window.lucide) window.lucide.createIcons();
   }
@@ -157,12 +248,144 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const adminLogoHomeLink = document.getElementById('adminLogoHomeLink');
+  if (adminLogoHomeLink) {
+    adminLogoHomeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.hash = '';
+      showLandingView();
+    });
+  }
+
   const portalHomeLink = document.getElementById('portalHomeLink');
   if (portalHomeLink) {
     portalHomeLink.addEventListener('click', (e) => {
       e.preventDefault();
       window.location.hash = '';
       showLandingView();
+    });
+  }
+
+  if (clientSignInHomeLink) {
+    clientSignInHomeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.hash = '';
+      showLandingView();
+    });
+  }
+
+  // Handle Client Sign In Form Submission
+  if (clientSignInForm) {
+    clientSignInForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (clientSignInError) {
+        clientSignInError.style.display = 'none';
+        clientSignInError.textContent = '';
+      }
+
+      const enteredUsername = (clientSignInUsername?.value || '').trim().toLowerCase();
+      const enteredPassword = (clientSignInPassword?.value || '').trim();
+
+      // Retrieve latest client list (includes newly admin-created clients)
+      const currentClients = loadClients();
+
+      const foundClient = currentClients.find(c => {
+        const u = (c.username || '').toLowerCase().trim();
+        const em = (c.email || '').toLowerCase().trim();
+        const comp = (c.companyName || '').toLowerCase().trim();
+        const name = (c.clientName || '').toLowerCase().trim();
+        const pass = (c.password || '').trim();
+
+        const matchesUser = Boolean(
+          enteredUsername && (
+            u === enteredUsername ||
+            em === enteredUsername ||
+            comp === enteredUsername ||
+            name === enteredUsername ||
+            em.split('@')[0] === enteredUsername
+          )
+        );
+        const matchesPass = (pass === enteredPassword);
+        return matchesUser && matchesPass;
+      });
+
+      if (foundClient) {
+        loggedInClient = foundClient;
+        saveActiveSession(foundClient);
+        clientSignInForm.reset();
+        showClientSpaceView();
+        window.location.hash = '#client-space';
+      } else {
+        if (clientSignInError) {
+          clientSignInError.textContent = 'Nom d\'utilisateur, email ou mot de passe incorrect.';
+          clientSignInError.style.display = 'block';
+        }
+      }
+    });
+  }
+
+  // User Profile Dropdown & Sign Out Handler
+  const portalAvatarBtn = document.getElementById('portalUserAvatarBtn');
+  const portalProfileDropdown = document.getElementById('portalProfileDropdown');
+  const portalSignOutBtn = document.getElementById('portalSignOutBtn');
+
+  if (portalAvatarBtn && portalProfileDropdown) {
+    portalAvatarBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = portalProfileDropdown.style.display === 'block';
+      portalProfileDropdown.style.display = isVisible ? 'none' : 'block';
+      portalAvatarBtn.classList.toggle('is-active', !isVisible);
+      portalAvatarBtn.setAttribute('aria-expanded', !isVisible ? 'true' : 'false');
+      if (window.lucide) window.lucide.createIcons();
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!portalAvatarBtn.contains(e.target) && !portalProfileDropdown.contains(e.target)) {
+        portalProfileDropdown.style.display = 'none';
+        portalAvatarBtn.classList.remove('is-active');
+        portalAvatarBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  if (portalSignOutBtn) {
+    portalSignOutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      loggedInClient = null;
+      saveActiveSession(null);
+      if (portalProfileDropdown) portalProfileDropdown.style.display = 'none';
+      if (portalAvatarBtn) portalAvatarBtn.classList.remove('is-active');
+      showLandingView();
+      window.location.hash = '';
+      
+      // Toast confirmation
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 0.85rem 1.3rem;
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        z-index: 999999;
+        animation: fadeIn 0.3s ease;
+      `;
+      toast.innerHTML = `<i data-lucide="log-out" style="width: 16px; height: 16px; color: #38bdf8;"></i> <span>Signed out successfully</span>`;
+      document.body.appendChild(toast);
+      if (window.lucide) window.lucide.createIcons();
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.4s ease';
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
     });
   }
 
@@ -1125,7 +1348,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 5. PRIVATE ADMIN CRM & CLIENT WORKSPACE MANAGEMENT (ORSAP THEME)
+  // 5. PRIVATE ADMIN CRM & CLIENT WORKSPACE MANAGEMENT
   // =========================================================================
 
   function renderAdminPortal() {
@@ -1135,15 +1358,31 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateAdminKPIs() {
-    const total = inquiries.length;
+    const totalInquiries = inquiries.length;
+    const totalClients = clients.length;
+    const totalApprovals = clients.reduce((sum, c) => sum + (c.approvals || []).length, 0);
+    const totalIdeas = clients.reduce((sum, c) => sum + (c.ideas || []).length, 0);
+
     const countBadge = document.getElementById('tabLeadCountBadge');
-    if (countBadge) countBadge.textContent = total;
+    if (countBadge) countBadge.textContent = totalInquiries;
 
     const inquiriesTitle = document.getElementById('inquiriesCardTitle');
-    if (inquiriesTitle) inquiriesTitle.textContent = `Demandes de Devis Reçues (${total})`;
+    if (inquiriesTitle) inquiriesTitle.textContent = `Demandes de Devis Reçues (${totalInquiries})`;
 
     const clientBadge = document.getElementById('tabClientCountBadge');
-    if (clientBadge) clientBadge.textContent = clients.length;
+    if (clientBadge) clientBadge.textContent = totalClients;
+
+    const kpiInq = document.getElementById('kpiTotalInquiries');
+    if (kpiInq) kpiInq.textContent = totalInquiries;
+
+    const kpiCli = document.getElementById('kpiTotalClients');
+    if (kpiCli) kpiCli.textContent = totalClients;
+
+    const kpiApp = document.getElementById('kpiTotalApprovals');
+    if (kpiApp) kpiApp.textContent = totalApprovals;
+
+    const kpiIde = document.getElementById('kpiTotalIdeas');
+    if (kpiIde) kpiIde.textContent = totalIdeas;
   }
 
   function formatDateTime(isoString) {
@@ -1156,7 +1395,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const year = d.getFullYear();
       const hours = String(d.getHours()).padStart(2, '0');
       const minutes = String(d.getMinutes()).padStart(2, '0');
-      return `${day}/${month}/${year}<br>${hours}:${minutes}`;
+      return `<div class="date-stamp">${day}/${month}/${year}<br><span style="color: #64748b; font-weight: 500;">${hours}:${minutes}</span></div>`;
     } catch (e) {
       return isoString;
     }
@@ -1188,8 +1427,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inquiriesEmptyState) inquiriesEmptyState.style.display = 'none';
 
     inquiriesTableBody.innerHTML = filtered.map(item => {
-      const typeClass = (item.type || 'PRO').toUpperCase() === 'PRO' ? 'pro' : 'particulier';
+      const typeClass = (item.type || 'PRO').toUpperCase() === 'PRO' ? 'pro' : 
+                        (item.type || '').toUpperCase() === 'ENTERPRISE' ? 'enterprise' :
+                        (item.type || '').toUpperCase() === 'STARTUP' ? 'startup' : 'particulier';
       const typeLabel = (item.type || 'PRO').toUpperCase();
+
+      const initials = ((item.clientName || item.companyName || 'Lead').substring(0, 2)).toUpperCase();
 
       const servicesHtml = (item.services && item.services.length > 0)
         ? item.services.map(s => `<span class="solution-tag">${escapeHtml(s.toUpperCase())}</span>`).join('')
@@ -1200,47 +1443,89 @@ document.addEventListener('DOMContentLoaded', () => {
         : '—';
 
       const emailHtml = (item.clientEmail && item.clientEmail !== '—')
-        ? `<a href="mailto:${escapeHtml(item.clientEmail)}" class="tbl-link">${escapeHtml(item.clientEmail)}</a>`
+        ? `<a href="mailto:${escapeHtml(item.clientEmail)}" class="tbl-link" title="Envoyer un email"><i data-lucide="mail" style="width:13px;height:13px;"></i> ${escapeHtml(item.clientEmail)}</a>`
         : '—';
 
       const phoneHtml = (item.clientPhone && item.clientPhone !== '—')
-        ? `<a href="tel:${escapeHtml(item.clientPhone)}" class="tbl-link">${escapeHtml(item.clientPhone)}</a>`
-        : '—';
+        ? `<a href="tel:${escapeHtml(item.clientPhone)}" class="tbl-link" title="Appeler"><i data-lucide="phone" style="width:13px;height:13px;"></i> ${escapeHtml(item.clientPhone)}</a>`
+        : '';
 
       const messageHtml = (item.notes && item.notes !== '—')
         ? escapeHtml(item.notes)
         : '—';
 
-      const dateHtml = item.dateDisplay || formatDateTime(item.createdAt);
+      const dateHtml = item.dateDisplay ? `<div class="date-stamp">${item.dateDisplay}</div>` : formatDateTime(item.createdAt);
 
       return `
         <tr>
-          <td><div class="date-stamp">${dateHtml}</div></td>
+          <td>${dateHtml}</td>
           <td><span class="type-chip ${typeClass}">${typeLabel}</span></td>
-          <td><span class="tbl-name">${escapeHtml(item.clientName || '—')}</span></td>
-          <td>${escapeHtml(item.companyName || '—')}</td>
-          <td>${emailHtml}</td>
-          <td>${phoneHtml}</td>
+          <td>
+            <div class="client-lead-meta">
+              <div class="client-lead-avatar">${initials}</div>
+              <div>
+                <span class="tbl-name">${escapeHtml(item.clientName || '—')}</span>
+                <span class="tbl-company">${escapeHtml(item.companyName || '—')}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="contact-links-box">
+              ${emailHtml}
+              ${phoneHtml}
+            </div>
+          </td>
           <td>${servicesHtml}</td>
           <td>${sectorHtml}</td>
-          <td><div class="tbl-message">${messageHtml}</div></td>
+          <td><div class="tbl-message" title="${escapeHtml(item.notes || '')}">${messageHtml}</div></td>
           <td>
-            <button class="btn-delete-row delete-inquiry-btn" data-id="${item.id}" title="Supprimer la demande">
-              Supprimer
-            </button>
+            <div class="tbl-actions-wrap">
+              <button class="btn-convert-lead convert-lead-btn" data-name="${escapeHtml(item.clientName || '')}" data-company="${escapeHtml(item.companyName || '')}" data-email="${escapeHtml(item.clientEmail || '')}" data-service="${escapeHtml((item.services || [])[0] || 'Full-Service Growth Package')}" title="Créer un compte client à partir de ce devis">
+                <i data-lucide="user-plus" style="width:13px;height:13px;"></i>
+                <span>Créer Compte</span>
+              </button>
+              <button class="btn-delete-row delete-inquiry-btn" data-id="${item.id}" title="Supprimer la demande">
+                <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+              </button>
+            </div>
           </td>
         </tr>
       `;
     }).join('');
 
     inquiriesTableBody.querySelectorAll('.delete-inquiry-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const id = btn.getAttribute('data-id');
-        if (confirm('Êtes-vous sûr de vouloir supprimer cette demande ?')) {
-          inquiries = inquiries.filter(i => i.id !== id);
-          saveInquiries(inquiries);
-          renderAdminPortal();
+        if (!id) return;
+        inquiries = inquiries.filter(i => i.id !== id);
+        saveInquiries(inquiries);
+        renderAdminPortal();
+      });
+    });
+
+    inquiriesTableBody.querySelectorAll('.convert-lead-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const name = btn.getAttribute('data-name') || '';
+        const company = btn.getAttribute('data-company') || '';
+        const email = btn.getAttribute('data-email') || '';
+        const service = btn.getAttribute('data-service') || '';
+
+        if (document.getElementById('newClientName')) document.getElementById('newClientName').value = name;
+        if (document.getElementById('newClientCompany')) document.getElementById('newClientCompany').value = company;
+        if (document.getElementById('newClientEmail')) document.getElementById('newClientEmail').value = email;
+        if (document.getElementById('newClientUsername')) {
+          document.getElementById('newClientUsername').value = (company || name || 'client').toLowerCase().replace(/[^a-z0-9]/g, '');
         }
+        if (document.getElementById('newClientServices') && service) {
+          document.getElementById('newClientServices').value = service;
+        }
+        
+        createClientModal.style.display = 'flex';
+        if (window.lucide) window.lucide.createIcons();
       });
     });
 
@@ -1248,55 +1533,112 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderClientsGrid() {
-    adminClientsGrid.innerHTML = clients.map(c => `
-      <div class="admin-client-card">
-        <div class="client-card-top">
-          <div class="client-card-title">
-            <h3>${escapeHtml(c.companyName)}</h3>
-            <span>${escapeHtml(c.clientName)}</span>
+    if (!clients || clients.length === 0) {
+      adminClientsGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1; color: #64748b;">
+          <i data-lucide="users" style="width: 36px; height: 36px; color: #0088ff; margin-bottom: 0.75rem; opacity: 0.6;"></i>
+          <h4 style="font-size: 1.05rem; color: #0f172a; margin-bottom: 0.35rem;">Aucun compte client</h4>
+          <p style="font-size: 0.85rem; margin-bottom: 1rem;">Créez un nouveau workspace client pour commencer.</p>
+          <button type="button" class="btn-blue-pill btn-small" id="emptyStateAddClientBtn">
+            <i data-lucide="plus"></i>
+            <span>Créer un Compte Client</span>
+          </button>
+        </div>
+      `;
+      document.getElementById('emptyStateAddClientBtn')?.addEventListener('click', () => {
+        createClientModal.style.display = 'flex';
+        if (window.lucide) window.lucide.createIcons();
+      });
+      if (window.lucide) window.lucide.createIcons();
+      return;
+    }
+
+    adminClientsGrid.innerHTML = clients.map(c => {
+      const initials = ((c.companyName || c.clientName || 'CL').substring(0, 2)).toUpperCase();
+      const statusClass = (c.status || 'Active').toLowerCase();
+      const hasLogo = Boolean(c.logo);
+      const avatarInner = hasLogo
+        ? `<img src="${c.logo}" class="client-card-logo-img" alt="${escapeHtml(c.companyName)}" />`
+        : initials;
+
+      return `
+        <div class="admin-client-card" id="clientCard-${c.id}">
+          <div class="client-card-top">
+            <div class="client-card-identity">
+              <div class="client-card-avatar ${hasLogo ? 'has-logo-img' : ''}">${avatarInner}</div>
+              <div class="client-card-title">
+                <h3>${escapeHtml(c.companyName)}</h3>
+                <span>${escapeHtml(c.clientName)}</span>
+              </div>
+            </div>
+            <span class="status-badge-pill ${statusClass}">${escapeHtml(c.status || 'Active')}</span>
           </div>
-          <span class="status-tag approved">${escapeHtml(c.status || 'Active')}</span>
-        </div>
 
-        <div class="client-meta-box">
-          <div><strong style="color: var(--text-white);">Login Email:</strong> ${escapeHtml(c.email)}</div>
-          <div><strong style="color: var(--text-white);">Password:</strong> <code>${escapeHtml(c.password)}</code></div>
-          <div><strong style="color: var(--text-white);">Service Tier:</strong> ${escapeHtml(c.servicesTier)}</div>
-        </div>
+          <div class="client-meta-box">
+            <div><strong>Email :</strong> ${escapeHtml(c.email)}</div>
+            <div><strong>Nom d'utilisateur :</strong> <code>${escapeHtml(c.username || c.email)}</code></div>
+            <div><strong>Mot de passe :</strong> <code>${escapeHtml(c.password)}</code></div>
+            <div><span class="client-service-chip">${escapeHtml(c.servicesTier || 'Full-Service Growth')}</span></div>
+          </div>
 
-        <div class="client-stats-badges">
-          <span class="stat-chip">${(c.approvals || []).length} Approvals</span>
-          <span class="stat-chip">${(c.timeline || []).length} Milestones</span>
-          <span class="stat-chip">${(c.ideas || []).length} Ideas</span>
-        </div>
+          <div class="client-stats-badges">
+            <span class="stat-chip"><i data-lucide="check-square" style="width:13px;height:13px;color:#0088ff;"></i> ${(c.approvals || []).length} Approbations</span>
+            <span class="stat-chip"><i data-lucide="calendar" style="width:13px;height:13px;color:#7e22ce;"></i> ${(c.timeline || []).length} Échéances</span>
+            <span class="stat-chip"><i data-lucide="lightbulb" style="width:13px;height:13px;color:#d97706;"></i> ${(c.ideas || []).length} Idées</span>
+          </div>
 
-        <div class="client-card-actions">
-          <button class="btn-gold-pill btn-small manage-client-btn" data-id="${c.id}">
-            <i data-lucide="sliders"></i>
-            <span>Manage Workspace</span>
-          </button>
-          <button class="btn-ghost-small delete-client-btn" data-id="${c.id}" title="Delete Client">
-            <i data-lucide="trash-2"></i>
-          </button>
+          <div class="client-card-actions">
+            <button type="button" class="btn-blue-pill btn-small manage-client-btn" data-id="${c.id}">
+              <i data-lucide="sliders" style="width:14px;height:14px;"></i>
+              <span>Gérer Workspace</span>
+            </button>
+            <button type="button" class="btn-test-client test-client-login-btn" data-id="${c.id}" title="Se connecter directement dans l'Espace Client pour tester">
+              <i data-lucide="log-in" style="width:14px;height:14px;"></i>
+              <span>Tester Accès</span>
+            </button>
+            <button type="button" class="btn-delete-row delete-client-btn" data-id="${c.id}" title="Supprimer ce client">
+              <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+            </button>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     adminClientsGrid.querySelectorAll('.manage-client-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const id = btn.getAttribute('data-id');
         openManageClientModal(id);
       });
     });
 
-    adminClientsGrid.querySelectorAll('.delete-client-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+    adminClientsGrid.querySelectorAll('.test-client-login-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const id = btn.getAttribute('data-id');
-        if (confirm('Are you sure you want to delete this client workspace account?')) {
-          clients = clients.filter(c => c.id !== id);
-          saveClients(clients);
-          renderAdminPortal();
+        const currentClients = loadClients();
+        const client = currentClients.find(c => c.id === id);
+        if (client) {
+          loggedInClient = client;
+          saveActiveSession(client);
+          showClientSpaceView();
+          window.location.hash = '#client-space';
         }
+      });
+    });
+
+    adminClientsGrid.querySelectorAll('.delete-client-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        if (!id) return;
+        if (!confirm('Supprimer ce compte client ?')) return;
+        clients = loadClients().filter(c => c.id !== id);
+        saveClients(clients);
+        renderAdminPortal();
       });
     });
 
@@ -1345,7 +1687,51 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Create Client Modal
+  let newClientLogoDataUrl = '';
+
+  const newClientLogoInput = document.getElementById('newClientLogoInput');
+  const newClientLogoImg = document.getElementById('newClientLogoImg');
+  const newClientLogoDefaultIcon = document.getElementById('newClientLogoDefaultIcon');
+  const removeNewClientLogoBtn = document.getElementById('removeNewClientLogoBtn');
+
+  function resetNewClientLogoPreview() {
+    newClientLogoDataUrl = '';
+    if (newClientLogoInput) newClientLogoInput.value = '';
+    if (newClientLogoImg) {
+      newClientLogoImg.src = '';
+      newClientLogoImg.style.display = 'none';
+    }
+    if (newClientLogoDefaultIcon) newClientLogoDefaultIcon.style.display = 'block';
+    if (removeNewClientLogoBtn) removeNewClientLogoBtn.style.display = 'none';
+  }
+
+  if (newClientLogoInput) {
+    newClientLogoInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        newClientLogoDataUrl = evt.target.result;
+        if (newClientLogoImg) {
+          newClientLogoImg.src = newClientLogoDataUrl;
+          newClientLogoImg.style.display = 'block';
+        }
+        if (newClientLogoDefaultIcon) newClientLogoDefaultIcon.style.display = 'none';
+        if (removeNewClientLogoBtn) removeNewClientLogoBtn.style.display = 'inline-flex';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (removeNewClientLogoBtn) {
+    removeNewClientLogoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      resetNewClientLogoPreview();
+    });
+  }
+
   openNewClientModalBtn.addEventListener('click', () => {
+    resetNewClientLogoPreview();
     createClientModal.style.display = 'flex';
   });
   closeCreateClientBtn.addEventListener('click', () => createClientModal.style.display = 'none');
@@ -1353,32 +1739,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
   createClientForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    const rawUsername = (document.getElementById('newClientUsername')?.value || '').trim();
+    const emailVal = document.getElementById('newClientEmail').value.trim();
+    const companyVal = document.getElementById('newClientCompany').value.trim();
+    const usernameVal = rawUsername || emailVal.split('@')[0].toLowerCase() || emailVal.toLowerCase();
+
     const newClient = {
       id: 'CLI-' + Math.random().toString(36).substring(2, 7).toUpperCase(),
       createdAt: new Date().toISOString(),
       clientName: document.getElementById('newClientName').value.trim(),
-      companyName: document.getElementById('newClientCompany').value.trim(),
-      email: document.getElementById('newClientEmail').value.trim(),
-      username: document.getElementById('newClientEmail').value.trim(),
+      companyName: companyVal,
+      email: emailVal,
+      username: usernameVal,
       password: document.getElementById('newClientPassword').value.trim(),
+      logo: newClientLogoDataUrl || '',
       servicesTier: document.getElementById('newClientServices').value,
       status: document.getElementById('newClientStatus').value,
       summary: document.getElementById('newClientSummary').value.trim(),
       approvals: [],
       timeline: [],
-      ideas: [],
+      ideas: [
+        {
+          id: 'IDEA-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+          category: 'Stratégie de Marque',
+          title: `Roadmap Stratégique & Croissance (${companyVal})`,
+          description: `Plan d'action personnalisé, charte visuelle et acquisition de conversion pour ${companyVal}.`,
+          impact: '+120% Notoriété & Acquisition',
+          status: 'Pending',
+          date: 'Oct 08, 2026'
+        }
+      ],
+      files: [],
       links: []
     };
 
+    clients = loadClients();
     clients.unshift(newClient);
     saveClients(clients);
     createClientModal.style.display = 'none';
     createClientForm.reset();
+    resetNewClientLogoPreview();
     renderAdminPortal();
-    alert(`Client account created for ${newClient.companyName}! Credentials: ${newClient.email} / ${newClient.password}`);
+    alert(`Compte client créé avec succès pour ${newClient.companyName} !\n\nIdentifiant / Email: ${newClient.username}\nMot de passe: ${newClient.password}`);
   });
 
-  // Manage Client Modal Tabs & Editor
+  // =========================================================================
+  // ADMIN WORKSPACE MANAGER (CALENDAR, IDEAS/NOTES, DOCUMENTS, VALIDATIONS)
+  // =========================================================================
+
+  let adminCalYear = 2026;
+  let adminCalMonth = 9; // October (0-indexed)
+  let selectedAdminDate = '2026-10-12';
+  const frenchMonthNames = [
+    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+  ];
+
+  function formatDisplayDate(dateStr) {
+    if (!dateStr) return '';
+    try {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        return `${d} ${frenchMonthNames[m]} ${y}`;
+      }
+    } catch (e) {}
+    return dateStr;
+  }
+
   function openManageClientModal(clientId) {
     activeEditingClientId = clientId;
     const client = clients.find(c => c.id === clientId);
@@ -1387,9 +1817,16 @@ document.addEventListener('DOMContentLoaded', () => {
     manageClientTitle.textContent = `Workspace: ${client.companyName}`;
     manageClientSub.textContent = `Client: ${client.clientName} (${client.email})`;
 
+    // Reset active subtab to calendar
+    document.querySelectorAll('.client-editor-tabs .editor-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.client-editor-content .editor-pane').forEach(p => p.classList.remove('active'));
+    document.querySelector('.client-editor-tabs .editor-tab[data-tab="calendar"]')?.classList.add('active');
+    document.getElementById('paneCalendar')?.classList.add('active');
+
+    renderAdminInteractiveCalendar(client);
+    renderAdminIdeasList(client);
+    renderAdminDocsList(client);
     renderEditorApprovals(client);
-    renderEditorCalendar(client);
-    renderEditorIdeas(client);
     renderEditorInfo(client);
 
     manageClientModal.style.display = 'flex';
@@ -1403,198 +1840,573 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Sub-tabs in Manage Client Modal
-  document.querySelectorAll('.editor-tab').forEach(tab => {
+  document.querySelectorAll('.client-editor-tabs .editor-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.editor-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.client-editor-tabs .editor-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.client-editor-content .editor-pane').forEach(p => p.classList.remove('active'));
 
       tab.classList.add('active');
       const target = tab.getAttribute('data-tab');
-      if (target === 'approvals') document.getElementById('paneApprovals').classList.add('active');
-      if (target === 'calendar') document.getElementById('paneCalendar').classList.add('active');
-      if (target === 'ideas') document.getElementById('paneIdeas').classList.add('active');
-      if (target === 'info') document.getElementById('paneInfo').classList.add('active');
+      if (target === 'calendar') document.getElementById('paneCalendar')?.classList.add('active');
+      if (target === 'ideas') document.getElementById('paneIdeas')?.classList.add('active');
+      if (target === 'documents') document.getElementById('paneDocuments')?.classList.add('active');
+      if (target === 'approvals') document.getElementById('paneApprovals')?.classList.add('active');
+      if (target === 'info') document.getElementById('paneInfo')?.classList.add('active');
       if (window.lucide) window.lucide.createIcons();
     });
   });
 
-  function renderEditorApprovals(client) {
-    const list = document.getElementById('editorApprovalsList');
-    if (!client.approvals || client.approvals.length === 0) {
-      list.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No approval items yet. Click "+ Add Approval Item" above.</p>`;
-      return;
+  // 1. ADMIN INTERACTIVE CALENDAR
+  function renderAdminInteractiveCalendar(client) {
+    if (!client) return;
+    if (!client.timeline) client.timeline = [];
+
+    const monthTitleEl = document.getElementById('adminCalMonthTitle');
+    const gridEl = document.getElementById('adminCalGrid');
+    const headingEl = document.getElementById('adminSelectedDateHeading');
+
+    if (monthTitleEl) {
+      monthTitleEl.textContent = `${frenchMonthNames[adminCalMonth]} ${adminCalYear}`;
     }
 
-    list.innerHTML = client.approvals.map(item => `
-      <div class="editor-row-item">
-        <div>
-          <strong>${escapeHtml(item.title)}</strong>
-          <span class="status-tag ${item.status.toLowerCase().replace(/\s+/g, '-')}" style="margin-left: 0.5rem;">${escapeHtml(item.status)}</span>
-          <p style="font-size: 0.82rem; color: var(--text-gray); margin-top: 0.2rem;">${escapeHtml(item.description)}</p>
-        </div>
-        <button class="btn-ghost-small delete-appr-btn" data-id="${item.id}"><i data-lucide="trash-2"></i></button>
-      </div>
-    `).join('');
+    if (headingEl) {
+      headingEl.textContent = `Ajouter un événement pour le ${formatDisplayDate(selectedAdminDate)}`;
+    }
 
-    list.querySelectorAll('.delete-appr-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.getAttribute('data-id');
-        client.approvals = client.approvals.filter(a => a.id !== id);
-        saveClients(clients);
-        renderEditorApprovals(client);
-      });
-    });
+    if (gridEl) {
+      gridEl.innerHTML = '';
+      const firstDayIndex = new Date(adminCalYear, adminCalMonth, 1).getDay();
+      const totalDays = new Date(adminCalYear, adminCalMonth + 1, 0).getDate();
+
+      // Empty cells before start of month
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'admin-cal-day-cell empty-day';
+        gridEl.appendChild(emptyCell);
+      }
+
+      // Day cells 1..totalDays
+      for (let day = 1; day <= totalDays; day++) {
+        const cell = document.createElement('div');
+        cell.className = 'admin-cal-day-cell';
+        const dayStr = `${adminCalYear}-${String(adminCalMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        const dayNumberSpan = document.createElement('span');
+        dayNumberSpan.className = 'cal-day-num';
+        dayNumberSpan.textContent = day;
+        cell.appendChild(dayNumberSpan);
+
+        // Check if there is an event on this date
+        const hasEvent = client.timeline.some(ev => {
+          if (ev.rawDate === dayStr) return true;
+          if (ev.date) {
+            const evUpper = ev.date.toUpperCase();
+            const mNameUpper = frenchMonthNames[adminCalMonth].toUpperCase();
+            const engMonthUpper = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'][adminCalMonth];
+            if ((evUpper.includes(mNameUpper) || evUpper.includes(engMonthUpper) || evUpper.includes(String(adminCalMonth + 1))) && evUpper.includes(String(day))) {
+              return true;
+            }
+          }
+          return false;
+        });
+
+        if (hasEvent) {
+          cell.classList.add('has-event');
+        }
+
+        if (selectedAdminDate === dayStr) {
+          cell.classList.add('is-selected');
+        }
+
+        cell.addEventListener('click', () => {
+          selectedAdminDate = dayStr;
+          renderAdminInteractiveCalendar(client);
+        });
+
+        gridEl.appendChild(cell);
+      }
+    }
+
+    renderAdminCalendarList(client);
   }
 
-  document.getElementById('addApprovalItemBtn').addEventListener('click', () => {
-    const client = clients.find(c => c.id === activeEditingClientId);
-    if (!client) return;
-
-    const title = prompt('Approval Item Title (e.g. Website Homepage Wireframe v2):');
-    if (!title) return;
-    const desc = prompt('Description or details of what needs client sign-off:') || '';
-
-    if (!client.approvals) client.approvals = [];
-    client.approvals.push({
-      id: 'APP-' + Date.now().toString(36),
-      title: title.trim(),
-      description: desc.trim(),
-      status: 'Pending'
-    });
-
-    saveClients(clients);
-    renderEditorApprovals(client);
-  });
-
-  function renderEditorCalendar(client) {
+  function renderAdminCalendarList(client) {
     const list = document.getElementById('editorCalendarList');
+    if (!list) return;
+
     if (!client.timeline || client.timeline.length === 0) {
-      list.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No calendar events yet. Click "+ Add Calendar Event" above.</p>`;
+      list.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem 0;">Aucun événement planifié pour ce client. Cliquez sur une date du calendrier pour en ajouter.</p>`;
       return;
     }
 
     list.innerHTML = client.timeline.map(item => `
       <div class="editor-row-item">
         <div>
-          <span class="gold-text" style="font-size: 0.78rem; font-weight: 700;">${escapeHtml(item.date)}</span>
-          <strong style="display: block;">${escapeHtml(item.title)}</strong>
-          <p style="font-size: 0.82rem; color: var(--text-gray);">${escapeHtml(item.description)}</p>
+          <span style="font-size: 0.78rem; font-weight: 700; color: #0088ff; display: block; margin-bottom: 0.2rem;">
+            ${escapeHtml(item.date || formatDisplayDate(item.rawDate))}
+          </span>
+          <strong style="display: block; color: #0f172a; font-size: 0.9rem;">${escapeHtml(item.title)}</strong>
+          ${item.description ? `<p style="font-size: 0.82rem; color: var(--text-gray); margin-top: 0.2rem;">${escapeHtml(item.description)}</p>` : ''}
         </div>
-        <button class="btn-ghost-small delete-cal-btn" data-id="${item.id}"><i data-lucide="trash-2"></i></button>
+        <button type="button" class="btn-ghost-small delete-cal-btn" data-id="${item.id}" title="Supprimer cet événement">
+          <i data-lucide="trash-2"></i>
+        </button>
       </div>
     `).join('');
 
     list.querySelectorAll('.delete-cal-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const id = btn.getAttribute('data-id');
         client.timeline = client.timeline.filter(t => t.id !== id);
         saveClients(clients);
-        renderEditorCalendar(client);
+        renderAdminInteractiveCalendar(client);
       });
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  const saveAdminCalEventBtn = document.getElementById('saveAdminCalEventBtn');
+  if (saveAdminCalEventBtn) {
+    saveAdminCalEventBtn.addEventListener('click', () => {
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (!client) return;
+
+      const titleInput = document.getElementById('adminEventTitle');
+      const descInput = document.getElementById('adminEventDesc');
+      const title = (titleInput?.value || '').trim();
+      const desc = (descInput?.value || '').trim();
+
+      if (!title) {
+        alert('Veuillez saisir un titre pour l\'événement.');
+        titleInput?.focus();
+        return;
+      }
+
+      if (!client.timeline) client.timeline = [];
+      const displayDate = formatDisplayDate(selectedAdminDate);
+
+      client.timeline.push({
+        id: 'CAL-' + Date.now().toString(36),
+        date: displayDate,
+        rawDate: selectedAdminDate,
+        title: title,
+        description: desc,
+        status: 'Scheduled'
+      });
+
+      if (titleInput) titleInput.value = '';
+      if (descInput) descInput.value = '';
+
+      saveClients(clients);
+      renderAdminInteractiveCalendar(client);
     });
   }
 
-  document.getElementById('addCalendarItemBtn').addEventListener('click', () => {
-    const client = clients.find(c => c.id === activeEditingClientId);
-    if (!client) return;
+  const adminCalPrevMonthBtn = document.getElementById('adminCalPrevMonthBtn');
+  const adminCalNextMonthBtn = document.getElementById('adminCalNextMonthBtn');
 
-    const date = prompt('Event Date / Deadline (e.g. Oct 12, 2026):');
-    if (!date) return;
-    const title = prompt('Event Title (e.g. Social Content Batch Review):');
-    if (!title) return;
-    const desc = prompt('Event Notes:') || '';
-
-    if (!client.timeline) client.timeline = [];
-    client.timeline.push({
-      id: 'CAL-' + Date.now().toString(36),
-      date: date.trim(),
-      title: title.trim(),
-      description: desc.trim()
+  if (adminCalPrevMonthBtn) {
+    adminCalPrevMonthBtn.addEventListener('click', () => {
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (adminCalMonth === 0) {
+        adminCalMonth = 11;
+        adminCalYear--;
+      } else {
+        adminCalMonth--;
+      }
+      renderAdminInteractiveCalendar(client);
     });
+  }
 
-    saveClients(clients);
-    renderEditorCalendar(client);
-  });
+  if (adminCalNextMonthBtn) {
+    adminCalNextMonthBtn.addEventListener('click', () => {
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (adminCalMonth === 11) {
+        adminCalMonth = 0;
+        adminCalYear++;
+      } else {
+        adminCalMonth++;
+      }
+      renderAdminInteractiveCalendar(client);
+    });
+  }
 
-  function renderEditorIdeas(client) {
+  // 2. ADMIN IDEAS & NOTES BANK
+  function renderAdminIdeasList(client) {
     const list = document.getElementById('editorIdeasList');
+    if (!list) return;
+
     if (!client.ideas || client.ideas.length === 0) {
-      list.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No creative ideas posted yet. Click "+ Add Creative Idea" above.</p>`;
+      list.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem 0;">Aucune proposition ou note stratégique enregistrée pour ce client.</p>`;
       return;
     }
 
     list.innerHTML = client.ideas.map(item => `
-      <div class="editor-row-item">
-        <div>
-          <strong>${escapeHtml(item.title)}</strong>
-          <p style="font-size: 0.82rem; color: var(--text-gray); margin-top: 0.2rem;">${escapeHtml(item.description)}</p>
+      <div class="editor-idea-card">
+        <div style="flex: 1;">
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap;">
+            <span class="idea-cat-tag">${escapeHtml(item.category || 'Stratégie')}</span>
+            <span class="status-tag ${(item.priority || 'medium').toLowerCase()}" style="font-size: 0.72rem; padding: 0.15rem 0.5rem;">
+              Priorité: ${escapeHtml(item.priority || 'Moyenne')}
+            </span>
+            ${item.date ? `<span style="font-size: 0.75rem; color: #94a3b8;">${escapeHtml(item.date)}</span>` : ''}
+          </div>
+          <strong style="color: #0f172a; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">${escapeHtml(item.title)}</strong>
+          <p style="font-size: 0.84rem; color: #475569; line-height: 1.45; margin: 0;">${escapeHtml(item.description || item.desc || '')}</p>
+          ${item.impact ? `<div style="font-size: 0.78rem; color: #0088ff; font-weight: 600; margin-top: 0.35rem;">Impact: ${escapeHtml(item.impact)}</div>` : ''}
         </div>
-        <button class="btn-ghost-small delete-idea-btn" data-id="${item.id}"><i data-lucide="trash-2"></i></button>
+        <button type="button" class="btn-ghost-small delete-idea-btn" data-id="${item.id}" title="Supprimer cette idée">
+          <i data-lucide="trash-2"></i>
+        </button>
       </div>
     `).join('');
 
     list.querySelectorAll('.delete-idea-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const id = btn.getAttribute('data-id');
         client.ideas = client.ideas.filter(i => i.id !== id);
         saveClients(clients);
-        renderEditorIdeas(client);
+        renderAdminIdeasList(client);
       });
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  const saveAdminIdeaBtn = document.getElementById('saveAdminIdeaBtn');
+  if (saveAdminIdeaBtn) {
+    saveAdminIdeaBtn.addEventListener('click', () => {
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (!client) return;
+
+      const titleInput = document.getElementById('adminIdeaTitle');
+      const catInput = document.getElementById('adminIdeaCategory');
+      const prioInput = document.getElementById('adminIdeaPriority');
+      const impactInput = document.getElementById('adminIdeaImpact');
+      const descInput = document.getElementById('adminIdeaDesc');
+
+      const title = (titleInput?.value || '').trim();
+      const category = catInput?.value || 'Concept Créatif & UX';
+      const priority = prioInput?.value || 'Medium';
+      const impact = (impactInput?.value || '').trim();
+      const desc = (descInput?.value || '').trim();
+
+      if (!title || !desc) {
+        alert('Veuillez renseigner au minimum un titre et une description.');
+        return;
+      }
+
+      if (!client.ideas) client.ideas = [];
+      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+
+      client.ideas.unshift({
+        id: 'IDEA-' + Date.now().toString(36),
+        title: title,
+        category: category,
+        priority: priority,
+        impact: impact || 'Recommandation Stratégique MotaGrowth',
+        description: desc,
+        desc: desc,
+        date: dateStr,
+        status: 'Pending'
+      });
+
+      if (titleInput) titleInput.value = '';
+      if (impactInput) impactInput.value = '';
+      if (descInput) descInput.value = '';
+
+      saveClients(clients);
+      renderAdminIdeasList(client);
     });
   }
 
-  document.getElementById('addIdeaItemBtn').addEventListener('click', () => {
-    const client = clients.find(c => c.id === activeEditingClientId);
-    if (!client) return;
+  const clearPremadeIdeasBtn = document.getElementById('clearPremadeIdeasBtn');
+  if (clearPremadeIdeasBtn) {
+    clearPremadeIdeasBtn.addEventListener('click', () => {
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (!client) return;
+      if (confirm('Voulez-vous supprimer toutes les idées et propositions pour ce client ?')) {
+        client.ideas = [];
+        saveClients(clients);
+        renderAdminIdeasList(client);
+      }
+    });
+  }
 
-    const title = prompt('Proposal / Concept Title (e.g. Dark-Mode 3D Product Interactive Page):');
-    if (!title) return;
-    const priority = prompt('Priority ranking (High, Medium, or Low):', 'High') || 'High';
-    const category = prompt('Category (e.g. Website & 3D UX, Paid Ads, Viral Video, Brand Strategy):', 'Website & 3D UX') || 'Growth Strategy';
-    const desc = prompt('Idea Details / Strategic Impact:') || '';
+  // 3. ADMIN DOCUMENTS & FILE UPLOADS
+  const adminDocFileInput = document.getElementById('adminDocFileInput');
+  const adminDocTitleInput = document.getElementById('adminDocTitle');
+  const adminDocSizeInput = document.getElementById('adminDocSize');
+  const uploadAdminDocBtn = document.getElementById('uploadAdminDocBtn');
 
-    if (!client.ideas) client.ideas = [];
-    client.ideas.unshift({
-      id: 'IDEA-' + Date.now().toString(36),
-      rank: 1,
-      priority: (priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()),
-      category: category.trim(),
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      title: title.trim(),
-      description: desc.trim(),
-      impact: 'Strategic Deliverable Proposal',
-      assetLink: null,
-      status: 'Pending',
-      clientFeedback: null
+  if (adminDocFileInput) {
+    adminDocFileInput.addEventListener('change', () => {
+      const file = adminDocFileInput.files[0];
+      if (file) {
+        if (adminDocTitleInput && !adminDocTitleInput.value) {
+          adminDocTitleInput.value = file.name;
+        }
+        if (adminDocSizeInput) {
+          let sizeStr = '';
+          if (file.size < 1024 * 1024) {
+            sizeStr = `${Math.round(file.size / 1024)} KB`;
+          } else {
+            sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+          }
+          adminDocSizeInput.value = sizeStr;
+        }
+      }
+    });
+  }
+
+  function renderAdminDocsList(client) {
+    const list = document.getElementById('editorDocsList');
+    if (!list) return;
+
+    if (!client.files || client.files.length === 0) {
+      list.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem 0;">Aucun document téléversé pour ce client.</p>`;
+      return;
+    }
+
+    list.innerHTML = client.files.map(doc => {
+      const name = doc.name || doc.title || 'Document';
+      const isPdf = name.toLowerCase().endsWith('.pdf');
+      const isZip = name.toLowerCase().endsWith('.zip');
+      const isFigma = name.toLowerCase().endsWith('.fig') || doc.type === 'figma';
+      
+      let icon = 'file-text';
+      if (isPdf) icon = 'file-check';
+      if (isZip) icon = 'archive';
+      if (isFigma) icon = 'layout';
+
+      return `
+        <div class="editor-doc-item">
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0;">
+            <div class="doc-icon-badge">
+              <i data-lucide="${icon}"></i>
+            </div>
+            <div style="min-width: 0;">
+              <strong style="display: block; font-size: 0.88rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${escapeHtml(name)}
+              </strong>
+              <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.15rem; display: flex; gap: 0.5rem; align-items: center;">
+                <span class="category-tag" style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">${escapeHtml(doc.category || 'Général')}</span>
+                <span>${escapeHtml(doc.size || '1.0 MB')}</span>
+                <span>• ${escapeHtml(doc.date || 'Oct 2026')}</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn-ghost-small delete-doc-btn" data-id="${doc.id}" title="Supprimer ce document">
+            <i data-lucide="trash-2"></i>
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    list.querySelectorAll('.delete-doc-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        client.files = client.files.filter(f => f.id !== id);
+        saveClients(clients);
+        renderAdminDocsList(client);
+      });
     });
 
-    saveClients(clients);
-    renderEditorIdeas(client);
-  });
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  if (uploadAdminDocBtn) {
+    uploadAdminDocBtn.addEventListener('click', () => {
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (!client) return;
+
+      const file = adminDocFileInput?.files[0];
+      const title = (adminDocTitleInput?.value || '').trim() || (file ? file.name : '');
+      const category = document.getElementById('adminDocCategory')?.value || 'Contrats & Accords';
+      const sizeVal = (adminDocSizeInput?.value || '').trim() || '1.2 MB';
+
+      if (!title) {
+        alert('Veuillez sélectionner un fichier ou entrer un nom de document.');
+        return;
+      }
+
+      if (!client.files) client.files = [];
+      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+
+      client.files.unshift({
+        id: 'FILE-' + Date.now().toString(36),
+        name: title,
+        title: title,
+        category: category,
+        size: sizeVal,
+        date: dateStr,
+        type: title.toLowerCase().endsWith('.pdf') ? 'pdf' : (title.toLowerCase().endsWith('.doc') ? 'doc' : 'file'),
+        downloadName: title,
+        url: '#'
+      });
+
+      if (adminDocFileInput) adminDocFileInput.value = '';
+      if (adminDocTitleInput) adminDocTitleInput.value = '';
+      if (adminDocSizeInput) adminDocSizeInput.value = '';
+
+      saveClients(clients);
+      renderAdminDocsList(client);
+    });
+  }
+
+  // 4. ADMIN VALIDATIONS / APPROVALS
+  function renderEditorApprovals(client) {
+    const list = document.getElementById('editorApprovalsList');
+    if (!list) return;
+
+    if (!client.approvals || client.approvals.length === 0) {
+      list.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem 0;">Aucune validation en attente pour ce client.</p>`;
+      return;
+    }
+
+    list.innerHTML = client.approvals.map(item => `
+      <div class="editor-row-item">
+        <div>
+          <strong style="color: #0f172a; font-size: 0.88rem;">${escapeHtml(item.title)}</strong>
+          <span class="status-tag ${(item.status || 'pending').toLowerCase().replace(/\s+/g, '-')}" style="margin-left: 0.5rem; font-size: 0.72rem;">${escapeHtml(item.status || 'En attente')}</span>
+          ${item.description ? `<p style="font-size: 0.82rem; color: var(--text-gray); margin-top: 0.2rem;">${escapeHtml(item.description)}</p>` : ''}
+        </div>
+        <button type="button" class="btn-ghost-small delete-appr-btn" data-id="${item.id}" title="Supprimer cette validation">
+          <i data-lucide="trash-2"></i>
+        </button>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.delete-appr-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        client.approvals = client.approvals.filter(a => a.id !== id);
+        saveClients(clients);
+        renderEditorApprovals(client);
+      });
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  const saveAdminApprovalBtn = document.getElementById('saveAdminApprovalBtn');
+  if (saveAdminApprovalBtn) {
+    saveAdminApprovalBtn.addEventListener('click', () => {
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (!client) return;
+
+      const titleInput = document.getElementById('adminApprovalTitle');
+      const descInput = document.getElementById('adminApprovalDesc');
+      const title = (titleInput?.value || '').trim();
+      const desc = (descInput?.value || '').trim();
+
+      if (!title) {
+        alert('Veuillez entrer un titre pour la validation.');
+        return;
+      }
+
+      if (!client.approvals) client.approvals = [];
+      client.approvals.push({
+        id: 'APP-' + Date.now().toString(36),
+        title: title,
+        description: desc,
+        status: 'En attente'
+      });
+
+      if (titleInput) titleInput.value = '';
+      if (descInput) descInput.value = '';
+
+      saveClients(clients);
+      renderEditorApprovals(client);
+    });
+  }
+
+  // 5. ADMIN INFO & SCOPE OF WORK + LOGO MANAGEMENT
+  const manageClientLogoInput = document.getElementById('manageClientLogoInput');
+  const manageClientLogoImg = document.getElementById('manageClientLogoImg');
+  const manageClientLogoDefaultIcon = document.getElementById('manageClientLogoDefaultIcon');
+  const removeManageClientLogoBtn = document.getElementById('removeManageClientLogoBtn');
+
+  if (manageClientLogoInput) {
+    manageClientLogoInput.addEventListener('change', (e) => {
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (!client) return;
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        client.logo = evt.target.result;
+        saveClients(clients);
+        renderEditorInfo(client);
+        renderClientsGrid();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (removeManageClientLogoBtn) {
+    removeManageClientLogoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (!client) return;
+      client.logo = '';
+      if (manageClientLogoInput) manageClientLogoInput.value = '';
+      saveClients(clients);
+      renderEditorInfo(client);
+      renderClientsGrid();
+    });
+  }
 
   function renderEditorInfo(client) {
-    document.getElementById('editorProjectSummary').value = client.summary || '';
-    const linksText = (client.links || []).map(l => `${l.label}: ${l.url}`).join('\n');
-    document.getElementById('editorSharedLinks').value = linksText;
+    const summaryEl = document.getElementById('editorProjectSummary');
+    const linksEl = document.getElementById('editorSharedLinks');
+    if (summaryEl) summaryEl.value = client.summary || '';
+    if (linksEl) {
+      const linksText = (client.links || []).map(l => `${l.label}: ${l.url}`).join('\n');
+      linksEl.value = linksText;
+    }
+
+    if (manageClientLogoImg && manageClientLogoDefaultIcon && removeManageClientLogoBtn) {
+      if (client.logo) {
+        manageClientLogoImg.src = client.logo;
+        manageClientLogoImg.style.display = 'block';
+        manageClientLogoDefaultIcon.style.display = 'none';
+        removeManageClientLogoBtn.style.display = 'inline-flex';
+      } else {
+        manageClientLogoImg.src = '';
+        manageClientLogoImg.style.display = 'none';
+        manageClientLogoDefaultIcon.style.display = 'block';
+        removeManageClientLogoBtn.style.display = 'none';
+      }
+    }
   }
 
-  document.getElementById('saveProjectInfoBtn').addEventListener('click', () => {
-    const client = clients.find(c => c.id === activeEditingClientId);
-    if (!client) return;
+  const saveProjectInfoBtn = document.getElementById('saveProjectInfoBtn');
+  if (saveProjectInfoBtn) {
+    saveProjectInfoBtn.addEventListener('click', () => {
+      const client = clients.find(c => c.id === activeEditingClientId);
+      if (!client) return;
 
-    client.summary = document.getElementById('editorProjectSummary').value.trim();
-    const rawLinks = document.getElementById('editorSharedLinks').value.trim().split('\n');
-    
-    client.links = rawLinks
-      .filter(line => line.includes(':'))
-      .map(line => {
-        const parts = line.split(/:\s*(.+)/);
-        return { label: parts[0].trim(), url: parts[1].trim() };
-      });
+      client.summary = document.getElementById('editorProjectSummary')?.value.trim() || '';
+      const rawLinks = (document.getElementById('editorSharedLinks')?.value || '').trim().split('\n');
+      
+      client.links = rawLinks
+        .filter(line => line.includes(':'))
+        .map(line => {
+          const parts = line.split(/:\s*(.+)/);
+          return { label: parts[0].trim(), url: parts[1].trim() };
+        });
 
-    saveClients(clients);
-    alert('Project specifications and links saved!');
-  });
+      saveClients(clients);
+      alert('Cahier des charges et liens mis à jour !');
+    });
+  }
 
   // =========================================================================
   // 6. DATA PERSISTENCE & SEEDING
@@ -1709,7 +2521,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clientName: 'Elena Rostova',
         companyName: 'Velour Luxury Apparel',
         email: 'elena@velourclothing.co',
-        username: 'elena@velourclothing.co',
+        username: 'velour',
         password: 'growth2026',
         servicesTier: 'Full-Service Growth Retainer',
         status: 'Active',
@@ -1959,8 +2771,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. MOTAGROWTH CLIENT PORTAL ENGINE (CALENDAR, AI SEARCH, CHAT, TASKS, DOCS)
   // =========================================================================
 
-  let isClientPortalInitialized = false;
-
   function initMotaGrowthClientSpace() {
     if (isClientPortalInitialized) return;
     isClientPortalInitialized = true;
@@ -2084,29 +2894,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Subfolder Toggle in Tree
-    const abcFolderToggle = document.getElementById('portalAbcFolderToggle');
-    const abcSublist = document.getElementById('portalAbcSublist');
-    if (abcFolderToggle && abcSublist) {
-      abcFolderToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isCollapsed = abcSublist.style.display === 'none';
-        abcSublist.style.display = isCollapsed ? 'block' : 'none';
-        const chevron = abcFolderToggle.querySelector('.portal-tree-chevron');
-        if (chevron) {
-          chevron.classList.toggle('is-down', isCollapsed);
-        }
-      });
-    }
-
-    // Tree Sidebar Collapse Toggle
-    const treeCollapseBtn = document.getElementById('portalTreeCollapseBtn');
-    const treeNavCard = document.querySelector('.portal-tree-nav-card');
-    if (treeCollapseBtn && treeNavCard) {
-      treeCollapseBtn.addEventListener('click', () => {
-        treeNavCard.classList.toggle('is-minimized');
-      });
-    }
+    // -----------------------------------------------------------------------
+    // C. INTERACTIVE CALENDAR ENGINE
+    // -----------------------------------------------------------------------
 
     // -----------------------------------------------------------------------
     // C. INTERACTIVE CALENDAR ENGINE
@@ -2780,31 +3570,53 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     ];
 
+    function getActiveIdeas() {
+      if (loggedInClient && Array.isArray(loggedInClient.ideas)) {
+        return loggedInClient.ideas;
+      }
+      return portalIdeas;
+    }
+
     function renderIdeasList() {
       const container = document.getElementById('portalIdeasListContainer');
       if (!container) return;
 
-      let filtered = portalIdeas;
-      if (ideasFilter === 'pending') filtered = portalIdeas.filter(i => i.status === 'Pending');
-      else if (ideasFilter === 'approved') filtered = portalIdeas.filter(i => i.status === 'Approved');
+      const activeIdeas = getActiveIdeas();
+      let filtered = activeIdeas;
+      if (ideasFilter === 'pending') filtered = activeIdeas.filter(i => (i.status || 'Pending') === 'Pending');
+      else if (ideasFilter === 'approved') filtered = activeIdeas.filter(i => i.status === 'Approved');
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: #64748b; background: #ffffff; border-radius: 1rem; border: 1px dashed #e2e8f0;">
+            <i data-lucide="lightbulb" style="width: 32px; height: 32px; color: #0088ff; margin-bottom: 0.5rem; opacity: 0.6;"></i>
+            <h4 style="font-size: 1rem; color: #0f172a; margin-bottom: 0.25rem;">Aucune proposition dans cette catégorie</h4>
+            <p style="font-size: 0.85rem;">Votre directeur de croissance MotaGrowth partagera de nouveaux concepts sous peu.</p>
+          </div>
+        `;
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
 
       container.innerHTML = filtered.map(idea => {
         const isApproved = idea.status === 'Approved';
         return `
           <div class="idea-proposal-card ${isApproved ? 'is-approved' : ''}" data-idea-id="${idea.id}">
             <div class="idea-card-header">
-              <span class="idea-cat-tag">${escapeHtml(idea.category)}</span>
+              <span class="idea-cat-tag">${escapeHtml(idea.category || 'Stratégie')}</span>
               <span class="idea-status-badge ${isApproved ? 'badge-approved' : 'badge-pending'}">
                 <i data-lucide="${isApproved ? 'check-circle' : 'clock'}"></i>
                 ${isApproved ? 'Approved for Production' : 'Pending Client Review'}
               </span>
             </div>
             <h4 class="idea-title">${escapeHtml(idea.title)}</h4>
-            <p class="idea-desc">${escapeHtml(idea.desc)}</p>
-            <div class="idea-impact-box">
-              <i data-lucide="trending-up"></i>
-              <span><strong>Projected Impact:</strong> ${escapeHtml(idea.impact)}</span>
-            </div>
+            <p class="idea-desc">${escapeHtml(idea.description || idea.desc || '')}</p>
+            ${idea.impact ? `
+              <div class="idea-impact-box">
+                <i data-lucide="trending-up"></i>
+                <span><strong>Projected Impact:</strong> ${escapeHtml(idea.impact)}</span>
+              </div>
+            ` : ''}
             <div class="idea-footer-actions">
               <button type="button" class="btn-idea-approve ${isApproved ? 'is-active' : ''}" data-approve-id="${idea.id}">
                 <i data-lucide="${isApproved ? 'check' : 'thumbs-up'}"></i>
@@ -2822,9 +3634,18 @@ document.addEventListener('DOMContentLoaded', () => {
       container.querySelectorAll('[data-approve-id]').forEach(btn => {
         btn.addEventListener('click', () => {
           const id = btn.getAttribute('data-approve-id');
-          const item = portalIdeas.find(i => i.id === id);
+          const currentList = getActiveIdeas();
+          const item = currentList.find(i => i.id === id);
           if (item) {
             item.status = (item.status === 'Approved') ? 'Pending' : 'Approved';
+            if (loggedInClient) {
+              const currentClients = loadClients();
+              const cIdx = currentClients.findIndex(c => c.id === loggedInClient.id);
+              if (cIdx !== -1) {
+                currentClients[cIdx].ideas = loggedInClient.ideas;
+                saveClients(currentClients);
+              }
+            }
             renderIdeasList();
             showPortalToast(item.status === 'Approved' ? `Approved "${item.title}"!` : 'Status updated to pending');
           }
@@ -2852,45 +3673,63 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------------------------
     // H. DOCUMENTS VAULT & 1-CLICK DOWNLOADS
     // -----------------------------------------------------------------------
-    const vaultDocs = [
-      { name: 'Agency client contract.doc', type: 'Word Document', size: '1.2 MB', date: 'Oct 01, 2026', downloadName: 'Agency client contract.doc' },
-      { name: 'Main concept.pdf', type: 'PDF Document', size: '4.8 MB', date: 'Oct 02, 2026', downloadName: 'Main concept.pdf' },
-      { name: 'Agreement.pdf', type: 'PDF Document', size: '850 KB', date: 'Sep 28, 2026', downloadName: 'Agreement.pdf' },
-      { name: 'Project Plan.doc', type: 'Word Document', size: '2.1 MB', date: 'Oct 03, 2026', downloadName: 'Project Plan.doc' },
-      { name: 'Sales Presentation.pdf', type: 'PDF Document', size: '14.5 MB', date: 'Oct 04, 2026', downloadName: 'Sales Presentation.pdf' },
-      { name: 'SWOT Analysis.pdf', type: 'PDF Document', size: '920 KB', date: 'Sep 30, 2026', downloadName: 'SWOT Analysis.pdf' }
+    const defaultVaultDocs = [
+      { name: 'Agency client contract.doc', category: 'Word Document', size: '1.2 MB', date: 'Oct 01, 2026', downloadName: 'Agency client contract.doc' },
+      { name: 'Main concept.pdf', category: 'PDF Document', size: '4.8 MB', date: 'Oct 02, 2026', downloadName: 'Main concept.pdf' },
+      { name: 'Agreement.pdf', category: 'PDF Document', size: '850 KB', date: 'Sep 28, 2026', downloadName: 'Agreement.pdf' },
+      { name: 'Project Plan.doc', category: 'Word Document', size: '2.1 MB', date: 'Oct 03, 2026', downloadName: 'Project Plan.doc' },
+      { name: 'Sales Presentation.pdf', category: 'PDF Document', size: '14.5 MB', date: 'Oct 04, 2026', downloadName: 'Sales Presentation.pdf' },
+      { name: 'SWOT Analysis.pdf', category: 'PDF Document', size: '920 KB', date: 'Sep 30, 2026', downloadName: 'SWOT Analysis.pdf' }
     ];
+
+    function getActiveDocs() {
+      if (loggedInClient && Array.isArray(loggedInClient.files) && loggedInClient.files.length > 0) {
+        return loggedInClient.files;
+      }
+      return defaultVaultDocs;
+    }
 
     function renderVaultDocs() {
       const tbody = document.getElementById('portalVaultFilesBody');
       if (!tbody) return;
 
-      tbody.innerHTML = vaultDocs.map(doc => `
-        <tr>
-          <td>
-            <div class="file-name-cell">
-              <div class="file-type-pill ${doc.name.endsWith('.pdf') ? 'pdf' : 'doc'}">
-                <i data-lucide="${doc.name.endsWith('.pdf') ? 'file-check' : 'file-text'}"></i>
+      const activeDocs = getActiveDocs();
+
+      tbody.innerHTML = activeDocs.map(doc => {
+        const docName = doc.name || doc.title || 'Document.pdf';
+        const isPdf = docName.toLowerCase().endsWith('.pdf');
+        const cat = doc.category || (isPdf ? 'PDF Document' : 'Document');
+        const dlName = doc.downloadName || docName;
+
+        return `
+          <tr>
+            <td>
+              <div class="file-name-cell">
+                <div class="file-type-pill ${isPdf ? 'pdf' : 'doc'}">
+                  <i data-lucide="${isPdf ? 'file-check' : 'file-text'}"></i>
+                </div>
+                <div class="file-meta-name">
+                  <strong>${escapeHtml(docName)}</strong>
+                  <span>MotaGrowth Verified Asset</span>
+                </div>
               </div>
-              <div class="file-meta-name">
-                <strong>${escapeHtml(doc.name)}</strong>
-                <span>MotaGrowth Verified Asset</span>
-              </div>
-            </div>
-          </td>
-          <td><span class="category-tag">${escapeHtml(doc.type)}</span></td>
-          <td><span style="font-weight: 600; color: #475569;">${escapeHtml(doc.size)}</span></td>
-          <td><span style="color: #64748b; font-size: 0.84rem;">${escapeHtml(doc.date)}</span></td>
-          <td style="text-align: right;">
-            <button type="button" class="btn-file-action" data-download="${escapeHtml(doc.downloadName)}">
-              <i data-lucide="download"></i>
-              <span>Download</span>
-            </button>
-          </td>
-        </tr>
-      `).join('');
+            </td>
+            <td><span class="category-tag">${escapeHtml(cat)}</span></td>
+            <td><span style="font-weight: 600; color: #475569;">${escapeHtml(doc.size || '1.0 MB')}</span></td>
+            <td><span style="color: #64748b; font-size: 0.84rem;">${escapeHtml(doc.date || 'Oct 2026')}</span></td>
+            <td style="text-align: right;">
+              <button type="button" class="btn-file-action" data-download="${escapeHtml(dlName)}">
+                <i data-lucide="download"></i>
+                <span>Download</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
 
       bindDownloadButtons();
+      if (window.lucide) window.lucide.createIcons();
+    }
       if (window.lucide) window.lucide.createIcons();
     }
 
@@ -3085,10 +3924,31 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (e) {}
     }
 
+    // Expose portal refresher for dynamic switching & account logins
+    window._motaSwitchPortalTab = switchPortalSubView;
+    window._motaRefreshPortal = function() {
+      try {
+        renderHomeTasksTable();
+        renderInteractiveCalendar();
+        renderIdeasList();
+        renderVaultDocs();
+        updateTasksCounters();
+        bindDownloadButtons();
+        switchPortalSubView(currentActiveTab || 'home');
+      } catch (err) {
+        console.warn('Portal refresh error:', err);
+      }
+    };
+
     // --- Initial Boot of Interactive Portal Components ---
     renderHomeTasksTable();
     bindDownloadButtons();
     updateTasksCounters();
   }
-});
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMotaGrowthApp);
+} else {
+  initMotaGrowthApp();
+}
 
