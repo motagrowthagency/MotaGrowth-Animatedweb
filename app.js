@@ -11,7 +11,7 @@ function initMotaGrowthApp() {
   if (window.lucide) window.lucide.createIcons();
 
   // Storage Keys
-  const STORAGE_INQUIRIES = 'motagrowth_v6_inquiries_db';
+  const STORAGE_INQUIRIES = 'motagrowth_v7_inquiries_db';
   const STORAGE_CLIENTS = 'motagrowth_v6_clients_db';
   const STORAGE_ACTIVE_CLIENT_SESSION = 'motagrowth_active_client_session_v1';
 
@@ -48,9 +48,10 @@ function initMotaGrowthApp() {
   }
 
   // Load Initial State
+  let loggedInClient = null;
   let inquiries = loadInquiries();
   let clients = loadClients();
-  let loggedInClient = getActiveSessionClient();
+  loggedInClient = getActiveSessionClient();
   let activeEditingClientId = null;
   let currentWizardStep = 1;
   let activeClientTab = 'home';
@@ -399,8 +400,130 @@ function initMotaGrowthApp() {
 
   let isAnimationEnding = false;
 
+  // -------------------------------------------------------------------------
+  // 2a. CURSOR-PROXIMITY SCRUB — the closer the cursor gets to "Get In Touch",
+  //     the further the hands animation scrubs toward the fingers touching.
+  // -------------------------------------------------------------------------
+  let cursorScrubEnabled = true; // disabled while the full click animation is committed/playing
+  let scrubTargetProgress = 0;
+  let scrubCurrentProgress = 0;
+  let scrubRafId = null;
+  let motionVideoDuration = 0;
+
+  if (motionVideo) {
+    const captureDuration = () => {
+      if (motionVideo.duration && isFinite(motionVideo.duration)) {
+        motionVideoDuration = motionVideo.duration;
+      }
+    };
+    motionVideo.addEventListener('loadedmetadata', captureDuration);
+    if (motionVideo.readyState >= 1) captureDuration();
+  }
+
+  function computeCursorProximity(clientX, clientY) {
+    if (!getInTouchBtn) return 0;
+    const rect = getInTouchBtn.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = clientX - cx;
+    const dy = clientY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // Fully "touching" once the cursor is essentially over the button.
+    const innerRadius = Math.max(rect.width, rect.height) * 0.55;
+    // Falloff distance scales with viewport so it feels consistent on any screen size.
+    const outerRadius = Math.max(window.innerWidth, window.innerHeight) * 0.7;
+
+    let t = 1 - (dist - innerRadius) / (outerRadius - innerRadius);
+    t = Math.min(1, Math.max(0, t));
+
+    // Smoothstep easing for a more natural, organic approach curve.
+    return t * t * (3 - 2 * t);
+  }
+
+  let scrubLastTs = null;
+
+  function scrubAnimationLoop(ts) {
+    if (scrubLastTs == null) scrubLastTs = ts;
+    const dt = Math.max(0, ts - scrubLastTs);
+    scrubLastTs = ts;
+
+    // Time-based (not frame-count-based) exponential easing so the motion
+    // stays correct regardless of refresh rate or throttled/backgrounded tabs.
+    const smoothingMs = 220; // smaller = snappier response to the cursor
+    const alpha = 1 - Math.exp(-dt / smoothingMs);
+    scrubCurrentProgress += (scrubTargetProgress - scrubCurrentProgress) * alpha;
+
+    if (motionVideo && motionVideoDuration && cursorScrubEnabled) {
+      // Hover can bring the hands within a hair of touching, but never all the
+      // way to the final frame — that stays reserved for the actual click, and
+      // it keeps a safe margin above the "near peak" completion threshold below.
+      const hoverCeiling = 0.97;
+      const safetyBufferSec = 0.35;
+      const cappedProgress = Math.min(scrubCurrentProgress, hoverCeiling);
+      try {
+        motionVideo.currentTime = cappedProgress * (motionVideoDuration - safetyBufferSec);
+      } catch (e) {}
+      motionVideo.style.opacity = String(scrubCurrentProgress);
+      motionVideo.style.visibility = scrubCurrentProgress > 0.01 ? 'visible' : 'hidden';
+    }
+
+    if (Math.abs(scrubTargetProgress - scrubCurrentProgress) > 0.001) {
+      scrubRafId = requestAnimationFrame(scrubAnimationLoop);
+    } else {
+      scrubRafId = null;
+      scrubLastTs = null;
+    }
+  }
+
+  function requestScrubFrame() {
+    if (!scrubRafId) {
+      scrubLastTs = null;
+      scrubRafId = requestAnimationFrame(scrubAnimationLoop);
+    }
+  }
+
+  function isLandingViewActive() {
+    return landingView && landingView.style.display !== 'none';
+  }
+
+  window.addEventListener('mousemove', (e) => {
+    if (!cursorScrubEnabled || !isLandingViewActive()) return;
+    scrubTargetProgress = computeCursorProximity(e.clientX, e.clientY);
+    requestScrubFrame();
+  }, { passive: true });
+
+  window.addEventListener('mouseleave', () => {
+    if (!cursorScrubEnabled) return;
+    scrubTargetProgress = 0;
+    requestScrubFrame();
+  });
+
+  function resetCursorScrub() {
+    cursorScrubEnabled = true;
+    scrubTargetProgress = 0;
+    scrubCurrentProgress = 0;
+    scrubLastTs = null;
+    if (scrubRafId) {
+      cancelAnimationFrame(scrubRafId);
+      scrubRafId = null;
+    }
+    if (motionVideo) {
+      motionVideo.style.opacity = '';
+      motionVideo.style.visibility = '';
+      motionVideo.currentTime = 0;
+    }
+  }
+
   function playNativeAnimation() {
     isAnimationEnding = false;
+
+    // Hand off from hover-scrub to the committed, full-audio playthrough
+    cursorScrubEnabled = false;
+    if (scrubRafId) {
+      cancelAnimationFrame(scrubRafId);
+      scrubRafId = null;
+    }
 
     // Smoothly fade out center hero copy and button
     if (heroCenterWrapper) {
@@ -409,6 +532,8 @@ function initMotaGrowthApp() {
 
     // Play finalanimation.mp4 with audio unmuted
     if (motionVideo) {
+      motionVideo.style.opacity = '';
+      motionVideo.style.visibility = '';
       motionVideo.classList.add('playing');
       motionVideo.currentTime = 0;
       motionVideo.muted = false;
@@ -445,9 +570,11 @@ function initMotaGrowthApp() {
       onAnimationComplete();
     });
 
-    // Seamless trigger near peak illumination
+    // Seamless trigger near peak illumination — only during the committed,
+    // click-triggered playthrough (never during paused hover-scrub seeking,
+    // which also fires 'timeupdate' and must not pop the modal on its own).
     motionVideo.addEventListener('timeupdate', () => {
-      if (motionVideo.duration && motionVideo.currentTime >= motionVideo.duration - 0.12) {
+      if (!motionVideo.paused && motionVideo.duration && motionVideo.currentTime >= motionVideo.duration - 0.12) {
         onAnimationComplete();
       }
     });
@@ -474,13 +601,13 @@ function initMotaGrowthApp() {
     setTimeout(() => {
       if (motionVideo) {
         motionVideo.pause();
-        motionVideo.currentTime = 0;
         motionVideo.classList.remove('playing');
       }
       if (heroCenterWrapper) {
         heroCenterWrapper.classList.remove('animating-out');
       }
       isAnimationEnding = false;
+      resetCursorScrub();
     }, 450);
   }
 
@@ -2832,6 +2959,7 @@ function initMotaGrowthApp() {
             item &&
             item.companyName !== 'Orsap' && 
             item.companyName !== 'ORSAP' && 
+            !(item.id && (item.id === 'DEVIS-001' || item.id === 'DEVIS-002' || item.id === 'DEVIS-003' || item.id === 'DEVIS-004')) &&
             !(item.sector && item.sector.includes('BTP')) && 
             !(item.services && JSON.stringify(item.services).includes('PROTECTION')) &&
             item.type !== 'PARTICULIER'
@@ -2943,64 +3071,7 @@ function initMotaGrowthApp() {
   }
 
   function getSeedInquiries() {
-    return [
-      {
-        id: 'DEVIS-001',
-        createdAt: '2026-09-05T14:18:00',
-        dateDisplay: '05/09/2026<br>14:18',
-        type: 'STARTUP',
-        clientName: 'Marcus Vance',
-        companyName: 'Hyperion Digital',
-        clientEmail: 'marcus@hyperiondigital.co',
-        clientPhone: '+1 (555) 345-6789',
-        services: ['CUSTOM WEBSITE DESIGN & DEV', 'BRAND IDENTITY & CREATIVE DIRECTION'],
-        sector: 'TECH & SAAS',
-        notes: 'Need a high-converting 3D animated web platform with client portal.',
-        status: 'New'
-      },
-      {
-        id: 'DEVIS-002',
-        createdAt: '2026-09-04T19:13:00',
-        dateDisplay: '04/09/2026<br>19:13',
-        type: 'PRO',
-        clientName: 'Elena Rostova',
-        companyName: 'Velour Luxury Apparel',
-        clientEmail: 'elena@velourclothing.co',
-        clientPhone: '+1 (415) 890-4411',
-        services: ['CUSTOM WEBSITE DESIGN & DEV', 'PAID ADS & PERFORMANCE MARKETING'],
-        sector: 'LUXURY E-COMMERCE',
-        notes: 'Looking to scale TikTok & Meta ads to $150k/month revenue.',
-        status: 'Contacted'
-      },
-      {
-        id: 'DEVIS-003',
-        createdAt: '2026-09-03T14:29:00',
-        dateDisplay: '03/09/2026<br>14:29',
-        type: 'ENTERPRISE',
-        clientName: 'Liam Thorne',
-        companyName: 'Lumina Health Global',
-        clientEmail: 'liam@luminahealth.com',
-        clientPhone: '+44 20 7946 0912',
-        services: ['CUSTOM WEBSITE DESIGN & DEV', 'SOCIAL MEDIA GROWTH & MANAGEMENT', 'BRAND IDENTITY & CREATIVE DIRECTION'],
-        sector: 'HEALTH & BIO',
-        notes: 'Complete rebrand, custom digital experience and monthly viral reels.',
-        status: 'Proposal Sent'
-      },
-      {
-        id: 'DEVIS-004',
-        createdAt: '2026-09-02T21:49:00',
-        dateDisplay: '02/09/2026<br>21:49',
-        type: 'PRO',
-        clientName: 'Sofia Alami',
-        companyName: 'Aura Lifestyle',
-        clientEmail: 'sofia@auralifestyle.io',
-        clientPhone: '+33 6 12 34 56 78',
-        services: ['PAID ADS & PERFORMANCE MARKETING', 'SOCIAL MEDIA GROWTH & MANAGEMENT'],
-        sector: 'BEAUTY & LIFESTYLE',
-        notes: 'Full-funnel influencer marketing and conversion rate optimization.',
-        status: 'New'
-      }
-    ];
+    return [];
   }
 
   function getSeedClients() {

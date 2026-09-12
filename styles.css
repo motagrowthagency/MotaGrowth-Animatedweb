@@ -89,10 +89,10 @@ html, body {
   object-position: center bottom;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease;
 }
 
 .backdrop-motion-video.playing {
+  transition: opacity 0.2s ease;
   opacity: 1;
   visibility: visible;
 }
@@ -2272,6 +2272,7 @@ body.is-client-route #adminPortalView {
   justify-content: space-between;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
 .cal-day-cell:hover {
@@ -2281,46 +2282,99 @@ body.is-client-route #adminPortalView {
   box-shadow: 0 6px 16px rgba(0, 102, 255, 0.1);
 }
 
+/* Event Days Styled in Blue */
+.cal-day-cell.has-events {
+  background: linear-gradient(135deg, #e8f2ff 0%, #f0f7ff 100%);
+  border: 1.5px solid #3b82f6;
+  box-shadow: 0 3px 12px rgba(0, 102, 255, 0.12);
+}
+
+.cal-day-cell.has-events .cal-day-number,
+.cal-day-cell.has-events .day-number {
+  color: #0055ff;
+  font-weight: 800;
+}
+
+.cal-day-cell.has-events:hover {
+  background: linear-gradient(135deg, #dbeafe 0%, #e0f0ff 100%);
+  border-color: #0066ff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 102, 255, 0.22);
+}
+
 .cal-day-cell.other-month {
   opacity: 0.35;
   background: #f1f5f9;
 }
 
+.cal-day-cell.active-cal-day,
 .cal-day-cell.is-selected {
-  border-color: #0066ff;
-  background: #eff6ff;
-  box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.2);
+  border-color: #0052cc !important;
+  background: #0066ff !important;
+  box-shadow: 0 4px 16px rgba(0, 102, 255, 0.35) !important;
 }
 
-.cal-day-cell.is-today .day-number {
+.cal-day-cell.active-cal-day .cal-day-number,
+.cal-day-cell.active-cal-day .day-number,
+.cal-day-cell.is-selected .cal-day-number,
+.cal-day-cell.is-selected .day-number {
+  color: #ffffff !important;
+  font-weight: 900;
+}
+
+.cal-day-cell.active-cal-day .cal-dot,
+.cal-day-cell.is-selected .cal-dot {
+  box-shadow: 0 0 0 1px #ffffff;
+}
+
+.cal-day-cell.active-cal-day .cal-dot.more,
+.cal-day-cell.is-selected .cal-dot.more {
+  color: #ffffff;
+}
+
+.cal-day-cell.is-today .day-number,
+.cal-day-cell.is-today .cal-day-number {
   color: #0066ff;
   font-weight: 900;
 }
 
+.cal-day-number,
 .day-number {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: #334155;
+  line-height: 1;
 }
 
+.cal-day-dots,
 .day-dots-row {
   display: flex;
   align-items: center;
   gap: 0.25rem;
   flex-wrap: wrap;
-  margin-top: 0.3rem;
+  margin-top: 0.35rem;
 }
 
+.cal-dot,
 .event-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
+  display: inline-block;
 }
 
-.dot-reel { background: #ea580c; }
-.dot-deliverable { background: #0066ff; }
-.dot-shoot { background: #9333ea; }
-.dot-sync { background: #10b981; }
+.cal-dot.deliverable, .dot-deliverable { background: #0066ff; }
+.cal-dot.sync, .dot-sync { background: #10b981; }
+.cal-dot.reel, .dot-reel { background: #ea580c; }
+.cal-dot.shoot, .dot-shoot { background: #9333ea; }
+.cal-dot.more {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #0066ff;
+  width: auto;
+  height: auto;
+  line-height: 1;
+}
 
 /* Date Details Panel */
 .calendar-date-details-panel {
@@ -5913,14 +5967,27 @@ body.is-admin-route #adminPortalView {
   box-shadow: 0 3px 10px rgba(0, 136, 255, 0.35);
 }
 
+.admin-cal-day-cell.has-event {
+  background: #eff6ff;
+  color: #0066ff;
+  border: 1.5px solid #60a5fa;
+  font-weight: 800;
+}
+
+.admin-cal-day-cell.has-event:hover:not(.empty-day) {
+  background: #dbeafe;
+  color: #0047cc;
+  border-color: #3b82f6;
+}
+
 .admin-cal-day-cell.has-event::after {
   content: '';
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background-color: #0088ff;
+  background-color: #0066ff;
   position: absolute;
-  bottom: 3px;
+  bottom: 2px;
 }
 
 .admin-cal-day-cell.is-selected.has-event::after {
