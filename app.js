@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const frameClockEl = document.getElementById('frame-clock-display');
 
   const studioTimeFormatter = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Africa/Casablanca',
+    timeZone: 'Europe/Madrid',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const frameTimeFormatter = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Africa/Casablanca',
+    timeZone: 'Europe/Madrid',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
@@ -41,13 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const now = new Date();
       const studioTime = studioTimeFormatter.format(now);
-      const frameTime = frameTimeFormatter.format(now);
 
       if (clockEl) {
-        clockEl.textContent = `CASABLANCA MA • ${studioTime}`;
+        clockEl.textContent = `BARCELONA ES • ${studioTime}`;
       }
       if (frameClockEl) {
-        frameClockEl.textContent = `CASABLANCA ${frameTime}`;
+        frameClockEl.textContent = `BARCELONA ES • ${studioTime}`;
       }
     } catch {
       // Fallback
@@ -55,8 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const h = String(now.getUTCHours()).padStart(2, '0');
       const m = String(now.getUTCMinutes()).padStart(2, '0');
       const s = String(now.getUTCSeconds()).padStart(2, '0');
-      if (clockEl) clockEl.textContent = `CASABLANCA MA • ${h}:${m}:${s}`;
-      if (frameClockEl) frameClockEl.textContent = `CASABLANCA ${h}:${m}`;
+      if (clockEl) clockEl.textContent = `BARCELONA ES • ${h}:${m}:${s}`;
+      if (frameClockEl) frameClockEl.textContent = `BARCELONA ES • ${h}:${m}:${s}`;
     }
   }
 
@@ -422,10 +421,10 @@ document.addEventListener('DOMContentLoaded', () => {
       'cases.subtitle': 'CLEAR STRATEGY. DISTINCTIVE DESIGN. PURPOSEFUL EXECUTION.',
       'cases.cta': 'REQUEST STUDIO PROPOSAL ↗',
       'about.tag': '05 / LEADERSHIP & FOUNDER',
-      'about.title': 'BUILT IN CASABLANCA.<br><span class="gold-gradient-text">DIRECTED BY MOHAMED TAZI.</span>',
+      'about.title': 'BUILT IN BARCELONA.<br><span class="gold-gradient-text">DIRECTED BY MOHAMED TAZI.</span>',
       'about.badgeRole': 'Founder & Growth Strategist',
-      'about.badgeLocation': 'Casablanca, Morocco',
-      'about.desc1': 'MotaGrowth is an independent growth studio founded by Mohamed Tazi in Casablanca. We partner with ambitious founders, luxury hospitality venues, and modern digital brands who refuse to look or perform like generic templates.',
+      'about.badgeLocation': 'Barcelona, Spain',
+      'about.desc1': 'MotaGrowth is an independent growth studio founded by Mohamed Tazi in Barcelona. We partner with ambitious founders, luxury hospitality venues, and modern digital brands who refuse to look or perform like generic templates.',
       'about.desc2': 'Every strategic roadmap, conversion architecture, and high-stakes performance campaign is directly overseen by the founder. No junior account handoffs, no vanity impressions, and zero wasted ad spend.'
     },
     fr: {
@@ -476,10 +475,10 @@ document.addEventListener('DOMContentLoaded', () => {
       'cases.subtitle': 'STRATÉGIE CLAIRE. DESIGN DISTINCTIF. EXÉCUTION MAÎTRISÉE.',
       'cases.cta': 'DEMANDER UNE PROPOSITION ↗',
       'about.tag': '05 / LEADERSHIP & FONDATEUR',
-      'about.title': 'NÉ À CASABLANCA.<br><span class="gold-gradient-text">DIRIGÉ PAR MOHAMED TAZI.</span>',
+      'about.title': 'NÉ À BARCELONE.<br><span class="gold-gradient-text">DIRIGÉ PAR MOHAMED TAZI.</span>',
       'about.badgeRole': 'Fondateur & Stratège Digital',
-      'about.badgeLocation': 'Casablanca, Maroc',
-      'about.desc1': 'MotaGrowth est un studio indépendant de croissance digitale fondé par Mohamed Tazi à Casablanca. Nous accompagnons les fondateurs ambitieux, les acteurs de l’hôtellerie de luxe et les marques digitales résolues à dépasser les templates génériques.',
+      'about.badgeLocation': 'Barcelone, Espagne',
+      'about.desc1': 'MotaGrowth est un studio indépendant de croissance digitale fondé par Mohamed Tazi à Barcelone. Nous accompagnons les fondateurs ambitieux, les acteurs de l’hôtellerie de luxe et les marques digitales résolues à dépasser les templates génériques.',
       'about.desc2': 'Chaque feuille de route stratégique, architecture de conversion et campagne à haute rentabilité est directement pilotée par le fondateur. Aucun intermédiaire junior, aucune métrique d’illusion.'
     }
   };
@@ -1008,6 +1007,64 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ========================================================================
+  
+  // ========================================================================
+  // 8B. Interactive Studio Menu Chooser (Triggered by 4-Dots Button)
+  // ========================================================================
+  const menuTriggers = document.querySelectorAll('.menu-chooser-trigger');
+  const menuModal = document.getElementById('studioMenuModal');
+  const closeMenuBtn = document.getElementById('closeStudioMenuBtn');
+  const menuBackdrop = document.getElementById('studioMenuBackdrop');
+  const menuCloseLinks = document.querySelectorAll('[data-menu-close]');
+
+  function openStudioMenu() {
+    if (!menuModal) return;
+    menuModal.classList.add('is-open');
+    menuModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('menu-open');
+    menuTriggers.forEach(t => t.setAttribute('aria-expanded', 'true'));
+  }
+
+  function closeStudioMenu() {
+    if (!menuModal) return;
+    menuModal.classList.remove('is-open');
+    menuModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('menu-open');
+    menuTriggers.forEach(t => t.setAttribute('aria-expanded', 'false'));
+  }
+
+  menuTriggers.forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (menuModal && menuModal.classList.contains('is-open')) {
+        closeStudioMenu();
+      } else {
+        openStudioMenu();
+      }
+    });
+  });
+
+  if (closeMenuBtn) {
+    closeMenuBtn.addEventListener('click', closeStudioMenu);
+  }
+
+  if (menuBackdrop) {
+    menuBackdrop.addEventListener('click', closeStudioMenu);
+  }
+
+  menuCloseLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      closeStudioMenu();
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menuModal && menuModal.classList.contains('is-open')) {
+      closeStudioMenu();
+    }
+  });
+
   // 9. Client Enquiries Hook (Future Admin Dashboard Data Layer)
   // ========================================================================
   window.MotaInquiries = {

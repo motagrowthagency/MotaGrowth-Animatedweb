@@ -25,13 +25,15 @@
   <!-- Persistent Sticky Header -->
   <header class="site-header header-visible" id="site-header">
     <div class="header-inner">
-      <a href="index.html" class="brand-link" aria-label="MotaGrowth Home">
-        <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
-      </a>
+      <div class="header-left">
+        <a href="index.html" class="brand-link" aria-label="MotaGrowth Home">
+          <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
+        </a>
 
-      <div class="studio-status-pill" aria-label="Studio local time">
-        <span class="status-indicator" aria-hidden="true"></span>
-        <span class="status-text"><span id="studio-clock">--:--</span></span>
+        <div class="studio-status-pill" aria-label="Studio local time">
+          <span class="status-indicator" aria-hidden="true"></span>
+          <span class="status-text"><span id="studio-clock">--:--</span></span>
+        </div>
       </div>
 
       <nav class="nav-menu" aria-label="Primary Navigation">
@@ -51,12 +53,12 @@
         <a href="#proposal" class="btn-contact-header">
           <span>REQUEST A PROPOSAL</span>
         </a>
-        <a href="index.html#admin" class="frame-menu-dots" aria-label="Admin Portal" title="Studio Admin CRM">
+        <button type="button" class="frame-menu-dots menu-chooser-trigger" aria-label="Open Studio Menu" title="Studio Menu" aria-haspopup="dialog" aria-expanded="false">
           <span class="grid-dot"></span>
           <span class="grid-dot"></span>
           <span class="grid-dot"></span>
           <span class="grid-dot"></span>
-        </a>
+        </button>
       </div>
     </div>
   </header>
@@ -266,7 +268,7 @@
       </div>
 
       <div class="footer-bottom">
-        <div class="f-copy">© 2026 MotaGrowth Studio. All rights reserved. Casablanca, Morocco.</div>
+        <div class="f-copy">© 2026 MotaGrowth Studio. All rights reserved. Barcelona, Spain.</div>
         <div class="f-legal">
           <button type="button" class="legal-link-btn" id="openPrivacyBtn">Privacy Statement</button>
           <span class="sep" aria-hidden="true">•</span>
@@ -276,6 +278,88 @@
 
     </div>
   </footer>
+
+    <!-- Studio Menu Chooser Overlay -->
+  <div class="studio-menu-overlay" id="studioMenuModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Studio Menu">
+    <div class="studio-menu-backdrop" id="studioMenuBackdrop"></div>
+    <div class="studio-menu-panel">
+      <div class="studio-menu-header">
+        <div class="menu-brand">
+          <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
+          <span class="menu-location-pill">BARCELONA • 41°23'N 2°10'E</span>
+        </div>
+        <button type="button" class="studio-menu-close" id="closeStudioMenuBtn" aria-label="Close Menu">✕</button>
+      </div>
+      <div class="studio-menu-body">
+        <div class="menu-nav-col">
+          <span class="menu-col-label">Navigation</span>
+          <nav class="menu-links-list">
+            <a href="index.html#hero" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">01</span>
+              <span class="menu-item-text">Overview</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="index.html#audiences" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">02</span>
+              <span class="menu-item-text">Sectors &amp; Audiences</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="index.html#philosophy" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">03</span>
+              <span class="menu-item-text">Strategy &amp; Performance</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="cases.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">04</span>
+              <span class="menu-item-text">Selected Cases</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="services.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">05</span>
+              <span class="menu-item-text">Services &amp; Disciplines</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="about.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">06</span>
+              <span class="menu-item-text">About &amp; Founder</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+          </nav>
+        </div>
+        <div class="menu-portals-col">
+          <div class="menu-box-card">
+            <span class="menu-col-label">Workspaces</span>
+            <div class="menu-workspaces-links">
+              <a href="client-space.html" class="workspace-card-link">
+                <div class="ws-icon">🔒</div>
+                <div class="ws-info">
+                  <strong>Client Space</strong>
+                  <span>Project roadmap, approvals &amp; deliverables</span>
+                </div>
+                <span class="ws-arrow">↗</span>
+              </a>
+              <a href="admin.html" class="workspace-card-link">
+                <div class="ws-icon">⚡</div>
+                <div class="ws-info">
+                  <strong>Studio Admin CRM</strong>
+                  <span>Leads pipeline, calendar &amp; client management</span>
+                </div>
+                <span class="ws-arrow">↗</span>
+              </a>
+            </div>
+          </div>
+          <div class="menu-box-card">
+            <span class="menu-col-label">Direct Connect</span>
+            <div class="menu-contact-links">
+              <a href="https://wa.me/34675194956" target="_blank" rel="noopener">WhatsApp Direct (+34 675 194 956) ↗</a>
+              <a href="https://www.instagram.com/motagrowth/" target="_blank" rel="noopener">Instagram (@motagrowth) ↗</a>
+              <a href="mailto:contact@motagrowth.com">contact@motagrowth.com</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Custom Cursor -->
   <div class="custom-cursor cursor-dot" id="cursor-dot" aria-hidden="true"></div>

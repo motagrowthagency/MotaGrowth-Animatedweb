@@ -202,6 +202,13 @@ button {
   justify-content: space-between;
 }
 
+.header-left,
+.frame-bar-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
 .brand-link {
   display: inline-flex;
   align-items: center;
@@ -506,6 +513,12 @@ body.lang-transition .comma-card-inner {
   grid-template-columns: repeat(2, 5px);
   gap: 3px;
   padding: 6px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
   cursor: pointer;
   text-decoration: none;
   transform-origin: center center;
@@ -1518,6 +1531,270 @@ a:hover .btn-arrow {
 
 .legal-link-btn:hover {
   color: var(--brand-gold);
+}
+
+/* ==========================================================================
+   STUDIO MENU CHOOSER OVERLAY (Interactive Menu Triggered by 4-Dots Button)
+   ========================================================================== */
+
+.studio-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.studio-menu-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.studio-menu-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.studio-menu-panel {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 860px;
+  background: #040814;
+  border: 1px solid rgba(245, 176, 20, 0.32);
+  border-radius: 8px;
+  padding: 2.5rem 3rem;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.95), 0 0 50px rgba(245, 176, 20, 0.12);
+  transform: translateY(20px) scale(0.98);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.studio-menu-overlay.is-open .studio-menu-panel {
+  transform: translateY(0) scale(1);
+}
+
+.studio-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 2rem;
+}
+
+.menu-brand {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.menu-location-pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--brand-gold);
+  border: 1px solid rgba(245, 176, 20, 0.28);
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: rgba(245, 176, 20, 0.06);
+  text-transform: uppercase;
+}
+
+.studio-menu-close {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.7);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.studio-menu-close:hover {
+  border-color: var(--brand-gold);
+  color: var(--brand-gold);
+  transform: scale(1.08);
+}
+
+.studio-menu-body {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 2.5rem;
+}
+
+.menu-col-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+  margin-bottom: 1rem;
+}
+
+.menu-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.menu-link-item {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem 0.9rem;
+  border-radius: 4px;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.menu-link-item:hover {
+  background: rgba(245, 176, 20, 0.08);
+  border-color: rgba(245, 176, 20, 0.3);
+  transform: translateX(4px);
+}
+
+.menu-item-num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--brand-gold);
+  margin-right: 1rem;
+  opacity: 0.8;
+}
+
+.menu-item-text {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  flex: 1;
+}
+
+.menu-item-arrow {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.85rem;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.menu-link-item:hover .menu-item-arrow {
+  color: var(--brand-gold);
+  transform: translate(2px, -2px);
+}
+
+.menu-portals-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.menu-box-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 1.25rem;
+}
+
+.menu-workspaces-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.workspace-card-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 0.85rem;
+  background: rgba(2, 6, 18, 0.6);
+  border: 1px solid rgba(245, 176, 20, 0.15);
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.workspace-card-link:hover {
+  border-color: var(--brand-gold);
+  background: rgba(245, 176, 20, 0.08);
+  transform: translateY(-1px);
+}
+
+.ws-icon {
+  font-size: 1.1rem;
+}
+
+.ws-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+}
+
+.ws-info strong {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.ws-info span {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.ws-arrow {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.85rem;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.workspace-card-link:hover .ws-arrow {
+  color: var(--brand-gold);
+  transform: translate(2px, -2px);
+}
+
+.menu-contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menu-contact-links a {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.menu-contact-links a:hover {
+  color: var(--brand-gold);
+}
+
+@media (max-width: 768px) {
+  .studio-menu-panel {
+    padding: 1.5rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .studio-menu-body {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 }
 
 /* ==========================================================================

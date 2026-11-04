@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MotaGrowth — Digital Growth Studio</title>
-  <meta name="description" content="MotaGrowth is an independent digital growth studio based in Casablanca. Strategy, design, and performance marketing engineered for ambitious brands.">
+  <meta name="description" content="MotaGrowth is an independent digital growth studio based in Barcelona. Strategy, design, and performance marketing engineered for ambitious brands.">
   
   <link rel="icon" type="image/png" href="assets/mota-icon.png">
 
@@ -28,13 +28,15 @@
        ======================================================================== -->
   <header class="site-header" id="site-header" aria-hidden="true">
     <div class="header-inner">
-      <a href="#hero" class="brand-link" aria-label="MotaGrowth Home">
-        <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
-      </a>
+      <div class="header-left">
+        <a href="#hero" class="brand-link" aria-label="MotaGrowth Home">
+          <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
+        </a>
 
-      <div class="studio-status-pill" aria-label="Studio local time">
-        <span class="status-indicator" aria-hidden="true"></span>
-        <span class="status-text"><span id="studio-clock">--:--</span></span>
+        <div class="studio-status-pill" aria-label="Studio local time">
+          <span class="status-indicator" aria-hidden="true"></span>
+          <span class="status-text"><span id="studio-clock">--:--</span></span>
+        </div>
       </div>
 
       <nav class="nav-menu" aria-label="Primary Navigation">
@@ -42,7 +44,7 @@
         <a href="#audiences" class="nav-link" data-i18n="nav.audiences">Audiences</a>
         <a href="#philosophy" class="nav-link">Strategy</a>
         <a href="#cases" class="nav-link" data-i18n="nav.cases">Cases</a>
-        <a href="#about" class="nav-link" data-i18n="nav.about">About</a>
+        <a href="#about" class="nav-link" data-i18n="nav.about">About &amp; Founder</a>
         <a href="client-space.html" class="nav-link">Client Space</a>
       </nav>
 
@@ -55,12 +57,12 @@
         <a href="#proposal" class="btn-contact-header">
           <span data-i18n="btn.proposal">REQUEST A PROPOSAL</span>
         </a>
-        <a href="admin.html" class="frame-menu-dots" aria-label="Admin Portal" title="Studio Admin CRM">
+        <button type="button" class="frame-menu-dots menu-chooser-trigger" aria-label="Open Studio Menu" title="Studio Menu" aria-haspopup="dialog" aria-expanded="false">
           <span class="grid-dot"></span>
           <span class="grid-dot"></span>
           <span class="grid-dot"></span>
           <span class="grid-dot"></span>
-        </a>
+        </button>
       </div>
     </div>
   </header>
@@ -76,31 +78,42 @@
       <!-- Outer Rounded Glass Frame -->
       <div class="hero-glass-frame">
         
-        <!-- Header Bar Inside Frame (Initial In-View Navigation) -->
+        <!-- Header Bar Inside Frame (Head Page Selector - Matching Top Header Exactly) -->
         <div class="frame-top-bar">
-          <a href="#hero" class="frame-brand" aria-label="MotaGrowth Home">
-            <span class="frame-brand-name"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
-          </a>
-
-          <div class="frame-center-clock" aria-label="Casablanca local time">
-            <span id="frame-clock-display">--:--</span>
+          <div class="frame-bar-left">
+            <a href="#hero" class="brand-link" aria-label="MotaGrowth Home">
+              <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
+            </a>
+            <div class="studio-status-pill" aria-label="Studio local time">
+              <span class="status-indicator" aria-hidden="true"></span>
+              <span class="status-text"><span id="frame-clock-display">--:--</span></span>
+            </div>
           </div>
 
-          <div class="frame-right-controls">
+          <nav class="nav-menu" aria-label="Primary Navigation">
+            <a href="#hero" class="nav-link active" data-i18n="nav.home">Home</a>
+            <a href="#audiences" class="nav-link" data-i18n="nav.audiences">Audiences</a>
+            <a href="#philosophy" class="nav-link">Strategy</a>
+            <a href="#cases" class="nav-link" data-i18n="nav.cases">Cases</a>
+            <a href="#about" class="nav-link" data-i18n="nav.about">About &amp; Founder</a>
+            <a href="client-space.html" class="nav-link">Client Space</a>
+          </nav>
+
+          <div class="header-actions">
             <div class="lang-selector" role="group" aria-label="Language Selector">
               <button type="button" class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
               <span class="lang-sep" aria-hidden="true">/</span>
               <button type="button" class="lang-btn" data-lang="fr" aria-pressed="false">FR</button>
             </div>
-            <a href="client-space.html" class="btn-ref btn-ref-ghost" style="margin-right:0.6rem; text-decoration:none;">
-              <span class="btn-text">CLIENT SPACE ↗</span>
+            <a href="#proposal" class="btn-contact-header">
+              <span data-i18n="btn.proposal">REQUEST A PROPOSAL</span>
             </a>
-            <a href="admin.html" class="frame-menu-dots" aria-label="Admin Portal" title="Studio Admin CRM">
+            <button type="button" class="frame-menu-dots menu-chooser-trigger" aria-label="Open Studio Menu" title="Studio Menu" aria-haspopup="dialog" aria-expanded="false">
               <span class="grid-dot"></span>
               <span class="grid-dot"></span>
               <span class="grid-dot"></span>
               <span class="grid-dot"></span>
-            </a>
+            </button>
           </div>
         </div>
 
@@ -344,7 +357,7 @@
         <div class="about-sec-header">
           <div class="about-tag" data-i18n="about.tag">05 / LEADERSHIP &amp; FOUNDER</div>
           <h2 class="about-sec-title" data-i18n="about.title">
-            BUILT IN CASABLANCA.<br>
+            BUILT IN BARCELONA.<br>
             <span class="gold-gradient-text">DIRECTED BY MOHAMED TAZI.</span>
           </h2>
         </div>
@@ -357,7 +370,7 @@
               <div class="about-portrait-img-wrap">
                 <img 
                   src="assets/founder-mohamed-tazi.jpg" 
-                  alt="Mohamed Tazi - Founder & Creative Director at MotaGrowth in Casablanca" 
+                  alt="Mohamed Tazi - Founder & Creative Director at MotaGrowth in Barcelona" 
                   class="about-founder-img"
                   loading="lazy"
                 />
@@ -370,7 +383,7 @@
                 </div>
                 <div class="caption-location">
                   <span class="loc-pin">📍</span>
-                  <span data-i18n="about.badgeLocation">Casablanca, Morocco</span>
+                  <span data-i18n="about.badgeLocation">Barcelona, Spain</span>
                 </div>
               </div>
             </div>
@@ -383,7 +396,7 @@
             </div>
             
             <p class="about-body-text" data-i18n="about.desc1">
-              MotaGrowth is an independent growth studio founded by Mohamed Tazi in Casablanca. We partner with ambitious founders, luxury hospitality venues, and modern digital brands who refuse to look or perform like generic templates.
+              MotaGrowth is an independent growth studio founded by Mohamed Tazi in Barcelona. We partner with ambitious founders, luxury hospitality venues, and modern digital brands who refuse to look or perform like generic templates.
             </p>
 
             <p class="about-body-text" data-i18n="about.desc2">
@@ -412,7 +425,7 @@
                 <div class="pillar-num">03</div>
                 <div class="pillar-content">
                   <h4 class="pillar-title">Global Standards, Local Edge</h4>
-                  <p class="pillar-desc">Casablanca DNA executed to international standards across Morocco, Europe, and the GCC.</p>
+                  <p class="pillar-desc">Barcelona DNA executed to international standards across Europe (Spain, France), Morocco, and the GCC.</p>
                 </div>
               </div>
             </div>
@@ -480,7 +493,7 @@
       </div>
 
       <div class="footer-bottom">
-        <div class="f-copy">© 2026 MotaGrowth Studio. All rights reserved. Casablanca, Morocco.</div>
+        <div class="f-copy">© 2026 MotaGrowth Studio. All rights reserved. Barcelona, Spain.</div>
         <div class="f-legal">
           <button type="button" class="legal-link-btn" id="openPrivacyBtn">Privacy Statement</button>
           <span class="sep" aria-hidden="true">•</span>
@@ -491,6 +504,100 @@
     </div>
   </footer>
 
+
+  
+  <!-- =========================================================================
+       STUDIO MENU CHOOSER (Interactive Overlay Triggered by the 4 Spinning Dots)
+       ========================================================================= -->
+  <div class="studio-menu-overlay" id="studioMenuModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Studio Menu">
+    <div class="studio-menu-backdrop" id="studioMenuBackdrop"></div>
+    <div class="studio-menu-panel">
+      
+      <div class="studio-menu-header">
+        <div class="menu-brand">
+          <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
+          <span class="menu-location-pill">BARCELONA • 41°23'N 2°10'E</span>
+        </div>
+        <button type="button" class="studio-menu-close" id="closeStudioMenuBtn" aria-label="Close Menu">✕</button>
+      </div>
+
+      <div class="studio-menu-body">
+        
+        <!-- Main Navigation Links -->
+        <div class="menu-nav-col">
+          <span class="menu-col-label">Navigation</span>
+          <nav class="menu-links-list">
+            <a href="#hero" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">01</span>
+              <span class="menu-item-text">Overview</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="#audiences" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">02</span>
+              <span class="menu-item-text">Sectors &amp; Audiences</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="#philosophy" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">03</span>
+              <span class="menu-item-text">Strategy &amp; Performance</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="cases.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">04</span>
+              <span class="menu-item-text">Selected Cases</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="services.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">05</span>
+              <span class="menu-item-text">Services &amp; Disciplines</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="about.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">06</span>
+              <span class="menu-item-text">About &amp; Founder</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+          </nav>
+        </div>
+
+        <!-- Portals & Direct Channels -->
+        <div class="menu-portals-col">
+          <div class="menu-box-card">
+            <span class="menu-col-label">Workspaces</span>
+            <div class="menu-workspaces-links">
+              <a href="client-space.html" class="workspace-card-link">
+                <div class="ws-icon">🔒</div>
+                <div class="ws-info">
+                  <strong>Client Space</strong>
+                  <span>Project roadmap, approvals &amp; deliverables</span>
+                </div>
+                <span class="ws-arrow">↗</span>
+              </a>
+              <a href="admin.html" class="workspace-card-link">
+                <div class="ws-icon">⚡</div>
+                <div class="ws-info">
+                  <strong>Studio Admin CRM</strong>
+                  <span>Leads pipeline, calendar &amp; client management</span>
+                </div>
+                <span class="ws-arrow">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="menu-box-card">
+            <span class="menu-col-label">Direct Connect</span>
+            <div class="menu-contact-links">
+              <a href="https://wa.me/34675194956" target="_blank" rel="noopener">WhatsApp Direct (+34 675 194 956) ↗</a>
+              <a href="https://www.instagram.com/motagrowth/" target="_blank" rel="noopener">Instagram (@motagrowth) ↗</a>
+              <a href="mailto:contact@motagrowth.com">contact@motagrowth.com</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
 
   <!-- Accessible Legal Modals (Transparent Statements) -->
   <div class="legal-modal" id="legalModal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
