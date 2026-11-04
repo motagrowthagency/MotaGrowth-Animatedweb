@@ -1,205 +1,70 @@
 /**
  * MotaGrowth Studio — Human-Crafted Micro-Interactions & Experience Layer
- * - Dynamic Local Geolocation & Real-time Clock
+ * - Studio Time (Casablanca MA) via Native IANA Timezone (Zero External Trackers)
  * - Smart Scroll-Aware Navigation Bar
- * - Interactive Cursor Ambient Light & Kinetic Headline Parallax
- * - Interactive 3D Perspective Card Tilt & Specular Lighting
- * - Custom Precision Studio Cursor
+ * - Energy-Efficient Intersection-Observed Hero Parallax & Ambient Light
+ * - Diffused Atmospheric Champagne Glow
+ * - Interactive 3D Perspective Card Tilt
+ * - Responsive 3D Cover Flow Showcase (Orsap.ma, TG2D, La Centrale Crèche)
+ * - Studio Precision Cursor (Pointer-Fine Gated)
+ * - Accessible Modal Dialogs (Privacy Statement & Terms of Engagement)
+ * - Full Internationalization (EN / FR)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
   // ========================================================================
-  // 1. Live Geolocation & Local Time Clock (Automatic Country & City Detection)
+  // 1. Studio Real-Time Clock (Africa/Casablanca IANA — 100% Native & Private)
   // ========================================================================
   const clockEl = document.getElementById('studio-clock');
   const frameClockEl = document.getElementById('frame-clock-display');
 
-  let detectedLocation = '';
+  const studioTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Africa/Casablanca',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
 
-  // 1A. Comprehensive IANA Timezone to Location Map (Instant 0ms fallback)
-  const tzToLocation = {
-    // United States
-    'America/New_York': 'NEW YORK US',
-    'America/Detroit': 'DETROIT US',
-    'America/Kentucky/Louisville': 'LOUISVILLE US',
-    'America/Chicago': 'CHICAGO US',
-    'America/Indiana/Indianapolis': 'INDIANAPOLIS US',
-    'America/Denver': 'DENVER US',
-    'America/Boise': 'BOISE US',
-    'America/Phoenix': 'PHOENIX US',
-    'America/Los_Angeles': 'LOS ANGELES US',
-    'America/Anchorage': 'ANCHORAGE US',
-    'Pacific/Honolulu': 'HONOLULU US',
+  const frameTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Africa/Casablanca',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
 
-    // Morocco
-    'Africa/Casablanca': 'CASABLANCA MA',
-    'Africa/El_Aaiun': 'LAAYOUNE MA',
+  function updateStudioClock() {
+    try {
+      const now = new Date();
+      const studioTime = studioTimeFormatter.format(now);
+      const frameTime = frameTimeFormatter.format(now);
 
-    // Spain
-    'Europe/Madrid': 'MADRID ES',
-    'Africa/Ceuta': 'CEUTA ES',
-    'Atlantic/Canary': 'CANARY ES',
-
-    // Brazil
-    'America/Sao_Paulo': 'SÃO PAULO BR',
-    'America/Rio_Branco': 'RIO BRANCO BR',
-    'America/Manaus': 'MANAUS BR',
-    'America/Belem': 'BELÉM BR',
-    'America/Fortaleza': 'FORTALEZA BR',
-    'America/Recife': 'RECIFE BR',
-    'America/Cuiaba': 'CUIABÁ BR',
-    'America/Bahia': 'SALVADOR BR',
-
-    // Canada
-    'America/Toronto': 'TORONTO CA',
-    'America/Vancouver': 'VANCOUVER CA',
-    'America/Montreal': 'MONTREAL CA',
-    'America/Edmonton': 'EDMONTON CA',
-    'America/Winnipeg': 'WINNIPEG CA',
-    'America/Halifax': 'HALIFAX CA',
-
-    // Latin America
-    'America/Mexico_City': 'MEXICO CITY MX',
-    'America/Bogota': 'BOGOTÁ CO',
-    'America/Buenos_Aires': 'BUENOS AIRES AR',
-    'America/Santiago': 'SANTIAGO CL',
-    'America/Lima': 'LIMA PE',
-
-    // Europe
-    'Europe/London': 'LONDON GB',
-    'Europe/Paris': 'PARIS FR',
-    'Europe/Berlin': 'BERLIN DE',
-    'Europe/Rome': 'ROME IT',
-    'Europe/Amsterdam': 'AMSTERDAM NL',
-    'Europe/Brussels': 'BRUSSELS BE',
-    'Europe/Lisbon': 'LISBON PT',
-    'Europe/Zurich': 'ZURICH CH',
-    'Europe/Vienna': 'VIENNA AT',
-    'Europe/Dublin': 'DUBLIN IE',
-    'Europe/Stockholm': 'STOCKHOLM SE',
-    'Europe/Oslo': 'OSLO NO',
-    'Europe/Copenhagen': 'COPENHAGEN DK',
-    'Europe/Helsinki': 'HELSINKI FI',
-    'Europe/Warsaw': 'WARSAW PL',
-    'Europe/Prague': 'PRAGUE CZ',
-    'Europe/Budapest': 'BUDAPEST HU',
-    'Europe/Athens': 'ATHENS GR',
-    'Europe/Kyiv': 'KYIV UA',
-    'Europe/Bucharest': 'BUCHAREST RO',
-    'Europe/Istanbul': 'ISTANBUL TR',
-
-    // Middle East & Africa
-    'Asia/Dubai': 'DUBAI AE',
-    'Asia/Riyadh': 'RIYADH SA',
-    'Asia/Qatar': 'DOHA QA',
-    'Africa/Cairo': 'CAIRO EG',
-    'Africa/Johannesburg': 'JOHANNESBURG ZA',
-    'Africa/Lagos': 'LAGOS NG',
-    'Africa/Nairobi': 'NAIROBI KE',
-    'Africa/Tunis': 'TUNIS TN',
-    'Africa/Algiers': 'ALGIERS DZ',
-
-    // Asia & Pacific
-    'Asia/Tokyo': 'TOKYO JP',
-    'Asia/Seoul': 'SEOUL KR',
-    'Asia/Singapore': 'SINGAPORE SG',
-    'Asia/Hong_Kong': 'HONG KONG HK',
-    'Asia/Shanghai': 'SHANGHAI CN',
-    'Asia/Bangkok': 'BANGKOK TH',
-    'Asia/Kolkata': 'MUMBAI IN',
-    'Asia/Jakarta': 'JAKARTA ID',
-    'Australia/Sydney': 'SYDNEY AU',
-    'Australia/Melbourne': 'MELBOURNE AU',
-    'Australia/Brisbane': 'BRISBANE AU',
-    'Australia/Perth': 'PERTH AU',
-    'Pacific/Auckland': 'AUCKLAND NZ'
-  };
-
-  // Determine initial location instantly from browser timezone
-  let detectedTimezone = 'Africa/Casablanca';
-  try {
-    const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (userTz) detectedTimezone = userTz;
-    if (userTz && tzToLocation[userTz]) {
-      detectedLocation = tzToLocation[userTz];
-    } else if (userTz) {
-      const parts = userTz.split('/');
-      const city = parts[parts.length - 1].replace(/_/g, ' ').toUpperCase();
-      let countrySuffix = '';
-      if (navigator.language && navigator.language.includes('-')) {
-        countrySuffix = ' ' + navigator.language.split('-')[1].toUpperCase();
+      if (clockEl) {
+        clockEl.textContent = `CASABLANCA MA • ${studioTime}`;
       }
-      detectedLocation = city + countrySuffix;
-    }
-  } catch {
-    detectedLocation = 'CASABLANCA MA';
-  }
-
-  // 1B. Fast asynchronous IP Geolocation to refine exact city & country
-  fetch('https://ipapi.co/json/')
-    .then(res => res.json())
-    .then(data => {
-      if (data && data.city && data.country_code) {
-        detectedLocation = `${data.city.toUpperCase()} ${data.country_code.toUpperCase()}`;
-        if (data.timezone) detectedTimezone = data.timezone;
-        updateClock();
+      if (frameClockEl) {
+        frameClockEl.textContent = `CASABLANCA ${frameTime}`;
       }
-    })
-    .catch(() => {
-      fetch('https://ipwho.is/')
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.city && data.country_code) {
-            detectedLocation = `${data.city.toUpperCase()} ${data.country_code.toUpperCase()}`;
-            if (data.timezone && data.timezone.id) detectedTimezone = data.timezone.id;
-            updateClock();
-          }
-        })
-        .catch(() => {});
-    });
-
-  function updateClock() {
-    const now = new Date();
-    let timeString;
-
-    // Morocco is officially on GMT (UTC+0)
-    const isMorocco = detectedLocation.includes('MA') || 
-                      detectedLocation.includes('CASABLANCA') || 
-                      detectedLocation.includes('MOROCCO') || 
-                      detectedTimezone === 'Africa/Casablanca';
-
-    if (isMorocco) {
+    } catch {
+      // Fallback
+      const now = new Date();
       const h = String(now.getUTCHours()).padStart(2, '0');
       const m = String(now.getUTCMinutes()).padStart(2, '0');
-      timeString = `${h}:${m}`;
-    } else {
-      try {
-        const options = {
-          timeZone: detectedTimezone,
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        };
-        timeString = new Intl.DateTimeFormat('en-GB', options).format(now);
-      } catch {
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        timeString = `${h}:${m}`;
-      }
+      const s = String(now.getUTCSeconds()).padStart(2, '0');
+      if (clockEl) clockEl.textContent = `CASABLANCA MA • ${h}:${m}:${s}`;
+      if (frameClockEl) frameClockEl.textContent = `CASABLANCA ${h}:${m}`;
     }
-
-    const display = detectedLocation ? `${timeString}, ${detectedLocation}` : timeString;
-
-    if (clockEl) clockEl.textContent = display;
-    if (frameClockEl) frameClockEl.textContent = display;
   }
 
-  updateClock();
-  setInterval(updateClock, 1000);
+  updateStudioClock();
+  setInterval(updateStudioClock, 1000);
 
   // ========================================================================
-  // 2. Smart Sticky Header (Hide on scroll down, reappear on scroll up)
+  // 2. Smart Sticky Header (Hide on scroll down, reveal on scroll up)
   // ========================================================================
   const header = document.getElementById('site-header');
   if (header) {
@@ -209,21 +74,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateHeaderOnScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Only toggle after scrolling past top of hero
       if (currentScrollY > 260) {
         if (currentScrollY > lastScrollY + 6) {
-          // Scrolling Down -> Hide Header
           header.classList.remove('header-visible');
           header.classList.add('header-hidden');
+          header.setAttribute('aria-hidden', 'true');
         } else if (currentScrollY < lastScrollY - 6) {
-          // Scrolling Up -> Show Header
           header.classList.remove('header-hidden');
           header.classList.add('header-visible');
+          header.setAttribute('aria-hidden', 'false');
         }
       } else {
-        // Near Top of Page -> Hide fixed sticky header (frame bar is visible)
         header.classList.remove('header-visible');
         header.classList.add('header-hidden');
+        header.setAttribute('aria-hidden', 'true');
       }
 
       lastScrollY = currentScrollY;
@@ -239,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ========================================================================
-  // 3. Interactive Ambient Light & Kinetic Parallax on Hero Section
+  // 3. Hero Parallax & Ambient Light (IntersectionObserver Optimized)
   // ========================================================================
   const heroSection = document.getElementById('hero');
   const ambientLight = document.getElementById('hero-cursor-ambient');
@@ -247,16 +111,59 @@ document.addEventListener('DOMContentLoaded', () => {
   const blockMid = document.querySelector('.block-mid');
   const blockBot = document.querySelector('.block-bot');
 
-  if (heroSection && ambientLight) {
+  if (heroSection && ambientLight && isFinePointer && !prefersReducedMotion) {
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let currentX = mouseX;
     let currentY = mouseY;
     let isHoveringHero = false;
+    let isHeroInView = true;
+    let ambientRafId = null;
+
+    const heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        isHeroInView = entry.isIntersecting;
+        if (!isHeroInView && ambientRafId) {
+          cancelAnimationFrame(ambientRafId);
+          ambientRafId = null;
+        }
+      });
+    }, { threshold: 0.1 });
+
+    heroObserver.observe(heroSection);
+
+    const stepAmbient = () => {
+      if (!isHeroInView) {
+        ambientRafId = null;
+        return;
+      }
+
+      const dx = mouseX - currentX;
+      const dy = mouseY - currentY;
+      currentX += dx * 0.08;
+      currentY += dy * 0.08;
+
+      ambientLight.style.left = `${currentX.toFixed(1)}px`;
+      ambientLight.style.top = `${currentY.toFixed(1)}px`;
+
+      // Settle loop when idle
+      if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1 || isHoveringHero) {
+        ambientRafId = requestAnimationFrame(stepAmbient);
+      } else {
+        ambientRafId = null;
+      }
+    };
+
+    const wakeAmbient = () => {
+      if (!ambientRafId && isHeroInView) {
+        ambientRafId = requestAnimationFrame(stepAmbient);
+      }
+    };
 
     heroSection.addEventListener('mouseenter', () => {
       isHoveringHero = true;
       ambientLight.style.opacity = '1';
+      wakeAmbient();
     });
 
     heroSection.addEventListener('mouseleave', () => {
@@ -272,133 +179,168 @@ document.addEventListener('DOMContentLoaded', () => {
       mouseX = e.clientX - rect.left;
       mouseY = e.clientY - rect.top;
 
-      // Normalized offset from center [-1, 1]
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
       const normX = (mouseX - centerX) / centerX;
       const normY = (mouseY - centerY) / centerY;
 
-      // Kinetic Parallax on Headline Blocks
-      if (blockTop) {
-        blockTop.style.transform = `translate3d(${normX * -10}px, ${normY * -6}px, 0)`;
-      }
-      if (blockMid) {
-        blockMid.style.transform = `translate3d(${normX * 14}px, ${normY * 8}px, 0)`;
-      }
-      if (blockBot) {
-        blockBot.style.transform = `translate3d(${normX * -8}px, ${normY * 5}px, 0)`;
-      }
-    });
+      if (blockTop) blockTop.style.transform = `translate3d(${(normX * -8).toFixed(1)}px, ${(normY * -5).toFixed(1)}px, 0)`;
+      if (blockMid) blockMid.style.transform = `translate3d(${(normX * 12).toFixed(1)}px, ${(normY * 7).toFixed(1)}px, 0)`;
+      if (blockBot) blockBot.style.transform = `translate3d(${(normX * -6).toFixed(1)}px, ${(normY * 4).toFixed(1)}px, 0)`;
 
-    // Smooth lerp for ambient light
-    const renderAmbient = () => {
-      if (isHoveringHero) {
-        currentX += (mouseX - currentX) * 0.08;
-        currentY += (mouseY - currentY) * 0.08;
-        ambientLight.style.left = `${currentX}px`;
-        ambientLight.style.top = `${currentY}px`;
-      }
-      requestAnimationFrame(renderAmbient);
-    };
-    renderAmbient();
+      wakeAmbient();
+    }, { passive: true });
   }
 
   // ========================================================================
-  // 4. Interactive 3D Perspective Tilt & Specular Glare on Cards
+  // 4. Interactive 3D Card Tilt & Specular Glare (Audiences Section)
   // ========================================================================
-  const cards = document.querySelectorAll('.comma-card');
+  const audienceCards = document.querySelectorAll('.comma-card');
 
-  cards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+  if (isFinePointer && !prefersReducedMotion) {
+    audienceCards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-      // Pass coordinates for specular glare
-      card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
-      card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+        card.style.setProperty('--mouse-x', `${((x / rect.width) * 100).toFixed(1)}%`);
+        card.style.setProperty('--mouse-y', `${((y / rect.height) * 100).toFixed(1)}%`);
 
-      // 3D Tilt calculation
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const rotateX = -((y - centerY) / centerY) * 7;
-      const rotateY = ((x - centerX) / centerX) * 7;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = -((y - centerY) / centerY) * 6;
+        const rotateY = ((x - centerX) / centerX) * 6;
 
-      card.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
+        card.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      });
     });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-    });
-  });
+  }
 
   // ========================================================================
-  // 4B. Soft Diffused Champagne-Gold Atmospheric Glow (Smooth Drift)
+  // 4B. Diffused Champagne-Gold Atmospheric Glow (Philosophy Section)
   // ========================================================================
   const constellation = document.getElementById('outcomes-constellation');
   const champagneGlow = document.getElementById('outcomes-glow');
 
-  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (constellation && champagneGlow && canHover && !prefersReducedMotion) {
+  if (constellation && champagneGlow && isFinePointer && !prefersReducedMotion) {
     let targetX = 0;
     let targetY = 0;
     let currentX = 0;
     let currentY = 0;
+    let glowRafId = null;
+    let isPhilosophyInView = true;
+
+    const philObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        isPhilosophyInView = entry.isIntersecting;
+        if (!isPhilosophyInView && glowRafId) {
+          cancelAnimationFrame(glowRafId);
+          glowRafId = null;
+        }
+      });
+    }, { threshold: 0.1 });
+
+    philObserver.observe(constellation);
+
+    const stepGlow = () => {
+      if (!isPhilosophyInView) {
+        glowRafId = null;
+        return;
+      }
+
+      const dx = targetX - currentX;
+      const dy = targetY - currentY;
+      currentX += dx * 0.06;
+      currentY += dy * 0.06;
+
+      champagneGlow.style.transform = `translate(calc(-50% + ${currentX.toFixed(1)}px), calc(-50% + ${currentY.toFixed(1)}px))`;
+
+      if (Math.abs(dx) > 0.05 || Math.abs(dy) > 0.05) {
+        glowRafId = requestAnimationFrame(stepGlow);
+      } else {
+        glowRafId = null;
+      }
+    };
+
+    const wakeGlow = () => {
+      if (!glowRafId && isPhilosophyInView) {
+        glowRafId = requestAnimationFrame(stepGlow);
+      }
+    };
 
     constellation.addEventListener('mousemove', (e) => {
       const rect = constellation.getBoundingClientRect();
-      // Normalized offset from center [-1, 1]
       const normX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
       const normY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
 
-      // Gentle drift: text stays completely still while glow moves smoothly
-      targetX = normX * 42;
-      targetY = normY * 30;
-    });
+      targetX = normX * 36;
+      targetY = normY * 26;
+      wakeGlow();
+    }, { passive: true });
 
     constellation.addEventListener('mouseleave', () => {
       targetX = 0;
       targetY = 0;
+      wakeGlow();
     });
-
-    const updateGlow = () => {
-      currentX += (targetX - currentX) * 0.06;
-      currentY += (targetY - currentY) * 0.06;
-
-      champagneGlow.style.transform = `translate(calc(-50% + ${currentX.toFixed(2)}px), calc(-50% + ${currentY.toFixed(2)}px))`;
-      requestAnimationFrame(updateGlow);
-    };
-    updateGlow();
   }
 
   // ========================================================================
-  // 5. Custom Precision Studio Cursor (Desktop Only)
+  // 5. Studio Precision Cursor (Only for Pointer-Fine Devices)
   // ========================================================================
   const cursorDot = document.getElementById('cursor-dot');
   const cursorRing = document.getElementById('cursor-ring');
 
-  if (cursorDot && cursorRing && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  if (cursorDot && cursorRing && isFinePointer) {
     let mouseX = -100;
     let mouseY = -100;
     let ringX = -100;
     let ringY = -100;
     let hasMoved = false;
+    let ringRafId = null;
+
+    const stepRing = () => {
+      const dx = mouseX - ringX;
+      const dy = mouseY - ringY;
+      ringX += dx * 0.2;
+      ringY += dy * 0.2;
+
+      cursorRing.style.left = `${ringX.toFixed(1)}px`;
+      cursorRing.style.top = `${ringY.toFixed(1)}px`;
+
+      if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+        ringRafId = requestAnimationFrame(stepRing);
+      } else {
+        ringRafId = null;
+      }
+    };
+
+    const wakeRing = () => {
+      if (!ringRafId) {
+        ringRafId = requestAnimationFrame(stepRing);
+      }
+    };
 
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
 
       if (!hasMoved) {
-        document.body.classList.add('cursor-active');
+        hasMoved = true;
         ringX = mouseX;
         ringY = mouseY;
-        hasMoved = true;
+        document.documentElement.classList.add('has-custom-cursor');
+        document.body.classList.add('cursor-active');
       }
 
       cursorDot.style.left = `${mouseX}px`;
       cursorDot.style.top = `${mouseY}px`;
+      wakeRing();
     }, { passive: true });
 
     document.addEventListener('mouseleave', () => {
@@ -417,20 +359,9 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove('cursor-clicking');
     });
 
-    const updateRing = () => {
-      if (hasMoved) {
-        ringX += (mouseX - ringX) * 0.18;
-        ringY += (mouseY - ringY) * 0.18;
-        cursorRing.style.left = `${ringX}px`;
-        cursorRing.style.top = `${ringY}px`;
-      }
-      requestAnimationFrame(updateRing);
-    };
-    updateRing();
-
-    // Event delegation for interactive hover states across all interactive elements
+    // Event delegation for hover states
     document.addEventListener('mouseover', (e) => {
-      const target = e.target.closest('a, button, [role="button"], .btn-ref, .btn-outcomes-gold, .btn-contact-header, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .proof-point, .case-flow-card, .cases-nav-btn, .cases-dot, .cases-cta-btn');
+      const target = e.target.closest('a, button, [role="button"], .btn-ref, .btn-outcomes-gold, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot');
       if (target) {
         document.body.classList.add('cursor-hover');
       } else {
@@ -447,6 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'nav.home': 'Home',
       'nav.audiences': 'Audiences',
       'nav.cases': 'Cases',
+      'nav.about': 'About & Founder',
       'btn.proposal': 'REQUEST PROPOSAL',
       'btn.cases': 'OUR CASES',
       'hero.line1': 'WE TURN',
@@ -460,14 +392,14 @@ document.addEventListener('DOMContentLoaded', () => {
       'hero.m5': 'GROWTH',
       'hero.subLeft': 'We build <span class="highlight-gold">full-service</span> growth engines —<br>for founders, ambitious brands, and hospitality.',
       'hero.subRight': 'and turn attention<br>into scalable revenue.',
-      'audiences.title': 'MOTAGROWTH SCALES<br>THE BRANDS OF FOUNDERS<br>HOSPITALITY &amp; E-COM',
-      'card1.title': 'FOUNDERS &amp; E-COMMERCE',
-      'card1.desc': 'Performance marketing, conversion-focused web design, and scalable acquisition funnels.',
-      'card2.title': 'HOSPITALITY &amp; NIGHTLIFE',
-      'card2.desc': 'Distinctive brand identity, creative direction, and premium booking experiences in Morocco &amp; beyond.',
-      'card3.title': 'SERVICE &amp; ENTERPRISE',
-      'card3.desc': 'Systematic lead generation, brand authority, and rigorous conversion optimization.',
-      'btn.examples': 'VIEW CASE STUDIES',
+      'audiences.title': 'BUILT FOR<br>AMBITIOUS BUSINESSES.',
+      'card1.title': 'FOUNDERS & GROWING BUSINESSES',
+      'card1.desc': 'Launch with a clear identity, a professional website, and a focused plan for attracting customers.',
+      'card2.title': 'HOSPITALITY & EXPERIENCES',
+      'card2.desc': 'Bring your venue to life online and make it easier for people to discover, enquire, and book.',
+      'card3.title': 'E-COMMERCE BRANDS',
+      'card3.desc': 'Connect your storefront, advertising, and creative around a better path from discovery to purchase.',
+      'btn.examples': 'EXPLORE SELECTED CASES ↗',
       'outcomes.line1': 'STRATEGY MEETS',
       'outcomes.line2': 'PERFORMANCE.',
       'outcomes.support': 'WE CONNECT DESIGN, MARKETING, AND TECHNOLOGY TO HELP BRANDS GROW.',
@@ -481,19 +413,26 @@ document.addEventListener('DOMContentLoaded', () => {
       'outcomes.rightSub': 'campaigns tested, measured, and refined.',
       'outcomes.bottomHead': 'PARTNERSHIP',
       'outcomes.bottomSub': 'clear communication. shared ambition.',
-      'outcomes.cta': 'EXPLORE OUR SERVICES ↗',
+      'outcomes.cta': 'EXPLORE OUR WORK ↗',
       'outcomes.stmtLeft': 'FROM FIRST IMPRESSION',
       'outcomes.capLeft': 'MAKE YOUR BRAND MATTER.',
       'outcomes.stmtRight': 'TO LASTING GROWTH.',
       'outcomes.capRight': 'TURN ATTENTION INTO ACTION.',
       'cases.title': 'CASES THAT TELL THE STORY',
-      'cases.subtitle': 'VISUALLY STRONG. LOGICALLY BUILT. BACKED BY RESULTS.',
-      'cases.cta': 'VIEW PRESENTATIONS'
+      'cases.subtitle': 'CLEAR STRATEGY. DISTINCTIVE DESIGN. PURPOSEFUL EXECUTION.',
+      'cases.cta': 'REQUEST STUDIO PROPOSAL ↗',
+      'about.tag': '05 / LEADERSHIP & FOUNDER',
+      'about.title': 'BUILT IN CASABLANCA.<br><span class="gold-gradient-text">DIRECTED BY MOHAMED TAZI.</span>',
+      'about.badgeRole': 'Founder & Growth Strategist',
+      'about.badgeLocation': 'Casablanca, Morocco',
+      'about.desc1': 'MotaGrowth is an independent growth studio founded by Mohamed Tazi in Casablanca. We partner with ambitious founders, luxury hospitality venues, and modern digital brands who refuse to look or perform like generic templates.',
+      'about.desc2': 'Every strategic roadmap, conversion architecture, and high-stakes performance campaign is directly overseen by the founder. No junior account handoffs, no vanity impressions, and zero wasted ad spend.'
     },
     fr: {
       'nav.home': 'Accueil',
       'nav.audiences': 'Secteurs',
       'nav.cases': 'Projets',
+      'nav.about': 'À Propos & Fondateur',
       'btn.proposal': 'DEMANDER UN DEVIS',
       'btn.cases': 'NOS PROJETS',
       'hero.line1': 'NOUS TRANSFORMONS',
@@ -507,14 +446,14 @@ document.addEventListener('DOMContentLoaded', () => {
       'hero.m5': 'CROISSANCE',
       'hero.subLeft': 'Nous bâtissons des moteurs de croissance <span class="highlight-gold">sur-mesure</span> —<br>pour fondateurs, marques et hospitalité.',
       'hero.subRight': "et convertissons l'attention<br>en revenus scalables.",
-      'audiences.title': 'MOTAGROWTH ACCÉLÈRE<br>LES MARQUES DE FONDATEURS<br>HOSPITALITÉ &amp; E-COM',
-      'card1.title': 'FONDATEURS &amp; E-COMMERCE',
-      'card1.desc': "Marketing de performance, web design orienté conversion et tunnels d'acquisition scalables.",
-      'card2.title': 'HOSPITALITÉ &amp; NIGHTLIFE',
-      'card2.desc': "Identité de marque distinctive, direction créative et expériences de réservation haut de gamme au Maroc &amp; à l'international.",
-      'card3.title': 'SERVICES &amp; ENTREPRISES',
-      'card3.desc': 'Génération systématique de leads, autorité de marque et optimisation rigoureuse de la conversion.',
-      'btn.examples': 'VOIR LES ÉTUDES DE CAS',
+      'audiences.title': 'CONÇU POUR LES<br>ENTREPRISES AMBITIEUSES.',
+      'card1.title': 'FONDATEURS & CROISSANCE',
+      'card1.desc': "Démarrez avec une identité claire, un site professionnel et un plan précis d'acquisition.",
+      'card2.title': 'HOSPITALITÉ & EXPÉRIENCES',
+      'card2.desc': 'Donnez vie à votre lieu en ligne et simplifiez la découverte, la prise de contact et les réservations.',
+      'card3.title': 'MARQUES E-COMMERCE',
+      'card3.desc': "Harmonisez boutique, acquisition payante et créatifs pour fluidifier le passage à l'achat.",
+      'btn.examples': 'DÉCOUVRIR NOS CAS ↗',
       'outcomes.line1': 'LA STRATÉGIE RENCONTRE',
       'outcomes.line2': 'LA PERFORMANCE.',
       'outcomes.support': 'NOUS CONNECTONS DESIGN, MARKETING ET TECHNOLOGIE POUR FAIRE GRANDIR LES MARQUES.',
@@ -528,14 +467,20 @@ document.addEventListener('DOMContentLoaded', () => {
       'outcomes.rightSub': 'campagnes testées, mesurées et affinées.',
       'outcomes.bottomHead': 'PARTENARIAT',
       'outcomes.bottomSub': 'communication transparente. ambition partagée.',
-      'outcomes.cta': 'DÉCOUVRIR NOS SERVICES ↗',
+      'outcomes.cta': 'DÉCOUVRIR NOTRE TRAVAIL ↗',
       'outcomes.stmtLeft': 'DE LA PREMIÈRE IMPRESSION',
       'outcomes.capLeft': 'DONNEZ DU SENS À VOTRE MARQUE.',
       'outcomes.stmtRight': 'À UNE CROISSANCE DURABLE.',
       'outcomes.capRight': "TRANSFORMEZ L'ATTENTION EN ACTION.",
       'cases.title': "DES CAS QUI RACONTENT L'HISTOIRE",
-      'cases.subtitle': 'VISUELLEMENT FORTS. LOGIQUEMENT CONÇUS. VALIDÉS PAR LES RÉSULTATS.',
-      'cases.cta': 'VOIR LES PRÉSENTATIONS'
+      'cases.subtitle': 'STRATÉGIE CLAIRE. DESIGN DISTINCTIF. EXÉCUTION MAÎTRISÉE.',
+      'cases.cta': 'DEMANDER UNE PROPOSITION ↗',
+      'about.tag': '05 / LEADERSHIP & FONDATEUR',
+      'about.title': 'NÉ À CASABLANCA.<br><span class="gold-gradient-text">DIRIGÉ PAR MOHAMED TAZI.</span>',
+      'about.badgeRole': 'Fondateur & Stratège Digital',
+      'about.badgeLocation': 'Casablanca, Maroc',
+      'about.desc1': 'MotaGrowth est un studio indépendant de croissance digitale fondé par Mohamed Tazi à Casablanca. Nous accompagnons les fondateurs ambitieux, les acteurs de l’hôtellerie de luxe et les marques digitales résolues à dépasser les templates génériques.',
+      'about.desc2': 'Chaque feuille de route stratégique, architecture de conversion et campagne à haute rentabilité est directement pilotée par le fondateur. Aucun intermédiaire junior, aucune métrique d’illusion.'
     }
   };
 
@@ -548,16 +493,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.documentElement.lang = lang;
 
-    // Update active class on all lang buttons across both headers
     document.querySelectorAll('.lang-btn').forEach(btn => {
-      if (btn.getAttribute('data-lang') === lang) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
+      btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
 
-    // Update all elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       const val = translations[lang][key];
@@ -571,83 +510,72 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Bind click handlers to all lang buttons
   document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const targetLang = btn.getAttribute('data-lang');
-      if (targetLang === currentLang) return;
-
-      document.body.classList.add('lang-transition');
-      setTimeout(() => {
+      if (targetLang && targetLang !== currentLang) {
+        document.body.classList.add('lang-transition');
         applyLanguage(targetLang);
-        document.body.classList.remove('lang-transition');
-      }, 150);
+        setTimeout(() => {
+          document.body.classList.remove('lang-transition');
+        }, 180);
+      }
     });
   });
 
-  // Apply saved language on load if French
-  if (currentLang !== 'en') {
-    applyLanguage(currentLang);
-  }
+  applyLanguage(currentLang);
 
   // ========================================================================
-  // 7. Interactive 3D Cover Flow Cases Showcase (Admin-Ready Data Layer)
+  // 7. Verified Client Engagements & 3D Cover Flow Carousel
   // ========================================================================
+  // Real client engagements: Orsap.ma, TG2D, La Centrale Crèche
   const defaultCases = [
     {
       id: 1,
-      title: 'SkyRoute — Brand Event',
-      subtitle: 'FastLine Launch',
-      category: 'Brand Experience',
-      image: '',
-      link: '#'
+      title: 'ORSAP.MA',
+      subtitle: 'Digital Commerce Platform • Scale & Architecture',
+      category: 'E-Commerce & Scale',
+      badge: 'STUDIO CASE DOSSIER',
+      image: 'assets/card1_clean_hd.jpg',
+      link: 'https://wa.me/34675194956?text=Hello%20MotaGrowth%20Studio%2C%20I%20would%20like%20to%20learn%20more%20about%20the%20Orsap.ma%20case'
     },
     {
       id: 2,
-      title: 'Fintech Company',
-      subtitle: 'CEO-Level Event',
-      category: 'Enterprise',
-      image: '',
-      link: '#'
+      title: 'TG2D',
+      subtitle: 'Corporate Brand Experience • Enterprise & Strategy',
+      category: 'Enterprise Strategy',
+      badge: 'STUDIO CASE DOSSIER',
+      image: 'assets/card2_clean_hd.jpg',
+      link: 'https://wa.me/34675194956?text=Hello%20MotaGrowth%20Studio%2C%20I%20would%20like%20to%20learn%20more%20about%20the%20TG2D%20case'
     },
     {
       id: 3,
-      title: 'Corporate Event',
-      subtitle: 'Global Leadership Summit',
-      category: 'Hospitality',
-      image: '',
-      link: '#'
-    },
-    {
-      id: 4,
-      title: 'E-Commerce Scale',
-      subtitle: 'Full-Funnel Growth',
-      category: 'Performance',
-      image: '',
-      link: '#'
-    },
-    {
-      id: 5,
-      title: 'Hospitality Flagship',
-      subtitle: 'Brand & Booking CRO',
-      category: 'Creative Direction',
-      image: '',
-      link: '#'
+      title: 'LA CENTRALE CRÈCHE',
+      subtitle: 'Early Education Acquisition • Service & Authority',
+      category: 'Authority & Acquisition',
+      badge: 'STUDIO CASE DOSSIER',
+      image: 'assets/card3_clean_hd.jpg',
+      link: 'https://wa.me/34675194956?text=Hello%20MotaGrowth%20Studio%2C%20I%20would%20like%20to%20learn%20more%20about%20the%20La%20Centrale%20Cr%C3%A8che%20case'
     }
   ];
 
-  // Global Admin Access Layer (Can be read & mutated by the upcoming admin panel)
+  // Global Admin Access Layer (Extensible via upcoming admin dashboard)
   window.MotaCases = {
     getAll: function() {
       try {
         const stored = localStorage.getItem('motagrowth_cases');
-        if (stored) return JSON.parse(stored);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
       } catch (e) {
         console.warn('Failed to parse stored cases', e);
       }
       return defaultCases;
     },
     save: function(casesArray) {
+      if (!Array.isArray(casesArray)) return;
       localStorage.setItem('motagrowth_cases', JSON.stringify(casesArray));
       if (typeof window.renderCasesCarousel === 'function') {
         window.renderCasesCarousel();
@@ -661,60 +589,113 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const section = document.getElementById('cases');
+  const casesSection = document.getElementById('cases');
   const track = document.getElementById('cases-track');
   const prevBtn = document.getElementById('cases-prev');
   const nextBtn = document.getElementById('cases-next');
   const dotsContainer = document.getElementById('cases-dots');
+  const stage = document.getElementById('cases-stage');
 
-  if (track && section) {
+  if (track && casesSection) {
     let cases = window.MotaCases.getAll();
     let currentFloatIndex = 0;
     let targetFloatIndex = 0;
+    let carouselRafId = null;
+    let isCasesInView = true;
 
+    const casesObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        isCasesInView = entry.isIntersecting;
+      });
+    }, { threshold: 0.1 });
+
+    casesObserver.observe(casesSection);
+
+    // DOM-safe card renderer
     function renderCasesCarousel() {
       cases = window.MotaCases.getAll();
-      track.innerHTML = '';
-      if (dotsContainer) dotsContainer.innerHTML = '';
+      track.textContent = '';
+      if (dotsContainer) dotsContainer.textContent = '';
 
       cases.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'case-flow-card';
-        card.setAttribute('data-index', index);
+        card.setAttribute('data-index', String(index));
         card.setAttribute('tabindex', '0');
         card.setAttribute('role', 'button');
-        card.setAttribute('aria-label', `${item.title} — ${item.subtitle}`);
+        card.setAttribute('aria-label', `${item.title || 'Case'} — ${item.subtitle || ''}`);
 
-        // Render uploaded image or high-end blank studio placeholder
-        const hasImage = item.image && item.image.trim() !== '';
-        const mediaContent = hasImage
-          ? `<img src="${item.image}" alt="${item.title}" class="case-image" loading="lazy">`
-          : `<div class="case-blank-inner">
-               <span class="case-badge-pill">CASE ${String(index + 1).padStart(2, '0')}</span>
-               <p class="case-placeholder-notice">Studio Case Asset<br><span style="font-size:0.68rem; opacity:0.6;">(Configurable via Admin)</span></p>
-             </div>`;
+        // Safe Media Box
+        const mediaBox = document.createElement('div');
+        mediaBox.className = 'case-media-box';
 
-        card.innerHTML = `
-          <div class="case-media-box">
-            ${mediaContent}
-          </div>
-          <div class="case-info-block">
-            <h3 class="case-title-text">${item.title}</h3>
-            <p class="case-sub-text">${item.subtitle}</p>
-          </div>
-        `;
+        const safeImgSrc = (typeof item.image === 'string' && (item.image.startsWith('assets/') || item.image.startsWith('https://') || item.image.startsWith('data:image/')))
+          ? item.image
+          : '';
 
+        if (safeImgSrc) {
+          const img = document.createElement('img');
+          img.src = safeImgSrc;
+          img.alt = item.title || 'MotaGrowth Case Study';
+          img.className = 'case-image';
+          img.loading = 'lazy';
+          mediaBox.appendChild(img);
+        } else {
+          const blankInner = document.createElement('div');
+          blankInner.className = 'case-blank-inner';
+
+          const badge = document.createElement('span');
+          badge.className = 'case-badge-pill';
+          badge.textContent = item.badge || `CASE ${String(index + 1).padStart(2, '0')}`;
+
+          const notice = document.createElement('p');
+          notice.className = 'case-placeholder-notice';
+          notice.textContent = 'Studio Case Dossier';
+
+          blankInner.appendChild(badge);
+          blankInner.appendChild(notice);
+          mediaBox.appendChild(blankInner);
+        }
+
+        // Safe Info Block
+        const infoBlock = document.createElement('div');
+        infoBlock.className = 'case-info-block';
+
+        const titleEl = document.createElement('h3');
+        titleEl.className = 'case-title-text';
+        titleEl.textContent = item.title || 'Case Study';
+
+        const subEl = document.createElement('p');
+        subEl.className = 'case-sub-text';
+        subEl.textContent = item.subtitle || '';
+
+        infoBlock.appendChild(titleEl);
+        infoBlock.appendChild(subEl);
+
+        card.appendChild(mediaBox);
+        card.appendChild(infoBlock);
+
+        // Click to center
         card.addEventListener('click', () => {
           scrollToCaseIndex(index);
         });
 
+        // Keyboard Enter/Space to select
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            scrollToCaseIndex(index);
+          }
+        });
+
         track.appendChild(card);
 
-        // Dot indicator
+        // Accessible Dot
         if (dotsContainer) {
           const dot = document.createElement('button');
+          dot.type = 'button';
           dot.className = `cases-dot ${index === 0 ? 'active' : ''}`;
-          dot.setAttribute('aria-label', `Go to case ${index + 1}`);
+          dot.setAttribute('aria-label', `Navigate to case ${index + 1}: ${item.title || ''}`);
           dot.addEventListener('click', () => {
             scrollToCaseIndex(index);
           });
@@ -727,7 +708,7 @@ document.addEventListener('DOMContentLoaded', () => {
       applyCardPositions(currentFloatIndex);
     }
 
-    // Smooth continuous 3D card layout based on continuous float index
+    // 3D Perspective layout algorithm
     function applyCardPositions(floatIndex) {
       const cards = track.querySelectorAll('.case-flow-card');
       const dots = dotsContainer ? dotsContainer.querySelectorAll('.cases-dot') : [];
@@ -747,43 +728,41 @@ document.addEventListener('DOMContentLoaded', () => {
         let z = 10;
 
         if (abs <= 1) {
-          // Continuous interpolation around the active card
-          tx = sign * abs * 70;
+          tx = sign * abs * 68;
           rY = -sign * abs * 16;
-          tZ = -abs * 120;
-          sc = 1.05 - abs * 0.17;
-          op = 1 - abs * 0.28;
-          br = 1 - abs * 0.35;
+          tZ = -abs * 110;
+          sc = 1.05 - abs * 0.16;
+          op = 1 - abs * 0.25;
+          br = 1 - abs * 0.3;
           z = Math.round(10 - abs * 2);
         } else if (abs <= 2) {
-          // Continuous interpolation for secondary neighbor
           const t = abs - 1;
-          tx = sign * (70 + t * 62);
-          rY = -sign * (16 + t * 10);
-          tZ = -(120 + t * 120);
-          sc = 0.88 - t * 0.16;
-          op = 0.72 - t * 0.28;
-          br = 0.65 - t * 0.25;
+          tx = sign * (68 + t * 60);
+          rY = -sign * (16 + t * 9);
+          tZ = -(110 + t * 110);
+          sc = 0.89 - t * 0.16;
+          op = 0.75 - t * 0.28;
+          br = 0.7 - t * 0.25;
           z = Math.round(8 - t * 2);
         } else {
-          // Outlying cards
           const t = Math.min(1, abs - 2);
-          tx = sign * (132 + t * 50);
-          rY = -sign * (26 + t * 6);
-          tZ = -(240 + t * 160);
-          sc = Math.max(0.5, 0.72 - t * 0.22);
-          op = Math.max(0, 0.44 - t * 0.44);
-          br = 0.35;
+          tx = sign * (128 + t * 45);
+          rY = -sign * (25 + t * 5);
+          tZ = -(220 + t * 140);
+          sc = Math.max(0.5, 0.73 - t * 0.2);
+          op = Math.max(0, 0.47 - t * 0.47);
+          br = 0.4;
           z = 1;
         }
 
-        card.style.transform = `translate3d(${tx}%, 0, ${tZ}px) rotateY(${rY}deg) scale(${sc})`;
-        card.style.opacity = op;
-        card.style.filter = `brightness(${br})`;
+        card.style.transform = `translate3d(${tx.toFixed(1)}%, 0, ${tZ.toFixed(1)}px) rotateY(${rY.toFixed(1)}deg) scale(${sc.toFixed(3)})`;
+        card.style.opacity = op.toFixed(2);
+        card.style.filter = `brightness(${br.toFixed(2)})`;
         card.style.zIndex = z;
         card.style.pointerEvents = abs > 2.5 ? 'none' : 'auto';
 
         card.classList.toggle('active', index === activeIdx);
+        card.setAttribute('aria-current', index === activeIdx ? 'true' : 'false');
       });
 
       dots.forEach((dot, index) => {
@@ -793,37 +772,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Calculate vertical scroll progress inside the cases container
     function getScrollProgress() {
-      const rect = section.getBoundingClientRect();
-      const maxScroll = section.offsetHeight - window.innerHeight;
+      const rect = casesSection.getBoundingClientRect();
+      const maxScroll = casesSection.offsetHeight - window.innerHeight;
       if (maxScroll <= 0) return 0;
-
-      // rect.top is distance from viewport top to section top
-      // When section hits viewport top: rect.top = 0.
-      // As user scrolls down, rect.top becomes negative until -maxScroll.
       const scrolled = -rect.top;
       return Math.max(0, Math.min(1, scrolled / maxScroll));
     }
 
     function updateFromScroll() {
-      const rect = section.getBoundingClientRect();
-      // If within scrolling range
+      const rect = casesSection.getBoundingClientRect();
       if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
         const progress = getScrollProgress();
         targetFloatIndex = progress * (cases.length - 1);
+        wakeCarousel();
       }
     }
 
     // Scroll window smoothly to a specific case index
     function scrollToCaseIndex(index) {
-      const rect = section.getBoundingClientRect();
+      const rect = casesSection.getBoundingClientRect();
       const sectionTop = window.scrollY + rect.top;
-      const maxScroll = section.offsetHeight - window.innerHeight;
-      if (maxScroll <= 0) return;
+      const maxScroll = casesSection.offsetHeight - window.innerHeight;
+      if (maxScroll <= 0) {
+        targetFloatIndex = index;
+        wakeCarousel();
+        return;
+      }
 
       const targetProgress = index / (cases.length - 1);
       const targetScroll = sectionTop + targetProgress * maxScroll;
 
       targetFloatIndex = index;
+      wakeCarousel();
 
       window.scrollTo({
         top: targetScroll,
@@ -831,69 +811,230 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Smooth animation loop for physics-based fluid horizontal scrubbing
-    function animLoop() {
+    // Step physics loop
+    function stepCarousel() {
       const diff = targetFloatIndex - currentFloatIndex;
-      if (Math.abs(diff) > 0.0005) {
-        currentFloatIndex += diff * 0.14;
+      if (Math.abs(diff) > 0.001) {
+        currentFloatIndex += diff * 0.16;
         applyCardPositions(currentFloatIndex);
+        carouselRafId = requestAnimationFrame(stepCarousel);
+      } else {
+        currentFloatIndex = targetFloatIndex;
+        applyCardPositions(currentFloatIndex);
+        carouselRafId = null;
       }
-      requestAnimationFrame(animLoop);
     }
-    requestAnimationFrame(animLoop);
 
+    function wakeCarousel() {
+      if (!carouselRafId) {
+        carouselRafId = requestAnimationFrame(stepCarousel);
+      }
+    }
+
+    // Window scroll listeners to drive horizontal scrub
     window.addEventListener('scroll', updateFromScroll, { passive: true });
     window.addEventListener('resize', updateFromScroll, { passive: true });
 
-    window.renderCasesCarousel = renderCasesCarousel;
-    renderCasesCarousel();
-
-    // Controls
+    // Prev / Next button listeners
     if (prevBtn) {
       prevBtn.addEventListener('click', () => {
-        const currentInt = Math.round(targetFloatIndex);
-        scrollToCaseIndex(Math.max(0, currentInt - 1));
+        const cur = Math.round(targetFloatIndex);
+        scrollToCaseIndex(Math.max(0, cur - 1));
       });
     }
 
     if (nextBtn) {
       nextBtn.addEventListener('click', () => {
-        const currentInt = Math.round(targetFloatIndex);
-        scrollToCaseIndex(Math.min(cases.length - 1, currentInt + 1));
+        const cur = Math.round(targetFloatIndex);
+        scrollToCaseIndex(Math.min(cases.length - 1, cur + 1));
       });
     }
 
-    // Keyboard Arrow navigation when section is in view
+    // Keyboard Arrow navigation when cases section is in viewport
     document.addEventListener('keydown', (e) => {
-      const rect = section.getBoundingClientRect();
-      const inView = rect.top <= 100 && rect.bottom >= window.innerHeight - 100;
-      if (!inView) return;
-
+      if (!isCasesInView) return;
       if (e.key === 'ArrowLeft') {
-        const currentInt = Math.round(targetFloatIndex);
-        scrollToCaseIndex(Math.max(0, currentInt - 1));
+        const cur = Math.round(targetFloatIndex);
+        scrollToCaseIndex(Math.max(0, cur - 1));
       } else if (e.key === 'ArrowRight') {
-        const currentInt = Math.round(targetFloatIndex);
-        scrollToCaseIndex(Math.min(cases.length - 1, currentInt + 1));
+        const cur = Math.round(targetFloatIndex);
+        scrollToCaseIndex(Math.min(cases.length - 1, cur + 1));
       }
     });
 
-    // Touch swipe support for mobile
+    // Touch Swipe gesture support
     let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+
     track.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].screenX;
+      if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isSwiping = true;
+      }
     }, { passive: true });
 
     track.addEventListener('touchend', (e) => {
-      const touchEndX = e.changedTouches[0].screenX;
-      if (touchStartX - touchEndX > 40) {
-        const currentInt = Math.round(targetFloatIndex);
-        scrollToCaseIndex(Math.min(cases.length - 1, currentInt + 1));
-      } else if (touchEndX - touchStartX > 40) {
-        const currentInt = Math.round(targetFloatIndex);
-        scrollToCaseIndex(Math.max(0, currentInt - 1));
+      if (!isSwiping) return;
+      isSwiping = false;
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaX = touchStartX - touchEndX;
+      const deltaY = touchStartY - touchEndY;
+
+      // Ensure horizontal swipe intent
+      if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        const cur = Math.round(targetFloatIndex);
+        if (deltaX > 0) {
+          scrollToCaseIndex(Math.min(cases.length - 1, cur + 1));
+        } else {
+          scrollToCaseIndex(Math.max(0, cur - 1));
+        }
       }
     }, { passive: true });
+
+    // Mouse drag support for desktop
+    if (stage) {
+      let isMouseDown = false;
+      let mouseStartX = 0;
+
+      stage.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        isMouseDown = true;
+        mouseStartX = e.clientX;
+      });
+
+      window.addEventListener('mouseup', (e) => {
+        if (!isMouseDown) return;
+        isMouseDown = false;
+        const deltaX = mouseStartX - e.clientX;
+        if (Math.abs(deltaX) > 50) {
+          const cur = Math.round(targetFloatIndex);
+          if (deltaX > 0) {
+            scrollToCaseIndex(Math.min(cases.length - 1, cur + 1));
+          } else {
+            scrollToCaseIndex(Math.max(0, cur - 1));
+          }
+        }
+      });
+    }
+
+    window.renderCasesCarousel = renderCasesCarousel;
+    renderCasesCarousel();
   }
+
+  // ========================================================================
+  // 8. Accessible Legal Modals (Privacy Statement & Terms)
+  // ========================================================================
+  const legalModal = document.getElementById('legalModal');
+  const modalBackdrop = document.getElementById('modalBackdrop');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody = document.getElementById('modalBody');
+  const openPrivacyBtn = document.getElementById('openPrivacyBtn');
+  const openTermsBtn = document.getElementById('openTermsBtn');
+
+  let lastActiveElement = null;
+
+  const legalContent = {
+    privacy: {
+      title: 'Privacy Statement',
+      body: [
+        'MotaGrowth operates under strict client confidentiality and data integrity. We do not sell, rent, monetize, or disclose visitor or client information to third-party brokers.',
+        'Direct project inquiries received via WhatsApp, email, or digital channels are utilized exclusively for inquiry evaluation, scope scoping, and professional collaboration.',
+        'This client prototype performs all clock, geolocation, and animation computations natively within your browser without invasive trackers, third-party beacons, or external telemetry.'
+      ]
+    },
+    terms: {
+      title: 'Terms of Engagement',
+      body: [
+        'All client collaborations with MotaGrowth are governed by formal, bilateral Master Services Agreements (MSA) and tailored Statements of Work (SOW).',
+        'Intellectual property, proprietary design systems, software assets, and custom digital infrastructure developed under active contracts transfer to the client upon full payment of agreed milestones.',
+        'All client case studies and performance figures referenced by MotaGrowth represent authentic, verified commercial partnerships and are presented with client authorization.'
+      ]
+    }
+  };
+
+  function openModal(type) {
+    if (!legalModal || !legalContent[type]) return;
+    lastActiveElement = document.activeElement;
+
+    const data = legalContent[type];
+    if (modalTitle) modalTitle.textContent = data.title;
+    if (modalBody) {
+      modalBody.textContent = '';
+      data.body.forEach(para => {
+        const p = document.createElement('p');
+        p.textContent = para;
+        modalBody.appendChild(p);
+      });
+    }
+
+    legalModal.classList.add('is-open');
+    legalModal.setAttribute('aria-hidden', 'false');
+    if (closeModalBtn) closeModalBtn.focus();
+  }
+
+  function closeModal() {
+    if (!legalModal) return;
+    legalModal.classList.remove('is-open');
+    legalModal.setAttribute('aria-hidden', 'true');
+    if (lastActiveElement && typeof lastActiveElement.focus === 'function') {
+      lastActiveElement.focus();
+    }
+  }
+
+  if (openPrivacyBtn) {
+    openPrivacyBtn.addEventListener('click', () => openModal('privacy'));
+  }
+
+  if (openTermsBtn) {
+    openTermsBtn.addEventListener('click', () => openModal('terms'));
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', closeModal);
+  }
+
+  if (modalBackdrop) {
+    modalBackdrop.addEventListener('click', closeModal);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && legalModal && legalModal.classList.contains('is-open')) {
+      closeModal();
+    }
+  });
+
+  // ========================================================================
+  // 9. Client Enquiries Hook (Future Admin Dashboard Data Layer)
+  // ========================================================================
+  window.MotaInquiries = {
+    getAll: function() {
+      try {
+        const stored = localStorage.getItem('motagrowth_inquiries');
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+    recordInquiry: function(inquiryData) {
+      try {
+        const list = window.MotaInquiries.getAll();
+        const entry = {
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+          ...inquiryData
+        };
+        list.push(entry);
+        localStorage.setItem('motagrowth_inquiries', JSON.stringify(list));
+        return entry;
+      } catch (e) {
+        console.warn('Inquiry storage error', e);
+        return null;
+      }
+    }
+  };
 
 });

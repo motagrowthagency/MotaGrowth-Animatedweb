@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MotaGrowth Studio — Espace Client</title>
+  <link rel="icon" type="image/png" href="assets/mota-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="portal.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="is-client-route">
+<div class="client-signin-view" id="clientSignInView" >
+    <a href="#" class="client-signin-back-link" id="clientSignInHomeLink" title="Return to Home">
+      <i data-lucide="arrow-left"></i>
+      <span>Home</span>
+    </a>
+
+    <div class="client-signin-card">
+      <div class="signin-brand-badge">
+        <i data-lucide="shield"></i>
+        <span>SECURE CLIENT WORKSPACE</span>
+      </div>
+      <h2 class="client-signin-title">Client Sign In</h2>
+      <p class="client-signin-subtitle">Access your project roadmap, approvals & growth metrics</p>
+
+      <form id="clientSignInForm" class="client-signin-form" autocomplete="off">
+        <div class="client-signin-field">
+          <input 
+            type="text" 
+            id="clientSignInUsername" 
+            class="client-signin-input" 
+            placeholder="Username or Work Email" 
+            required 
+            autocomplete="username"
+            autocapitalize="none"
+          />
+        </div>
+
+        <div class="client-signin-field">
+          <input 
+            type="password" 
+            id="clientSignInPassword" 
+            class="client-signin-input" 
+            placeholder="Workspace Password" 
+            required 
+            autocomplete="current-password"
+          />
+        </div>
+
+        <div class="client-signin-error" id="clientSignInError" ></div>
+
+        <button type="submit" class="client-signin-submit-btn" id="clientSignInSubmitBtn">
+          Sign In to Workspace ↗
+        </button>
+      </form>
+
+      <!-- Quick Demo Access for Testing -->
+      <div class="signin-demo-accounts">
+        <div class="signin-demo-title">⚡ Quick Demo Workspaces</div>
+        <div class="demo-account-chips">
+          <button type="button" class="btn-demo-chip" id="fillDemoClient1">✦ Velour Apparel</button>
+          <button type="button" class="btn-demo-chip" id="fillDemoClient2">✦ Lumina Health</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       4. CLIENT SPACE PORTAL (#client-space when logged in)
+       ========================================================================= -->
+  <div class="client-portal-view" id="clientPortalView" style="display: none;">
+    
+    <!-- Top Header Bar -->
+    <header class="portal-top-bar">
+      <div class="portal-top-left-actions">
+        <a href="#" class="portal-back-btn" id="portalHomeLink" title="Return to Home">
+          <i data-lucide="arrow-left"></i>
+          <span>Home</span>
+        </a>
+      </div>
+
+      <div class="portal-top-right-actions">
+        <button class="portal-btn-request-meeting" type="button" id="portalRequestMeetingBtn">
+          <i data-lucide="calendar-plus"></i>
+          <span>REQUEST MEETING</span>
+        </button>
+
+        <!-- User Profile Wrapper & Dropdown -->
+        <div class="portal-user-profile-wrapper">
+          <button class="portal-user-profile-circle" id="portalUserAvatarBtn" type="button" title="Client Profile (Velour Apparel)" aria-expanded="false">
+            <span class="portal-avatar-inner-text">VA</span>
+          </button>
+
+          <!-- Profile Dropdown Menu -->
+          <div class="portal-profile-dropdown" id="portalProfileDropdown" style="display: none;">
+            <div class="profile-dropdown-header">
+              <div class="profile-dropdown-avatar">VA</div>
+              <div class="profile-dropdown-info">
+                <strong class="profile-dropdown-name" id="dropdownClientName">Velour Luxury Apparel</strong>
+                <span class="profile-dropdown-email" id="dropdownClientEmail">elena@velourclothing.co</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <ul class="profile-dropdown-menu">
+              <li>
+                <button type="button" class="profile-dropdown-item" id="dropdownProfileSettingsBtn">
+                  <i data-lucide="building"></i>
+                  <span>Client Workspace</span>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="profile-dropdown-item dropdown-item-danger" id="portalSignOutBtn">
+                  <i data-lucide="log-out"></i>
+                  <span>Sign Out</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Center Hero Section: Welcome + Search -->
+    <div class="portal-hero-header">
+      <h1 class="portal-hero-title">Welcome back, <span class="portal-hero-name" id="portalHeroUserName">Velour</span></h1>
+      <p class="portal-hero-subtitle">Here is an overview of your active campaigns, deliverables, and assets.</p>
+      
+      <div class="portal-search-bar-wrap">
+        <div class="portal-search-bar" id="portalAiSearchContainer">
+          <i data-lucide="sparkles" class="portal-search-sparkle-icon"></i>
+          <input type="text" id="portalAiSearchInput" class="portal-search-input" placeholder="SEARCH BAR FOR AI (Ask anything about your projects, files, tasks...)" autocomplete="off" />
+          <button type="button" id="portalAiSearchBtn" class="portal-search-submit-btn" title="Ask AI">
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- AI Query Suggested Chips -->
+        <div class="portal-ai-query-chips">
+          <button type="button" class="portal-query-chip" data-query="What tasks are currently pending?">✦ Pending tasks</button>
+          <button type="button" class="portal-query-chip" data-query="When is our next deliverable or shoot scheduled?">✦ Next deliverables</button>
+          <button type="button" class="portal-query-chip" data-query="Which documents are ready for download?">✦ Downloadable docs</button>
+          <button type="button" class="portal-query-chip" data-query="What is the current project progress status?">✦ Project status</button>
+        </div>
+
+        <!-- Instant AI Search Answer Dropdown -->
+        <div class="portal-ai-answer-card" id="portalAiAnswerCard" style="display: none;">
+          <div class="portal-ai-answer-header">
+            <div class="ai-header-left">
+              <i data-lucide="bot" class="ai-bot-icon"></i>
+              <strong>MotaGrowth AI Portal Assistant</strong>
+            </div>
+            <button type="button" class="ai-close-btn" id="portalAiAnswerCloseBtn"><i data-lucide="x"></i></button>
+          </div>
+          <div class="portal-ai-answer-body" id="portalAiAnswerBody">
+            <!-- Dynamically injected response -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main 3-Column Portal Layout -->
+    <div class="portal-main-layout">
+      
+      <!-- LEFT COLUMN: NAVIGATION (Mini Menu & Tree Sidebar) -->
+      <aside class="portal-col portal-col-left">
+        <!-- Card 1: Mini Nav Menu -->
+        <div class="portal-white-card portal-mini-menu-card">
+          <ul class="portal-menu-list">
+            <li class="portal-menu-item active" data-portal-tab="home">
+              <span class="portal-menu-icon"><i data-lucide="home"></i></span>
+              <span class="portal-menu-text">Home</span>
+            </li>
+            <li class="portal-menu-item" data-portal-tab="ideas">
+              <span class="portal-menu-icon"><i data-lucide="lightbulb"></i></span>
+              <span class="portal-menu-text">Idea bank</span>
+              <span class="portal-menu-badge gold-badge" id="miniIdeaCount">0</span>
+            </li>
+            <li class="portal-menu-item" data-portal-tab="calendar">
+              <span class="portal-menu-icon"><i data-lucide="calendar"></i></span>
+              <span class="portal-menu-text">Calendar</span>
+              <span class="portal-menu-badge" id="miniCalCount">0</span>
+            </li>
+            <li class="portal-menu-item" data-portal-tab="tasks">
+              <span class="portal-menu-icon"><i data-lucide="check-square"></i></span>
+              <span class="portal-menu-text">Tasks</span>
+              <span class="portal-menu-badge" id="miniTasksCount">0</span>
+            </li>
+            <li class="portal-menu-item" data-portal-tab="documents">
+              <span class="portal-menu-icon"><i data-lucide="folder"></i></span>
+              <span class="portal-menu-text">Documents</span>
+              <span class="portal-menu-badge" id="miniDocsCount">0</span>
+            </li>
+            <li class="portal-menu-item" data-portal-tab="meetings">
+              <span class="portal-menu-icon"><i data-lucide="video"></i></span>
+              <span class="portal-menu-text">Meetings</span>
+              <span class="portal-menu-badge" id="miniMeetingsCount">0</span>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- CENTER COLUMN: DYNAMIC SUBVIEWS -->
+      <main class="portal-col portal-col-center">
+        
+        <!-- ===================================================================
+             SUBVIEW 1: HOME OVERVIEW (DEFAULT)
+             =================================================================== -->
+        <section class="portal-subview active" id="portalSubViewHome">
+          <!-- Card 1: Project Progress -->
+          <div class="portal-white-card portal-progress-card">
+            <div class="portal-card-header-group">
+              <div class="progress-title-row">
+                <h3 class="portal-card-title">Project Progress</h3>
+                <span class="portal-status-pill"><i data-lucide="sparkles"></i> Stage 2 Active</span>
+              </div>
+              <p class="portal-card-sub">Brand & Website Redesign Project - Project Status</p>
+            </div>
+
+            <div class="portal-progress-stepper">
+              <div class="portal-stepper-bar-container">
+                <div class="portal-stepper-line fill-half"></div>
+              </div>
+              <div class="portal-stepper-nodes">
+                <div class="portal-step-node completed">
+                  <div class="portal-node-circle"><i data-lucide="check"></i></div>
+                  <span class="portal-node-text">Getting started</span>
+                  <span class="node-date">Completed</span>
+                </div>
+                <div class="portal-step-node current">
+                  <div class="portal-node-circle">2</div>
+                  <span class="portal-node-text">Research & Briefing</span>
+                  <span class="node-date">In Progress</span>
+                </div>
+                <div class="portal-step-node upcoming">
+                  <div class="portal-node-circle">3</div>
+                  <span class="portal-node-text">Launch Stage</span>
+                  <span class="node-date">Target: Nov 2026</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Client Tasks -->
+          <div class="portal-white-card portal-tasks-card">
+            <div class="portal-tasks-header-row">
+              <div>
+                <h3 class="portal-card-title">Client Tasks</h3>
+                <p class="portal-card-sub">Interactive checklist — click checkboxes to toggle completion</p>
+              </div>
+              <div class="tasks-header-actions">
+                <span class="tasks-counter-pill" id="portalTasksCounter">1 of 4 Completed</span>
+                <button class="portal-btn-icon-dots" id="portalTasksMenuBtn" title="Task Options"><i data-lucide="more-vertical"></i></button>
+              </div>
+            </div>
+
+            <div class="portal-tasks-table" id="portalHomeTasksList">
+              <!-- Dynamically populated / interactive -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SUBVIEW 2: DEDICATED FULL-PAGE CALENDAR VIEW
+             =================================================================== -->
+        <section class="portal-subview" id="portalSubViewCalendar">
+          <div class="portal-white-card portal-calendar-page-card">
+            
+            <!-- Calendar Navigation Header -->
+            <div class="calendar-header-bar">
+              <div class="cal-title-wrap">
+                <div class="cal-badge"><i data-lucide="calendar"></i> CONTENT & PROJECT SCHEDULE</div>
+                <h3 class="portal-card-title" id="calendarCurrentMonthTitle">October 2026</h3>
+                <p class="portal-card-sub">Click any date to inspect scheduled deliverables, reels, shoots, and roadmap syncs.</p>
+              </div>
+
+              <div class="cal-actions-wrap">
+                <div class="cal-nav-buttons">
+                  <button type="button" class="btn-cal-nav" id="calPrevMonthBtn" title="Previous Month"><i data-lucide="chevron-left"></i></button>
+                  <button type="button" class="btn-cal-nav today-btn" id="calTodayBtn">Today</button>
+                  <button type="button" class="btn-cal-nav" id="calNextMonthBtn" title="Next Month"><i data-lucide="chevron-right"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Calendar Layout: Grid + Side Details Panel -->
+            <div class="calendar-interactive-layout">
+              
+              <!-- Month Grid (Left/Center) -->
+              <div class="calendar-grid-container">
+                <div class="calendar-weekdays-row">
+                  <div>SUN</div>
+                  <div>MON</div>
+                  <div>TUE</div>
+                  <div>WED</div>
+                  <div>THU</div>
+                  <div>FRI</div>
+                  <div>SAT</div>
+                </div>
+                <div class="calendar-days-grid" id="calendarDaysGrid">
+                  <!-- Generated via JS -->
+                </div>
+              </div>
+
+              <!-- Selected Date Details Drawer (Right) -->
+              <div class="calendar-date-details-panel" id="calendarDateDetailsPanel">
+                <div class="date-details-header">
+                  <div>
+                    <span class="details-label">SELECTED DATE</span>
+                    <h4 id="selectedDateDisplayTitle">October 12, 2026</h4>
+                  </div>
+                  <span class="events-count-badge" id="selectedDateEventsCount">0 Items</span>
+                </div>
+
+                <div class="date-events-list" id="selectedDateEventsList">
+                  <!-- Injected via JS -->
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SUBVIEW 3: IDEA BANK
+             =================================================================== -->
+        <section class="portal-subview" id="portalSubViewIdeas">
+          <div class="portal-white-card portal-ideas-page-card">
+            <div class="view-header-row">
+              <div>
+                <h3 class="portal-card-title">Ideas Bank & Strategic Proposals</h3>
+                <p class="portal-card-sub">Review creative concepts proposed by MotaGrowth. Approve proposals to greenlight production.</p>
+              </div>
+              <div class="ideas-filter-bar">
+                <button type="button" class="btn-filter-chip active" data-filter="all">All</button>
+                <button type="button" class="btn-filter-chip" data-filter="pending">Pending</button>
+                <button type="button" class="btn-filter-chip" data-filter="approved">Approved</button>
+              </div>
+            </div>
+
+            <div class="ideas-proposals-grid" id="portalIdeasListContainer">
+              <!-- Injected dynamically via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SUBVIEW 4: TASKS MANAGEMENT
+             =================================================================== -->
+        <section class="portal-subview" id="portalSubViewTasks">
+          <div class="portal-white-card portal-tasks-full-page">
+            <div class="view-header-row">
+              <div>
+                <h3 class="portal-card-title">Project Tasks & Action Tracker</h3>
+                <p class="portal-card-sub">Live synchronized milestone tasks for your agency growth team.</p>
+              </div>
+              <div class="tasks-filter-bar">
+                <button type="button" class="btn-filter-chip active" data-task-filter="all">All Tasks (4)</button>
+                <button type="button" class="btn-filter-chip" data-task-filter="pending">In Progress</button>
+                <button type="button" class="btn-filter-chip" data-task-filter="completed">Done</button>
+              </div>
+            </div>
+
+            <div class="tasks-full-list" id="portalFullTasksContainer">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SUBVIEW 6: DOCUMENTS & ASSET VAULT
+             =================================================================== -->
+        <section class="portal-subview" id="portalSubViewDocs">
+          <div class="portal-white-card portal-docs-vault-page">
+            <div class="view-header-row">
+              <div>
+                <h3 class="portal-card-title">Documents Vault & Asset Repository</h3>
+                <p class="portal-card-sub">Secure storage for agreements, SOW contracts, creative presentations, and raw assets.</p>
+              </div>
+            </div>
+
+            <!-- Folder categories -->
+            <div class="vault-folders-grid">
+              <div class="vault-folder-tile active-folder">
+                <i data-lucide="folder"></i>
+                <strong>01_Contracts_Legal</strong>
+                <span>3 files</span>
+              </div>
+              <div class="vault-folder-tile">
+                <i data-lucide="folder"></i>
+                <strong>02_Brand_Identity</strong>
+                <span>4 files</span>
+              </div>
+              <div class="vault-folder-tile">
+                <i data-lucide="folder"></i>
+                <strong>03_Web_Prototypes</strong>
+                <span>2 files</span>
+              </div>
+              <div class="vault-folder-tile">
+                <i data-lucide="folder"></i>
+                <strong>04_Raw_Video_4K</strong>
+                <span>1.8 GB</span>
+              </div>
+            </div>
+
+            <!-- Downloadable Files Table -->
+            <div class="vault-files-table-wrap">
+              <table class="vault-table">
+                <thead>
+                  <tr>
+                    <th>DOCUMENT NAME</th>
+                    <th>TYPE</th>
+                    <th>SIZE</th>
+                    <th>DATE</th>
+                    <th style="text-align: right;">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody id="portalVaultFilesBody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SUBVIEW 5: MEETINGS & STRATEGY SYNCS
+             =================================================================== -->
+        <section class="portal-subview" id="portalSubViewMeetings">
+          <div class="portal-white-card portal-meetings-page-card">
+            
+            <div class="view-header-row">
+              <div>
+                <h3 class="portal-card-title">1-on-1 Strategy Syncs & Meetings</h3>
+                <p class="portal-card-sub">Schedule dedicated growth reviews, creative brainstorms, or join your confirmed video calls.</p>
+              </div>
+            </div>
+
+            <div class="portal-meetings-grid-layout">
+              <!-- Left Column: Scheduler Card -->
+              <div class="portal-meeting-scheduler-box">
+                <div class="scheduler-box-header">
+                  <i data-lucide="calendar-plus"></i>
+                  <h4>Book a Strategy Call</h4>
+                </div>
+                <p class="scheduler-box-sub">Choose a session format and select your preferred date & time.</p>
+
+                <form id="meetingsTabBookingForm">
+                  <div class="form-group-block">
+                    <label class="block-label">SELECT SESSION FORMAT</label>
+                    <div class="meet-type-picker">
+                      <label class="meet-type-card active">
+                        <input type="radio" name="tabMeetType" value="15-min Sprint Sync" checked />
+                        <div class="type-icon-circle"><i data-lucide="zap"></i></div>
+                        <div class="type-text-meta">
+                          <strong>15-Min Sprint Sync</strong>
+                          <span>Urgent blockers, rapid reviews & decisions</span>
+                        </div>
+                      </label>
+                      <label class="meet-type-card">
+                        <input type="radio" name="tabMeetType" value="30-min Growth Review" />
+                        <div class="type-icon-circle"><i data-lucide="trending-up"></i></div>
+                        <div class="type-text-meta">
+                          <strong>30-Min Growth Review</strong>
+                          <span>Performance analytics & Meta ad scaling</span>
+                        </div>
+                      </label>
+                      <label class="meet-type-card">
+                        <input type="radio" name="tabMeetType" value="45-min Creative Strategy" />
+                        <div class="type-icon-circle"><i data-lucide="sparkles"></i></div>
+                        <div class="type-text-meta">
+                          <strong>45-Min Creative Strategy</strong>
+                          <span>New campaign launch & creative brainstorming</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="form-row-2col">
+                    <div class="form-group-block">
+                      <label for="tabMeetDate" class="block-label">PREFERRED DATE</label>
+                      <input type="date" id="tabMeetDate" class="portal-date-input" required />
+                    </div>
+                    <div class="form-group-block">
+                      <label for="tabMeetTime" class="block-label">TIME SLOT</label>
+                      <select id="tabMeetTime" class="portal-select-input">
+                        <option value="10:00 AM EST">10:00 AM EST</option>
+                        <option value="11:30 AM EST">11:30 AM EST</option>
+                        <option value="2:00 PM EST" selected>2:00 PM EST</option>
+                        <option value="3:30 PM EST">3:30 PM EST</option>
+                        <option value="4:30 PM EST">4:30 PM EST</option>
+                        <option value="6:00 PM EST">6:00 PM EST</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group-block">
+                    <label for="tabMeetAgenda" class="block-label">AGENDA / DISCUSSION TOPICS (OPTIONAL)</label>
+                    <textarea id="tabMeetAgenda" rows="2" class="portal-textarea-input" placeholder="e.g. Discuss Q4 TikTok content calendar and review new ad creative concepts..."></textarea>
+                  </div>
+
+                  <button type="submit" class="btn-portal-book-confirm">
+                    <i data-lucide="check"></i>
+                    <span>Confirm & Send to Admin</span>
+                  </button>
+                </form>
+              </div>
+
+              <!-- Right Column: Scheduled Meetings List -->
+              <div class="portal-meetings-list-box">
+                <div class="meetings-list-header">
+                  <div>
+                    <h4 class="box-title" style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0;">Scheduled Sessions</h4>
+                    <span class="box-sub" id="meetingsTabCountSub" style="font-size: 0.82rem; color: #64748b;">0 upcoming meetings</span>
+                  </div>
+                </div>
+
+                <div class="portal-scheduled-meetings-feed" id="portalScheduledMeetingsList">
+                  <!-- Dynamically rendered via JS -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+
+      <!-- RIGHT COLUMN: AI CHAT ASSISTANT & LATEST DOWNLOADS -->
+      <aside class="portal-col portal-col-right">
+        
+        <!-- Card 1: Interactive Chat History & AI Assistant -->
+        <div class="portal-white-card portal-chat-card">
+          <div class="chat-card-top-header">
+            <h2 class="portal-chat-title">CHAT<br>HISTORY</h2>
+            <div class="chat-online-badge"><span class="pulse-green"></span> AI Online</div>
+          </div>
+          
+          <!-- Chat Message Feed -->
+          <div class="portal-chat-feed" id="portalChatMessages">
+            <div class="chat-bubble bot-bubble">
+              <div class="chat-bubble-sender">MotaGrowth AI</div>
+              <p>Hello! I am your private workspace AI assistant. Ask me anything about your current sprint, deadlines, upcoming reels, or documents.</p>
+              <span class="chat-time">Just now</span>
+            </div>
+          </div>
+
+          <!-- Quick Suggestion Chips -->
+          <div class="chat-quick-suggestions">
+            <button type="button" class="chat-suggestion-chip" data-chat-prompt="Summarize my current project status">Status summary</button>
+            <button type="button" class="chat-suggestion-chip" data-chat-prompt="What tasks need my attention?">My tasks</button>
+            <button type="button" class="chat-suggestion-chip" data-chat-prompt="When is our next meeting?">Next sync</button>
+          </div>
+
+          <!-- Chat Input Form -->
+          <form id="portalChatForm" class="portal-chat-input-bar">
+            <input type="text" id="portalChatInput" placeholder="Ask AI assistant..." autocomplete="off" required />
+            <button type="submit" id="portalChatSendBtn" title="Send message">
+              <i data-lucide="send"></i>
+            </button>
+          </form>
+        </div>
+
+        <!-- Card 2: Latest Docs (Download Center) -->
+        <div class="portal-white-card portal-docs-card">
+          <div class="docs-header-row">
+            <h4 class="portal-docs-heading">Latest Docs</h4>
+            <span class="docs-sub-badge">Click to download</span>
+          </div>
+
+          <div class="portal-docs-stack">
+            <div class="portal-doc-tile" data-download="Agency client contract.doc" title="Download Agency client contract.doc">
+              <span class="portal-doc-icon"><i data-lucide="file-text"></i></span>
+              <span class="portal-doc-filename">Agency client contract.doc</span>
+              <span class="portal-download-arrow"><i data-lucide="download"></i></span>
+            </div>
+            <div class="portal-doc-tile" data-download="Main concept.pdf" title="Download Main concept.pdf">
+              <span class="portal-doc-icon"><i data-lucide="file-text"></i></span>
+              <span class="portal-doc-filename">Main concept.pdf</span>
+              <span class="portal-download-arrow"><i data-lucide="download"></i></span>
+            </div>
+            <div class="portal-doc-tile" data-download="Agreement.pdf" title="Download Agreement.pdf">
+              <span class="portal-doc-icon"><i data-lucide="file-text"></i></span>
+              <span class="portal-doc-filename">Agreement.pdf</span>
+              <span class="portal-download-arrow"><i data-lucide="download"></i></span>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: AESTHETIC MEETING REQUEST
+       ========================================================================= -->
+  <div class="modal-backdrop" id="portalMeetingModal" style="display: none;">
+    <div class="modal-card portal-meeting-modal-card">
+      <div class="modal-header">
+        <div class="meeting-header-title">
+          <div class="meeting-pill-badge"><i data-lucide="sparkles"></i> DIRECT FOUNDER & LEAD SYNC</div>
+          <h3>Schedule Strategy Session</h3>
+          <span class="modal-subtitle">Pick your format and time with Marcus Vance & the MotaGrowth creative team.</span>
+        </div>
+        <button type="button" class="modal-close" id="closePortalMeetingModalBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <form id="portalMeetingModalForm" class="portal-booking-form">
+        <!-- Session Formats -->
+        <div class="field-wrap">
+          <label>Session Format <span class="gold-text">*</span></label>
+          <div class="meeting-formats-grid">
+            <label class="meeting-format-radio">
+              <input type="radio" name="portalMeetType" value="15-min Quick Sync" checked />
+              <div class="format-card">
+                <strong>15-Min Sprint Sync</strong>
+                <span>Rapid approval & quick questions</span>
+              </div>
+            </label>
+            <label class="meeting-format-radio">
+              <input type="radio" name="portalMeetType" value="30-min Growth Review" />
+              <div class="format-card">
+                <strong>30-Min Growth Review</strong>
+                <span>KPI milestones & ad performance</span>
+              </div>
+            </label>
+            <label class="meeting-format-radio">
+              <input type="radio" name="portalMeetType" value="45-min Creative Strategy" />
+              <div class="format-card">
+                <strong>45-Min Strategy Session</strong>
+                <span>New campaign brainstorm & launch</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Date & Time Row -->
+        <div class="form-row-grid" style="margin-top: 1rem;">
+          <div class="field-wrap">
+            <label for="portalMeetDate">Preferred Date <span class="gold-text">*</span></label>
+            <input type="date" id="portalMeetDate" required />
+          </div>
+          <div class="field-wrap">
+            <label for="portalMeetTime">Preferred Time Slot (EST) <span class="gold-text">*</span></label>
+            <select id="portalMeetTime" required>
+              <option value="10:00 AM EST">10:00 AM EST</option>
+              <option value="02:00 PM EST" selected>02:00 PM EST</option>
+              <option value="04:30 PM EST">04:30 PM EST</option>
+              <option value="06:00 PM EST">06:00 PM EST</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Agenda Note -->
+        <div class="field-wrap" style="margin-top: 1rem;">
+          <label for="portalMeetAgenda">Discussion Agenda & Goals</label>
+          <textarea id="portalMeetAgenda" rows="3" placeholder="Tell us what you would like to cover (e.g. Q4 ad creative review, Black Friday landing page...)"></textarea>
+        </div>
+
+        <button type="submit" class="btn-confirm-meeting">
+          <i data-lucide="calendar-check"></i>
+          <span>Confirm & Schedule Meeting</span>
+        </button>
+      </form>
+
+      <!-- Confirmation view -->
+      <div class="meeting-dispatched-box" id="portalMeetingSuccessBox" style="display: none;">
+        <div class="success-icon"><i data-lucide="check-circle-2"></i></div>
+        <h4>Meeting Request Dispatched!</h4>
+        <p>Your session with <strong>Marcus Vance</strong> is booked for <span id="portalBookedTimeText" class="blue-bold-text"></span>.</p>
+        <div class="meet-link-badge">
+          <i data-lucide="video"></i>
+          <span>Google Meet HD link automatically sent to your email</span>
+        </div>
+        <button type="button" class="btn-done-meeting" id="portalMeetingDoneBtn">Done</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: UPLOAD CLIENT ASSET
+       ========================================================================= -->
+  <div class="modal-backdrop" id="uploadFileModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Upload Client Asset</h3>
+          <span style="font-size: 0.85rem; color: #64748b;">Share files directly with the MotaGrowth creative & strategy team.</span>
+        </div>
+        <button class="modal-close" id="closeUploadFileModalBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <form id="uploadFileForm" class="modal-form">
+        <div class="field-wrap full-span">
+          <label for="uploadFileName">File Title / Asset Name <span class="gold-text">*</span></label>
+          <input type="text" id="uploadFileName" placeholder="e.g. Autumn 2026 Raw 4K Video Footage.zip" required>
+        </div>
+
+        <div class="form-row-grid">
+          <div class="field-wrap">
+            <label for="uploadFileCategory">Destination Folder <span class="gold-text">*</span></label>
+            <select id="uploadFileCategory" required>
+              <option value="01_Brand_Identity">01_Brand_Identity</option>
+              <option value="02_Web_Prototypes">02_Web_Prototypes</option>
+              <option value="03_Video_Assets_4K" selected>03_Video_Assets_4K</option>
+              <option value="04_Ad_Creatives_Copy">04_Ad_Creatives_Copy</option>
+              <option value="05_Contracts_Invoices">05_Contracts_Invoices</option>
+            </select>
+          </div>
+
+          <div class="field-wrap">
+            <label for="uploadFileSize">Estimated Size</label>
+            <input type="text" id="uploadFileSize" placeholder="e.g. 1.2 GB" value="25.4 MB">
+          </div>
+        </div>
+
+        <div class="field-wrap full-span">
+          <label for="uploadFileLink">Cloud Link / File URL (Drive, Dropbox, WeTransfer, etc.) <span class="gold-text">*</span></label>
+          <input type="url" id="uploadFileLink" placeholder="https://drive.google.com/..." required>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelUploadFileBtn">Cancel</button>
+          <button type="submit" class="btn-gold-pill">Add to Asset Vault</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: NEED MORE DETAIL / FEEDBACK MODAL
+       ========================================================================= -->
+  <div class="modal-backdrop" id="ideaDetailModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Request More Details</h3>
+          <span class="gold-text" id="detailModalIdeaTitle" style="font-size: 0.9rem; font-weight: 600;"></span>
+        </div>
+        <button class="modal-close" id="closeIdeaDetailModalBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <form id="ideaDetailForm" class="modal-form">
+        <div class="field-wrap full-span">
+          <label for="detailTopicSelect">What clarification is needed? <span class="gold-text">*</span></label>
+          <select id="detailTopicSelect" required>
+            <option value="Visual / Design Variations">Visual / Design Mockup Variations</option>
+            <option value="Budget & Resource Impact">Budget & Resource Scope Breakdown</option>
+            <option value="Timeline & Rollout Schedule">Timeline & Rollout Schedule Details</option>
+            <option value="Copywriting & Messaging Adjustments">Copywriting & Messaging Adjustments</option>
+            <option value="Technical Specifications">Technical & Platform Specifications</option>
+            <option value="Other Specific Questions">Other Specific Questions</option>
+          </select>
+        </div>
+
+        <div class="field-wrap full-span">
+          <label for="detailClientNote">Your Questions / Adjustment Notes <span class="gold-text">*</span></label>
+          <textarea id="detailClientNote" rows="4" placeholder="e.g. Could we see an alternative color palette version for mobile, and what is the expected turnaround time for this batch?" required></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelIdeaDetailBtn">Cancel</button>
+          <button type="submit" class="btn-gold-pill">Submit Detail Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: PROPOSE CLIENT IDEA
+       ========================================================================= -->
+  <div class="modal-backdrop" id="proposeIdeaModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Propose New Idea to Agency</h3>
+          <span style="font-size: 0.85rem; color: #64748b;">Submit a campaign concept or feature request directly to our creative directors.</span>
+        </div>
+        <button class="modal-close" id="closeProposeIdeaModalBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <form id="proposeIdeaForm" class="modal-form">
+        <div class="field-wrap full-span">
+          <label for="proposeIdeaTitle">Idea / Proposal Title <span class="gold-text">*</span></label>
+          <input type="text" id="proposeIdeaTitle" placeholder="e.g. Black Friday VIP Early Access Landing Page" required>
+        </div>
+
+        <div class="form-row-grid">
+          <div class="field-wrap">
+            <label for="proposeIdeaCategory">Category</label>
+            <select id="proposeIdeaCategory">
+              <option value="Website & UX">Website & UX</option>
+              <option value="Video & Reels">Video & Reels</option>
+              <option value="Paid Growth">Paid Growth</option>
+              <option value="Brand Strategy">Brand Strategy</option>
+            </select>
+          </div>
+
+          <div class="field-wrap">
+            <label for="proposeIdeaPriority">Priority Ranking</label>
+            <select id="proposeIdeaPriority">
+              <option value="High">🔥 High Priority (Critical)</option>
+              <option value="Medium" selected>⚡ Medium Priority</option>
+              <option value="Low">✦ Low Priority</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-wrap full-span">
+          <label for="proposeIdeaDesc">Description & Objectives <span class="gold-text">*</span></label>
+          <textarea id="proposeIdeaDesc" rows="4" placeholder="Explain the concept, references, or goal for this proposal..." required></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelProposeIdeaBtn">Cancel</button>
+          <button type="submit" class="btn-gold-pill">Add to Ideas Queue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       4. PRIVATE ADMIN CRM DASHBOARD (#admin)
+       ========================================================================= -->
+  
+  <script src="portal.js"></script>
+</body>
+</html>

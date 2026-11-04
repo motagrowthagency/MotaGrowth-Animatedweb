@@ -14,19 +14,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
+  <!-- Accessible Skip to Main Content Link (WCAG 2.2 AA) -->
+  <a href="#hero" class="skip-link">Skip to main content</a>
+
+  <!-- Main Landing Page Viewport -->
+
   <!-- ========================================================================
-       TOP NAVIGATION BAR (Smart Scroll Hide/Reveal)
+       TOP NAVIGATION BAR (Smart Scroll Hide/Reveal - Persistent Sticky)
        ======================================================================== -->
-  <header class="site-header" id="site-header">
+  <header class="site-header" id="site-header" aria-hidden="true">
     <div class="header-inner">
       <a href="#hero" class="brand-link" aria-label="MotaGrowth Home">
         <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
       </a>
 
-      <div class="studio-status-pill">
+      <div class="studio-status-pill" aria-label="Studio local time">
         <span class="status-indicator" aria-hidden="true"></span>
         <span class="status-text"><span id="studio-clock">--:--</span></span>
       </div>
@@ -34,104 +40,110 @@
       <nav class="nav-menu" aria-label="Primary Navigation">
         <a href="#hero" class="nav-link active" data-i18n="nav.home">Home</a>
         <a href="#audiences" class="nav-link" data-i18n="nav.audiences">Audiences</a>
+        <a href="#philosophy" class="nav-link">Strategy</a>
         <a href="#cases" class="nav-link" data-i18n="nav.cases">Cases</a>
+        <a href="#about" class="nav-link" data-i18n="nav.about">About</a>
+        <a href="client-space.html" class="nav-link">Client Space</a>
       </nav>
 
       <div class="header-actions">
         <div class="lang-selector" role="group" aria-label="Language Selector">
-          <button type="button" class="lang-btn active" data-lang="en">EN</button>
-          <span class="lang-sep">/</span>
-          <button type="button" class="lang-btn" data-lang="fr">FR</button>
+          <button type="button" class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
+          <span class="lang-sep" aria-hidden="true">/</span>
+          <button type="button" class="lang-btn" data-lang="fr" aria-pressed="false">FR</button>
         </div>
         <a href="#proposal" class="btn-contact-header">
-          <span data-i18n="btn.proposal">REQUEST PROPOSAL</span>
+          <span data-i18n="btn.proposal">REQUEST A PROPOSAL</span>
         </a>
-        <div class="frame-menu-dots" aria-label="Menu">
+        <a href="admin.html" class="frame-menu-dots" aria-label="Admin Portal" title="Studio Admin CRM">
           <span class="grid-dot"></span>
           <span class="grid-dot"></span>
           <span class="grid-dot"></span>
           <span class="grid-dot"></span>
-        </div>
+        </a>
       </div>
     </div>
   </header>
 
   <main>
     <!-- ========================================================================
-         HERO SECTION (Matching Reference Mockup 1:1)
+         01 / HERO SECTION (Refined Editorial Agency Architecture)
          ======================================================================== -->
     <section class="hero-section" id="hero">
       <div class="hero-backdrop" aria-hidden="true"></div>
       <div class="hero-cursor-ambient" id="hero-cursor-ambient" aria-hidden="true"></div>
 
-      <!-- Outer Rounded Glass Frame (Matching Reference) -->
+      <!-- Outer Rounded Glass Frame -->
       <div class="hero-glass-frame">
         
-        <!-- Header Bar Inside Frame -->
+        <!-- Header Bar Inside Frame (Initial In-View Navigation) -->
         <div class="frame-top-bar">
           <a href="#hero" class="frame-brand" aria-label="MotaGrowth Home">
             <span class="frame-brand-name"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
           </a>
 
-          <div class="frame-center-clock">
+          <div class="frame-center-clock" aria-label="Casablanca local time">
             <span id="frame-clock-display">--:--</span>
           </div>
 
           <div class="frame-right-controls">
             <div class="lang-selector" role="group" aria-label="Language Selector">
-              <button type="button" class="lang-btn active" data-lang="en">EN</button>
-              <span class="lang-sep">/</span>
-              <button type="button" class="lang-btn" data-lang="fr">FR</button>
+              <button type="button" class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
+              <span class="lang-sep" aria-hidden="true">/</span>
+              <button type="button" class="lang-btn" data-lang="fr" aria-pressed="false">FR</button>
             </div>
-            <div class="frame-menu-dots" aria-label="Menu">
+            <a href="client-space.html" class="btn-ref btn-ref-ghost" style="margin-right:0.6rem; text-decoration:none;">
+              <span class="btn-text">CLIENT SPACE ↗</span>
+            </a>
+            <a href="admin.html" class="frame-menu-dots" aria-label="Admin Portal" title="Studio Admin CRM">
               <span class="grid-dot"></span>
               <span class="grid-dot"></span>
               <span class="grid-dot"></span>
               <span class="grid-dot"></span>
-            </div>
+            </a>
           </div>
         </div>
 
         <!-- Hero Content Stage -->
         <div class="hero-inner-stage">
           
-          <!-- Desktop Staggered Headline (Matching Reference Screenshot) -->
+          <!-- Desktop Staggered Headline (Clean Spacing and Dominant Typography) -->
           <h1 class="hero-headline-desktop" aria-label="We turn attention into growth">
-            <span class="headline-block block-top" data-i18n="hero.line1">WE TURN</span>
-            <span class="headline-block block-mid" data-i18n="hero.line2">ATTENTION</span>
+            <span class="headline-block block-top" data-i18n="hero.line1">WE TURN</span> 
+            <span class="headline-block block-mid" data-i18n="hero.line2">ATTENTION</span> 
             <span class="headline-block block-bot"><span data-i18n="hero.line3prefix">INTO </span><span class="growth-word" data-i18n="hero.line3accent">GROWTH</span></span>
           </h1>
 
-          <!-- Mobile Staggered Headline (Matching Phone Mockup Screenshot) -->
+          <!-- Mobile Staggered Headline -->
           <h1 class="hero-headline-mobile" aria-hidden="true">
             <span class="mobile-stack-right">
-              <span data-i18n="hero.m1">WE</span>
-              <span data-i18n="hero.m2">TURN</span>
+              <span data-i18n="hero.m1">WE</span> 
+              <span data-i18n="hero.m2">TURN</span> 
               <span data-i18n="hero.m3">ATTENTION</span>
             </span>
             <span class="mobile-stack-left">
-              <span data-i18n="hero.m4">INTO</span>
+              <span data-i18n="hero.m4">INTO</span> 
               <span class="growth-word" data-i18n="hero.m5">GROWTH</span>
             </span>
           </h1>
 
-          <!-- Subtitle Row (Left and Right Split) -->
+          <!-- Concrete Offer Description & Core Deliverables Strip -->
           <div class="hero-sub-split">
-            <p class="sub-split-left" data-i18n="hero.subLeft">
-              We build <span class="highlight-gold">full-service</span> growth engines —<br>for founders, ambitious brands, and hospitality.
+            <p class="sub-split-left" data-i18n="hero.supportingCopy">
+              We build websites, brands, and paid campaigns that help ambitious businesses attract customers and turn attention into enquiries, bookings, and sales.
             </p>
-            <p class="sub-split-right" data-i18n="hero.subRight">
-              and turn attention<br>into scalable revenue.
-            </p>
+            <div class="sub-split-right">
+              <span class="hero-service-badge" data-i18n="hero.serviceLine">WEB DESIGN &amp; DEVELOPMENT • PAID MEDIA • BRAND IDENTITY</span>
+            </div>
           </div>
 
-          <!-- Action Buttons (Solid White + Outline) -->
+          <!-- Action Buttons (High Contrast & Clear Hierarchy) -->
           <div class="hero-action-buttons">
             <a href="#proposal" class="btn-ref btn-ref-solid">
-              <span class="btn-text" data-i18n="btn.proposal">REQUEST PROPOSAL</span>
+              <span class="btn-text" data-i18n="btn.proposal">REQUEST A PROPOSAL ↗</span>
             </a>
             <a href="#cases" class="btn-ref btn-ref-outline">
-              <span class="btn-text" data-i18n="btn.cases">OUR CASES</span>
+              <span class="btn-text" data-i18n="btn.cases">EXPLORE OUR WORK ↗</span>
             </a>
           </div>
 
@@ -141,62 +153,60 @@
     </section>
 
     <!-- ========================================================================
-         02 / AUDIENCES (Matching Reference Mockup 1:1)
+         02 / AUDIENCES (Clear Segmentation & Concrete Focus)
          ======================================================================== -->
     <section class="comma-audiences-section" id="audiences">
       <div class="comma-container">
         
-        <!-- Section Heading (Right Aligned) -->
+        <!-- Section Heading -->
         <div class="comma-sec-header">
           <h2 class="comma-sec-title" data-i18n="audiences.title">
-            MOTAGROWTH SCALES<br>
-            THE BRANDS OF FOUNDERS<br>
-            HOSPITALITY &amp; E-COM
+            BUILT FOR<br>AMBITIOUS BUSINESSES.
           </h2>
         </div>
 
-        <!-- 3 Cards Grid -->
+        <!-- 3 Differentiated Cards Grid -->
         <div class="comma-cards-grid">
           
-          <!-- Card 1 (Founders & E-Commerce) -->
-          <div class="comma-card card-founders">
+          <!-- Card 1 (Founders & Growing Businesses) -->
+          <div class="comma-card card-founders" tabindex="0">
             <div class="comma-card-bg" style="background-image: url('assets/founders_ecommerce.jpg');"></div>
             <div class="comma-card-gradient"></div>
             <div class="card-glare" aria-hidden="true"></div>
             <div class="comma-card-inner">
-              <div class="comma-card-title" data-i18n="card1.title">FOUNDERS &amp; E-COMMERCE</div>
-              <p class="comma-card-desc" data-i18n="card1.desc">Performance marketing, conversion-focused web design, and scalable acquisition funnels.</p>
+              <div class="comma-card-title" data-i18n="card1.title">FOUNDERS &amp; GROWING BUSINESSES</div>
+              <p class="comma-card-desc" data-i18n="card1.desc">Launch with a clear identity, a professional website, and a focused plan for attracting customers.</p>
             </div>
           </div>
 
-          <!-- Card 2 (Hospitality & Nightlife) -->
-          <div class="comma-card card-hospitality">
-            <div class="comma-card-bg" style="background-image: url('assets/hospitality_nightlife_with_desc.jpg');"></div>
+          <!-- Card 2 (Hospitality & Experiences) -->
+          <div class="comma-card card-hospitality" tabindex="0">
+            <div class="comma-card-bg" style="background-image: url('assets/hospitality_nightlife_new.jpg');"></div>
             <div class="comma-card-gradient"></div>
             <div class="card-glare" aria-hidden="true"></div>
             <div class="comma-card-inner">
-              <div class="comma-card-title" data-i18n="card2.title">HOSPITALITY &amp; NIGHTLIFE</div>
-              <p class="comma-card-desc" data-i18n="card2.desc">Distinctive brand identity, creative direction, and premium booking experiences in Morocco &amp; beyond.</p>
+              <div class="comma-card-title" data-i18n="card2.title">HOSPITALITY &amp; EXPERIENCES</div>
+              <p class="comma-card-desc" data-i18n="card2.desc">Bring your venue to life online and make it easier for people to discover, enquire, and book.</p>
             </div>
           </div>
 
-          <!-- Card 3 (Service & Enterprise) -->
-          <div class="comma-card card-enterprise">
+          <!-- Card 3 (E-Commerce Brands) -->
+          <div class="comma-card card-enterprise" tabindex="0">
             <div class="comma-card-bg" style="background-image: url('assets/service_enterprise.jpg');"></div>
             <div class="comma-card-gradient"></div>
             <div class="card-glare" aria-hidden="true"></div>
             <div class="comma-card-inner">
-              <div class="comma-card-title" data-i18n="card3.title">SERVICE &amp; ENTERPRISE</div>
-              <p class="comma-card-desc" data-i18n="card3.desc">Systematic lead generation, brand authority, and rigorous conversion optimization.</p>
+              <div class="comma-card-title" data-i18n="card3.title">E-COMMERCE BRANDS</div>
+              <p class="comma-card-desc" data-i18n="card3.desc">Connect your storefront, advertising, and creative around a better path from discovery to purchase.</p>
             </div>
           </div>
 
         </div>
 
-        <!-- Bottom Action Button (Right Aligned) -->
+        <!-- Bottom Action Button -->
         <div class="comma-sec-footer">
           <a href="#cases" class="btn-ref btn-ref-solid comma-btn-examples">
-            <span class="btn-text" data-i18n="btn.examples">VIEW CASE STUDIES</span>
+            <span class="btn-text" data-i18n="btn.examples">EXPLORE SELECTED CASES ↗</span>
           </a>
         </div>
 
@@ -204,7 +214,7 @@
     </section>
 
     <!-- ========================================================================
-         03 / STRATEGY MEETS PERFORMANCE (MotaGrowth Philosophy & Proof Points)
+         03 / STRATEGY MEETS PERFORMANCE (Core Philosophy & Visual Constellation)
          ======================================================================== -->
     <section class="mota-outcomes-section" id="philosophy">
       <div class="mota-outcomes-container">
@@ -261,8 +271,8 @@
 
           <!-- Centered CTA Beneath Floating Groups -->
           <div class="outcomes-cta-wrap">
-            <a href="#services" class="btn-outcomes-gold" data-i18n="outcomes.cta">
-              EXPLORE OUR SERVICES ↗
+            <a href="#cases" class="btn-outcomes-gold" data-i18n="outcomes.cta">
+              EXPLORE OUR WORK ↗
             </a>
           </div>
 
@@ -284,7 +294,7 @@
     </section>
 
     <!-- ========================================================================
-         04 / CASES THAT TELL THE STORY (3D Cover Flow Showcase - Final Section)
+         04 / CASES THAT TELL THE STORY (Interactive 3D Cover Flow Showcase)
          ======================================================================== -->
     <section class="comma-cases-section" id="cases">
       <div class="cases-sticky-wrapper">
@@ -293,23 +303,23 @@
           <!-- Section Header -->
           <div class="cases-header">
             <h2 class="cases-title" data-i18n="cases.title">CASES THAT TELL THE STORY</h2>
-            <p class="cases-subtitle" data-i18n="cases.subtitle">VISUALLY STRONG. LOGICALLY BUILT. BACKED BY RESULTS.</p>
+            <p class="cases-subtitle" data-i18n="cases.subtitle">CLEAR STRATEGY. DISTINCTIVE DESIGN. PURPOSEFUL EXECUTION.</p>
           </div>
 
-          <!-- 3D Perspective Cover Flow Carousel -->
+          <!-- 3D Perspective Cover Flow Carousel Stage -->
           <div class="cases-flow-stage" id="cases-stage">
             <div class="cases-track" id="cases-track" aria-label="Interactive 3D Cases Carousel">
-              <!-- Dynamically populated from MotaCases (blank studio placeholders by default) -->
+              <!-- Dynamically populated from MotaCases (Orsap.ma, TG2D, La Centrale Crèche) -->
             </div>
 
             <!-- Carousel Controls -->
             <div class="cases-nav-controls">
               <button type="button" class="cases-nav-btn prev-btn" id="cases-prev" aria-label="Previous Case">
-                <span class="nav-arrow">←</span>
+                <span class="nav-arrow" aria-hidden="true">←</span>
               </button>
               <div class="cases-pagination-dots" id="cases-dots" role="tablist" aria-label="Cases Navigation"></div>
               <button type="button" class="cases-nav-btn next-btn" id="cases-next" aria-label="Next Case">
-                <span class="nav-arrow">→</span>
+                <span class="nav-arrow" aria-hidden="true">→</span>
               </button>
             </div>
           </div>
@@ -317,7 +327,7 @@
           <!-- Bottom Action CTA -->
           <div class="cases-cta-wrap">
             <a href="#proposal" class="btn-ref btn-ref-solid cases-cta-btn" data-i18n="cases.cta">
-              VIEW PRESENTATIONS
+              REQUEST A PROPOSAL ↗
             </a>
           </div>
 
@@ -325,29 +335,136 @@
       </div>
     </section>
 
+    <!-- ========================================================================
+         05 / ABOUT & FOUNDER (Built in Casablanca • Led by Mohamed Tazi)
+         ======================================================================== -->
+    <section class="studio-about-section" id="about">
+      <div class="content-container">
+        
+        <div class="about-sec-header">
+          <div class="about-tag" data-i18n="about.tag">05 / LEADERSHIP &amp; FOUNDER</div>
+          <h2 class="about-sec-title" data-i18n="about.title">
+            BUILT IN CASABLANCA.<br>
+            <span class="gold-gradient-text">DIRECTED BY MOHAMED TAZI.</span>
+          </h2>
+        </div>
+
+        <div class="about-grid">
+          
+          <!-- Left Column: Portrait Card -->
+          <div class="about-media-col">
+            <div class="about-portrait-card">
+              <div class="about-portrait-img-wrap">
+                <img 
+                  src="assets/founder-mohamed-tazi.jpg" 
+                  alt="Mohamed Tazi - Founder & Creative Director at MotaGrowth in Casablanca" 
+                  class="about-founder-img"
+                  loading="lazy"
+                />
+                <div class="portrait-ambient-glow" aria-hidden="true"></div>
+              </div>
+              <div class="about-portrait-caption">
+                <div class="caption-identity">
+                  <span class="caption-name">Mohamed Tazi</span>
+                  <span class="caption-role" data-i18n="about.badgeRole">Founder &amp; Growth Strategist</span>
+                </div>
+                <div class="caption-location">
+                  <span class="loc-pin">📍</span>
+                  <span data-i18n="about.badgeLocation">Casablanca, Morocco</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Editorial Narrative & Principles -->
+          <div class="about-content-col">
+            <div class="about-lead-quote">
+              “Where high-taste creative direction meets ruthless performance engineering.”
+            </div>
+            
+            <p class="about-body-text" data-i18n="about.desc1">
+              MotaGrowth is an independent growth studio founded by Mohamed Tazi in Casablanca. We partner with ambitious founders, luxury hospitality venues, and modern digital brands who refuse to look or perform like generic templates.
+            </p>
+
+            <p class="about-body-text" data-i18n="about.desc2">
+              Every strategic roadmap, conversion architecture, and high-stakes performance campaign is directly overseen by the founder. No junior account handoffs, no vanity impressions, and zero wasted ad spend.
+            </p>
+
+            <!-- 3 Core Studio Pillars -->
+            <div class="about-pillars-grid">
+              <div class="about-pillar-item">
+                <div class="pillar-num">01</div>
+                <div class="pillar-content">
+                  <h4 class="pillar-title">Direct Founder Oversight</h4>
+                  <p class="pillar-desc">You partner directly with seasoned creative and analytical leadership on every milestone.</p>
+                </div>
+              </div>
+
+              <div class="about-pillar-item">
+                <div class="pillar-num">02</div>
+                <div class="pillar-content">
+                  <h4 class="pillar-title">Zero-Fluff Performance</h4>
+                  <p class="pillar-desc">All campaigns and web experiences are measured against cash flow, ROAS, and real customer value.</p>
+                </div>
+              </div>
+
+              <div class="about-pillar-item">
+                <div class="pillar-num">03</div>
+                <div class="pillar-content">
+                  <h4 class="pillar-title">Global Standards, Local Edge</h4>
+                  <p class="pillar-desc">Casablanca DNA executed to international standards across Morocco, Europe, and the GCC.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Founder Direct Contact Actions -->
+            <div class="about-cta-strip">
+              <a href="https://wa.me/34675194956" target="_blank" rel="noopener" class="btn-ref btn-ref-solid">
+                <span class="btn-text">WhatsApp Founder Direct (+34 675 194 956) ↗</span>
+              </a>
+              <a href="https://www.instagram.com/motagrowth/" target="_blank" rel="noopener" class="btn-ref btn-ref-ghost">
+                <span class="btn-text">Instagram @motagrowth ↗</span>
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
   <!-- ========================================================================
-       FOOTER (Minimalist Studio Footer)
+       FOOTER (Minimalist Studio Footer & Inquiry Point)
        ======================================================================== -->
   <footer class="site-footer" id="proposal">
     <div class="content-container">
       
       <div class="footer-top">
         <div class="footer-brand">
-          <img src="assets/mota-icon.png" alt="MotaGrowth" class="footer-icon">
+          <img src="assets/mota-icon.png" alt="MotaGrowth Icon" class="footer-icon">
           <span class="footer-brand-title"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
           <p class="footer-tagline">“We turn attention into growth.”</p>
         </div>
 
         <div class="footer-nav-columns">
           <div class="f-col">
-            <span class="f-heading">Navigation</span>
+            <span class="f-heading">Studio Navigation</span>
             <ul class="f-links">
               <li><a href="#hero">Overview</a></li>
-              <li><a href="#audiences">Audiences</a></li>
-              <li><a href="#philosophy">Strategy &amp; Performance</a></li>
-              <li><a href="#cases">Cases</a></li>
+              <li><a href="services.html">Services &amp; Disciplines</a></li>
+              <li><a href="cases.html">Selected Cases</a></li>
+              <li><a href="about.html">About &amp; Founder</a></li>
+            </ul>
+          </div>
+
+          <div class="f-col">
+            <span class="f-heading">Portals</span>
+            <ul class="f-links">
+              <li><a href="client-space.html">Client Space ↗</a></li>
+              <li><a href="admin.html">Studio Admin CRM ↗</a></li>
             </ul>
           </div>
 
@@ -355,9 +472,8 @@
             <span class="f-heading">Studio Connect</span>
             <ul class="f-links">
               <li><a href="mailto:contact@motagrowth.com">contact@motagrowth.com</a></li>
-              <li><a href="https://wa.me/212600000000" target="_blank" rel="noopener">WhatsApp Direct ↗</a></li>
-              <li><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn ↗</a></li>
-              <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram ↗</a></li>
+              <li><a href="https://wa.me/34675194956" target="_blank" rel="noopener">WhatsApp Direct (+34 675 194 956) ↗</a></li>
+              <li><a href="https://www.instagram.com/motagrowth/" target="_blank" rel="noopener">Instagram (@motagrowth) ↗</a></li>
             </ul>
           </div>
         </div>
@@ -366,15 +482,32 @@
       <div class="footer-bottom">
         <div class="f-copy">© 2026 MotaGrowth Studio. All rights reserved. Casablanca, Morocco.</div>
         <div class="f-legal">
-          <a href="#" class="no-redirect">Privacy Policy</a>
-          <span class="sep">•</span>
-          <a href="#" class="no-redirect">Terms of Engagement</a>
+          <button type="button" class="legal-link-btn" id="openPrivacyBtn">Privacy Statement</button>
+          <span class="sep" aria-hidden="true">•</span>
+          <button type="button" class="legal-link-btn" id="openTermsBtn">Terms of Engagement</button>
         </div>
       </div>
 
     </div>
   </footer>
 
+
+  <!-- Accessible Legal Modals (Transparent Statements) -->
+  <div class="legal-modal" id="legalModal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
+    <div class="legal-modal-backdrop" id="modalBackdrop"></div>
+    <div class="legal-modal-box">
+      <div class="legal-modal-header">
+        <h3 id="modalTitle" class="legal-modal-title">Privacy Statement</h3>
+        <button type="button" class="legal-modal-close" id="closeModalBtn" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="legal-modal-body" id="modalBody">
+        <p>MotaGrowth operates under strict client confidentiality. We do not sell, trade, or share visitor data with third parties. Any direct communication received via email or WhatsApp is stored solely for project inquiry evaluation and professional collaboration.</p>
+        <p>This prototype runs securely on local and production HTTPS environments with privacy-first client time processing.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Studio Custom Precision Cursor (Desktop Only) -->
   <div class="studio-cursor-dot" id="cursor-dot" aria-hidden="true"></div>
   <div class="studio-cursor-ring" id="cursor-ring" aria-hidden="true"></div>
 
