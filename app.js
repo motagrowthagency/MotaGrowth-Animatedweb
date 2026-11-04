@@ -516,24 +516,47 @@ document.addEventListener('DOMContentLoaded', () => {
   if (header) {
     let lastScrollY = window.scrollY;
     let ticking = false;
+    const isSubpage = document.body.classList.contains('is-subpage');
 
     const updateHeaderOnScroll = () => {
       const currentScrollY = window.scrollY;
 
-      if (currentScrollY > 260) {
-        if (currentScrollY > lastScrollY + 6) {
-          header.classList.remove('header-visible');
-          header.classList.add('header-hidden');
-          header.setAttribute('aria-hidden', 'true');
-        } else if (currentScrollY < lastScrollY - 6) {
+      if (isSubpage) {
+        // Subpage: Always visible at top; smart hide/reveal on scroll down/up
+        if (currentScrollY > 120) {
+          if (currentScrollY > lastScrollY + 6) {
+            header.classList.remove('header-visible');
+            header.classList.add('header-hidden');
+            header.setAttribute('aria-hidden', 'true');
+          } else if (currentScrollY < lastScrollY - 6) {
+            header.classList.remove('header-hidden');
+            header.classList.add('header-visible');
+            header.setAttribute('aria-hidden', 'false');
+          }
+        } else {
           header.classList.remove('header-hidden');
           header.classList.add('header-visible');
           header.setAttribute('aria-hidden', 'false');
         }
       } else {
-        header.classList.remove('header-visible');
-        header.classList.add('header-hidden');
-        header.setAttribute('aria-hidden', 'true');
+        // Landing page: frame-top-bar handles the hero view.
+        // Reveal sticky site-header only once scrolled past hero frame to eliminate competing duplicate headers.
+        const heroThreshold = Math.max(window.innerHeight * 0.7, 480);
+        if (currentScrollY > heroThreshold) {
+          if (currentScrollY > lastScrollY + 8) {
+            header.classList.remove('header-visible');
+            header.classList.add('header-hidden');
+            header.setAttribute('aria-hidden', 'true');
+          } else if (currentScrollY < lastScrollY - 8) {
+            header.classList.remove('header-hidden');
+            header.classList.add('header-visible');
+            header.setAttribute('aria-hidden', 'false');
+          }
+        } else {
+          header.classList.remove('header-visible');
+          header.classList.add('header-hidden');
+          header.setAttribute('aria-hidden', 'true');
+        }
       }
 
       lastScrollY = currentScrollY;
@@ -546,6 +569,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ticking = true;
       }
     }, { passive: true });
+
+    // Initial check on page load
+    updateHeaderOnScroll();
   }
 
   // ========================================================================
@@ -826,7 +852,9 @@ document.addEventListener('DOMContentLoaded', () => {
       'nav.cases': 'Cases',
       'nav.about': 'About',
       'btn.proposal': 'Request Proposal',
-      'btn.cases': 'OUR CASES',
+      'btn.cases': 'EXPLORE OUR WORK ↗',
+      'hero.eyebrow': 'INDEPENDENT DIGITAL GROWTH STUDIO',
+      'hero.eyebrowLoc': 'BARCELONA · CASABLANCA · WORKING GLOBALLY',
       'hero.line1': 'WE TURN',
       'hero.line2': 'ATTENTION',
       'hero.line3prefix': 'INTO ',
@@ -836,6 +864,8 @@ document.addEventListener('DOMContentLoaded', () => {
       'hero.m3': 'ATTENTION',
       'hero.m4': 'INTO',
       'hero.m5': 'GROWTH',
+      'hero.supportingCopy': 'We build websites, brands, and paid campaigns that help ambitious businesses attract customers and turn attention into enquiries, bookings, and sales.',
+      'hero.serviceLine': 'WEB DESIGN & DEVELOPMENT • PAID MEDIA • BRAND IDENTITY',
       'hero.subLeft': 'We build <span class="highlight-gold">full-service</span> growth engines —<br>for founders, ambitious brands, and hospitality.',
       'hero.subRight': 'and turn attention<br>into scalable revenue.',
       'audiences.title': 'BUILT FOR<br>AMBITIOUS BUSINESSES.',
@@ -864,9 +894,10 @@ document.addEventListener('DOMContentLoaded', () => {
       'outcomes.capLeft': 'MAKE YOUR BRAND MATTER.',
       'outcomes.stmtRight': 'TO LASTING GROWTH.',
       'outcomes.capRight': 'TURN ATTENTION INTO ACTION.',
-      'cases.title': 'CASES THAT TELL THE STORY',
+      'cases.tag': '04 / SELECTED WORK',
+      'cases.title': 'PROJECTS THAT DEFINE THE STANDARD',
       'cases.subtitle': 'CLEAR STRATEGY. DISTINCTIVE DESIGN. PURPOSEFUL EXECUTION.',
-      'cases.cta': 'REQUEST STUDIO PROPOSAL ↗',
+      'cases.cta': 'REQUEST A PROPOSAL ↗',
       'about.tag': '05 / LEADERSHIP & FOUNDER',
       'about.title': 'BUILT IN BARCELONA.<br><span class="gold-gradient-text">DIRECTED BY MOHAMED TAZI.</span>',
       'about.badgeRole': 'Founder & Growth Strategist',
@@ -880,7 +911,9 @@ document.addEventListener('DOMContentLoaded', () => {
       'nav.cases': 'Projets',
       'nav.about': 'À Propos',
       'btn.proposal': 'Demander un devis',
-      'btn.cases': 'NOS PROJETS',
+      'btn.cases': 'NOS PROJETS ↗',
+      'hero.eyebrow': 'STUDIO INDÉPENDANT DE CROISSANCE DIGITALE',
+      'hero.eyebrowLoc': 'BARCELONE · CASABLANCA · IMPACT MONDIAL',
       'hero.line1': 'NOUS TRANSFORMONS',
       'hero.line2': "L'ATTENTION",
       'hero.line3prefix': 'EN ',
@@ -888,6 +921,10 @@ document.addEventListener('DOMContentLoaded', () => {
       'hero.m1': 'NOUS',
       'hero.m2': 'TRANSFORMANS',
       'hero.m3': "L'ATTENTION",
+      'hero.m4': 'EN',
+      'hero.m5': 'CROISSANCE',
+      'hero.supportingCopy': 'Nous concevons des plateformes web, identités de marque et campagnes d’acquisition pour aider les entreprises ambitieuses à transformer l’attention en réservations et revenus.',
+      'hero.serviceLine': 'CONCEPTION WEB & DÉVELOPPEMENT • MÉDIAS PAYANTS • IDENTITÉ DE MARQUE',
       'hero.m4': 'EN',
       'hero.m5': 'CROISSANCE',
       'hero.subLeft': 'Nous bâtissons des moteurs de croissance <span class="highlight-gold">sur-mesure</span> —<br>pour fondateurs, marques et hospitalité.',
