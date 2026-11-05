@@ -1692,34 +1692,62 @@ a:hover .btn-arrow {
 
 .orsap-screen-viewport {
   position: relative;
-  flex: 1;
+  height: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #040711;
+  display: flex;
+  justify-content: center;
+  scroll-behavior: smooth;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.orsap-screen-inner {
   width: 100%;
-  overflow: hidden;
+  max-width: 580px;
   background: #02040A;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.85);
+  position: relative;
 }
 
 .orsap-screen-img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  height: auto !important;
   display: block;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  margin: 0 auto;
+  transition: opacity 0.25s ease;
+  image-rendering: -webkit-optimize-contrast;
 }
 
-.orsap-browser-frame:hover .orsap-screen-img {
-  transform: scale(1.02);
+.orsap-viewport-hint {
+  position: sticky;
+  bottom: 12px;
+  margin-left: auto;
+  margin-right: 14px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(245, 176, 20, 0.4);
+  color: var(--brand-gold);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  z-index: 5;
 }
 
 .orsap-overlay-action {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.85) 100%);
+  background: linear-gradient(180deg, transparent 75%, rgba(0, 0, 0, 0.9) 100%);
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   padding: 1rem;
   pointer-events: none;
+  z-index: 6;
 }
 
 .btn-inspect-pill {
@@ -1751,13 +1779,11 @@ a:hover .btn-arrow {
   position: fixed;
   inset: 0;
   z-index: 100000;
-  background: rgba(0, 0, 0, 0.94);
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   display: none;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
   overflow: hidden;
 }
 
@@ -1770,10 +1796,18 @@ a:hover .btn-arrow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
-  background: rgba(10, 14, 24, 0.92);
+  padding: 0.85rem 1.75rem;
+  background: rgba(10, 14, 24, 0.95);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 10;
+  gap: 1rem;
+}
+
+.lightbox-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
 }
 
 .lightbox-title {
@@ -1782,21 +1816,83 @@ a:hover .btn-arrow {
   font-weight: 700;
   color: #FFFFFF;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .lightbox-subtitle {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--brand-gold);
-  margin-left: 0.75rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lightbox-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.lightbox-nav-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lightbox-nav-btn:hover {
+  background: var(--brand-gold);
+  color: #000000;
+  border-color: var(--brand-gold);
+}
+
+.lightbox-counter {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 0 4px;
+}
+
+.lightbox-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 4px;
+}
+
+.lightbox-size-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lightbox-size-btn:hover {
+  border-color: var(--brand-gold);
+  color: #FFFFFF;
 }
 
 .lightbox-close-btn {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   color: #FFFFFF;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   padding: 6px 14px;
   border-radius: 4px;
   cursor: pointer;
@@ -1804,29 +1900,84 @@ a:hover .btn-arrow {
 }
 
 .lightbox-close-btn:hover {
-  background: var(--brand-gold);
-  color: #000000;
-  border-color: var(--brand-gold);
+  background: #FF5F56;
+  color: #FFFFFF;
+  border-color: #FF5F56;
 }
 
+/* Scroll stage - NEVER squishes images because display is block */
 .lightbox-scroll-stage {
   flex: 1;
   width: 100%;
-  max-width: 1100px;
+  height: calc(100vh - 65px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 2rem 1.5rem;
+  padding: 2rem 1.5rem 5rem 1.5rem;
+  display: block;
+  text-align: center;
+  background: rgba(3, 5, 10, 0.96);
+  -webkit-overflow-scrolling: touch;
+}
+
+.lightbox-device-window {
+  display: inline-block;
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 35px rgba(245, 176, 20, 0.08);
+  background: #060911;
+  overflow: hidden;
+  text-align: left;
+  transition: max-width 0.25s ease;
+}
+
+.lightbox-device-window.is-wide {
+  max-width: 820px;
+}
+
+.lightbox-device-bar {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: #0B101C;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lightbox-device-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lightbox-device-url {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.04em;
+  padding: 3px 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lightbox-scroll-tip {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--brand-gold);
+  letter-spacing: 0.06em;
 }
 
 .lightbox-full-img {
+  display: block;
   width: 100%;
-  max-width: 1020px;
-  height: auto;
-  border-radius: 6px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: auto !important;
+  max-height: none !important;
+  object-fit: contain;
+  margin: 0 auto;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 /* ==========================================================================
@@ -1843,19 +1994,19 @@ a:hover .btn-arrow {
 
 .case-screens-gallery {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
-  margin: 2.25rem 0;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2.25rem 0 3.5rem 0;
 }
 
 .case-screen-card {
   position: relative;
   background: #080C16;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
 }
@@ -1863,12 +2014,41 @@ a:hover .btn-arrow {
 .case-screen-card:hover {
   transform: translateY(-4px);
   border-color: var(--brand-gold);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 16px var(--brand-gold-glow);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 176, 20, 0.15);
+}
+
+.screen-card-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  background: #0B101C;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.screen-card-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.screen-card-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.screen-card-tag {
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .screen-thumb-wrap {
   width: 100%;
-  aspect-ratio: 16 / 11;
+  height: 330px;
   overflow: hidden;
   position: relative;
   background: #02040A;
@@ -1876,14 +2056,41 @@ a:hover .btn-arrow {
 
 .screen-thumb-img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
-  transition: transform 0.6s ease;
+  height: auto !important;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: transform 5.5s cubic-bezier(0.25, 1, 0.5, 1);
+  image-rendering: -webkit-optimize-contrast;
 }
 
 .case-screen-card:hover .screen-thumb-img {
-  transform: scale(1.04);
+  transform: translateY(calc(-100% + 330px));
+}
+
+.screen-hover-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(245, 176, 20, 0.35);
+  color: var(--brand-gold);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 14px;
+  pointer-events: none;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+.case-screen-card:hover .screen-hover-badge {
+  opacity: 0.15;
 }
 
 .screen-card-caption {
@@ -3524,6 +3731,45 @@ a:hover .btn-arrow {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
+  }
+
+  /* ORSAP Showcase & Lightbox Mobile Optimization */
+  .orsap-screen-viewport {
+    height: 380px;
+  }
+
+  .case-screens-gallery {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .screen-thumb-wrap {
+    height: 280px;
+  }
+
+  .lightbox-header {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .lightbox-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .lightbox-size-btn {
+    display: none;
+  }
+
+  .lightbox-scroll-stage {
+    padding: 1rem 0.5rem 3.5rem 0.5rem;
+  }
+
+  .lightbox-device-window {
+    max-width: 100%;
+    border-radius: 6px;
   }
 }
 

@@ -874,35 +874,203 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ========================================================================
-  // 5B. ORSAP Interactive Showcase Tabs & Lightbox Viewer
+  // 5B. ORSAP Interactive Showcase Tabs & High-Fidelity Lightbox Viewer
   // ========================================================================
-  const orsapTabs = document.querySelectorAll('.orsap-tab-btn');
-  const orsapActiveImg = document.getElementById('orsapActiveImg');
+  const orsapCatalog = [
+    {
+      src: 'assets/orsap/orsap_01_home.jpg',
+      title: 'Storefront Architecture & Value Proposition',
+      desc: 'Brand hero, video presentation, 4 key commercial stats & BUTEC corporate proof',
+      url: 'https://orsap.ma'
+    },
+    {
+      src: 'assets/orsap/orsap_02_about.jpg',
+      title: 'Strategic Story & Market Differentiation',
+      desc: 'Company heritage, 5 core operational values & 4 pillar differentiators for Moroccan industry',
+      url: 'https://orsap.ma/a-propos'
+    },
+    {
+      src: 'assets/orsap/orsap_03_services.jpg',
+      title: '7 Technical Industrial Services Engine',
+      desc: 'End-to-end solutions: importation, industrial flooring, fluids, air handling & site fitting',
+      url: 'https://orsap.ma/services'
+    },
+    {
+      src: 'assets/orsap/orsap_04_services_detail.jpg',
+      title: '5-Step Engineering & Delivery Process',
+      desc: 'Rigorous execution method: Audit, Étude, Validation, Réalisation & Suivi SAV with SLA',
+      url: 'https://orsap.ma/methode'
+    },
+    {
+      src: 'assets/orsap/orsap_05_catalog.jpg',
+      title: '15-Sector Industrial Catalog Taxonomy',
+      desc: 'Structured browsing for 15,000+ references: EPI, work at heights, heavy handling & tooling',
+      url: 'https://orsap.ma/catalogue'
+    },
+    {
+      src: 'assets/orsap/orsap_06_temoignages.jpg',
+      title: 'Enterprise Proof & Client Dossiers',
+      desc: 'Validated testimonials from BUTEC (1,200 employees), Dislog Group, SNEP, and Ventec',
+      url: 'https://orsap.ma/temoignages'
+    },
+    {
+      src: 'assets/orsap/orsap_07_marques.png',
+      title: '300+ Global Brand Directory',
+      desc: 'International distributor partnerships with 3M, Makita, Bosch, DeWalt, ABB, Honeywell, Sika',
+      url: 'https://orsap.ma/marques'
+    },
+    {
+      src: 'assets/orsap/orsap_08_recrutement.jpg',
+      title: 'Corporate Careers & Talent Acquisition',
+      desc: 'Inbound recruitment pipeline, employer value proposition & structured CV intake portal',
+      url: 'https://orsap.ma/recrutement'
+    },
+    {
+      src: 'assets/orsap/orsap_09_contact_rfq.jpg',
+      title: 'Casablanca RFQ Hub & Inbound Engine',
+      desc: 'Multi-channel procurement engine: direct WhatsApp, phone desk & Casablanca depot coordinates',
+      url: 'https://orsap.ma/contact-devis'
+    },
+    {
+      src: 'assets/orsap/orsap_10_blog_technique.jpg',
+      title: 'HSE Technical Knowledge Base & SEO Hub',
+      desc: 'Educational guides on Moroccan workplace safety standards (Loi 65-99) & high-intent B2B SEO',
+      url: 'https://orsap.ma/blog-technique'
+    },
+    {
+      src: 'assets/orsap/orsap_11_navigation_menu.png',
+      title: 'Slide-Out Architecture & Navigation Drawer',
+      desc: 'Frictionless information architecture designed for high-conversion B2B buyer journeys',
+      url: 'https://orsap.ma/#menu'
+    },
+    {
+      src: 'assets/orsap/orsap_12_ecommerce_store.jpg',
+      title: 'B2B E-Commerce & Express Outillage Store',
+      desc: 'Real-time pricing in MAD, stock availability, digital cart and corporate account portal',
+      url: 'https://orsap.ma/boutique-express'
+    }
+  ];
+
+  let currentOrsapIndex = 0;
   const orsapLightboxModal = document.getElementById('orsapLightboxModal');
   const lightboxFullImg = document.getElementById('lightboxFullImg');
   const lightboxTitle = document.getElementById('lightboxTitle');
   const lightboxSubtitle = document.getElementById('lightboxSubtitle');
+  const lightboxDeviceUrl = document.getElementById('lightboxDeviceUrl');
+  const lightboxCounter = document.getElementById('lightboxCounter');
+  const lightboxPrevBtn = document.getElementById('lightboxPrevBtn');
+  const lightboxNextBtn = document.getElementById('lightboxNextBtn');
+  const lightboxSizeBtn = document.getElementById('lightboxSizeBtn');
+  const lightboxDeviceWindow = document.getElementById('lightboxDeviceWindow');
   const closeLightboxBtn = document.getElementById('closeLightboxBtn');
+
+  function renderLightboxScreen(index) {
+    if (!orsapCatalog[index]) return;
+    currentOrsapIndex = index;
+    const item = orsapCatalog[index];
+
+    if (lightboxFullImg) {
+      lightboxFullImg.src = item.src;
+      lightboxFullImg.alt = item.title;
+    }
+    if (lightboxTitle) {
+      lightboxTitle.textContent = `ORSAP.MA — ${item.title}`;
+    }
+    if (lightboxSubtitle) {
+      lightboxSubtitle.textContent = item.desc;
+    }
+    if (lightboxDeviceUrl) {
+      lightboxDeviceUrl.textContent = item.url;
+    }
+    if (lightboxCounter) {
+      const pad = (n) => (n < 10 ? `0${n}` : `${n}`);
+      lightboxCounter.textContent = `${pad(index + 1)} / ${pad(orsapCatalog.length)}`;
+    }
+
+    // Scroll stage back to top
+    const stage = document.getElementById('lightboxScrollStage');
+    if (stage) stage.scrollTop = 0;
+  }
+
+  function openOrsapLightbox(index = 0) {
+    if (!orsapLightboxModal) return;
+    renderLightboxScreen(index);
+    orsapLightboxModal.classList.add('active');
+    orsapLightboxModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeOrsapLightbox() {
+    if (!orsapLightboxModal) return;
+    orsapLightboxModal.classList.remove('active');
+    orsapLightboxModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  if (lightboxPrevBtn) {
+    lightboxPrevBtn.addEventListener('click', () => {
+      const nextIdx = (currentOrsapIndex - 1 + orsapCatalog.length) % orsapCatalog.length;
+      renderLightboxScreen(nextIdx);
+    });
+  }
+
+  if (lightboxNextBtn) {
+    lightboxNextBtn.addEventListener('click', () => {
+      const nextIdx = (currentOrsapIndex + 1) % orsapCatalog.length;
+      renderLightboxScreen(nextIdx);
+    });
+  }
+
+  if (lightboxSizeBtn && lightboxDeviceWindow) {
+    lightboxSizeBtn.addEventListener('click', () => {
+      const isWide = lightboxDeviceWindow.classList.toggle('is-wide');
+      lightboxSizeBtn.textContent = isWide ? 'Standard (620px)' : 'Toggle Wide (820px)';
+    });
+  }
+
+  if (closeLightboxBtn) {
+    closeLightboxBtn.addEventListener('click', closeOrsapLightbox);
+  }
+
+  if (orsapLightboxModal) {
+    orsapLightboxModal.addEventListener('click', (e) => {
+      if (e.target === orsapLightboxModal || e.target.id === 'lightboxScrollStage') {
+        closeOrsapLightbox();
+      }
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (!orsapLightboxModal || !orsapLightboxModal.classList.contains('active')) return;
+    if (e.key === 'Escape') {
+      closeOrsapLightbox();
+    } else if (e.key === 'ArrowRight') {
+      const nextIdx = (currentOrsapIndex + 1) % orsapCatalog.length;
+      renderLightboxScreen(nextIdx);
+    } else if (e.key === 'ArrowLeft') {
+      const nextIdx = (currentOrsapIndex - 1 + orsapCatalog.length) % orsapCatalog.length;
+      renderLightboxScreen(nextIdx);
+    }
+  });
+
+  // Homepage flagship tabs & buttons
+  const orsapTabs = document.querySelectorAll('.orsap-tab-btn');
+  const orsapActiveImg = document.getElementById('orsapActiveImg');
   const inspectBtns = [document.getElementById('orsapInspectBtn'), document.getElementById('orsapInspectPill')];
 
   if (orsapTabs.length > 0 && orsapActiveImg) {
-    let currentImgSrc = orsapActiveImg.getAttribute('src');
-    let currentTitle = 'Storefront & Value Proposition';
-    let currentDesc = 'Brand hero, video presentation, stats counters & BUTEC client proof';
-
     orsapTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         orsapTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
         const imgSrc = tab.getAttribute('data-img');
-        const title = tab.getAttribute('data-title');
-        const desc = tab.getAttribute('data-desc');
+        const foundIdx = orsapCatalog.findIndex(item => item.src === imgSrc);
+        if (foundIdx !== -1) {
+          currentOrsapIndex = foundIdx;
+        }
 
         if (imgSrc) {
-          currentImgSrc = imgSrc;
-          currentTitle = title || 'Platform View';
-          currentDesc = desc || 'Architecture Capture';
           orsapActiveImg.style.opacity = '0.3';
           setTimeout(() => {
             orsapActiveImg.src = imgSrc;
@@ -912,63 +1080,38 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    const openLightbox = () => {
-      if (!orsapLightboxModal || !lightboxFullImg) return;
-      lightboxFullImg.src = currentImgSrc;
-      if (lightboxTitle) lightboxTitle.textContent = `ORSAP.MA — ${currentTitle}`;
-      if (lightboxSubtitle) lightboxSubtitle.textContent = currentDesc;
-      orsapLightboxModal.classList.add('active');
-      orsapLightboxModal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    };
-
-    const closeLightbox = () => {
-      if (!orsapLightboxModal) return;
-      orsapLightboxModal.classList.remove('active');
-      orsapLightboxModal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    };
-
     inspectBtns.forEach(btn => {
-      if (btn) btn.addEventListener('click', openLightbox);
-    });
-
-    if (closeLightboxBtn) {
-      closeLightboxBtn.addEventListener('click', closeLightbox);
-    }
-
-    if (orsapLightboxModal) {
-      orsapLightboxModal.addEventListener('click', (e) => {
-        if (e.target === orsapLightboxModal || e.target.id === 'lightboxScrollStage') {
-          closeLightbox();
-        }
-      });
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && orsapLightboxModal && orsapLightboxModal.classList.contains('active')) {
-        closeLightbox();
-      }
+      if (btn) btn.addEventListener('click', () => openOrsapLightbox(currentOrsapIndex));
     });
   }
 
-  // Support for general case inspection buttons (across cases.html)
+  // Cards on cases.html
   document.querySelectorAll('[data-case-inspect]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const imgSrc = btn.getAttribute('data-case-inspect');
-      const title = btn.getAttribute('data-case-title') || 'Case Study Architecture';
-      const desc = btn.getAttribute('data-case-desc') || 'Full Platform Capture';
-      if (orsapLightboxModal && lightboxFullImg) {
-        lightboxFullImg.src = imgSrc;
-        if (lightboxTitle) lightboxTitle.textContent = `ORSAP.MA — ${title}`;
-        if (lightboxSubtitle) lightboxSubtitle.textContent = desc;
-        orsapLightboxModal.classList.add('active');
-        orsapLightboxModal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
+      const rawIdx = btn.getAttribute('data-case-index');
+      let targetIdx = rawIdx !== null ? parseInt(rawIdx, 10) : -1;
+      if (isNaN(targetIdx) || targetIdx < 0) {
+        const imgSrc = btn.getAttribute('data-case-inspect');
+        targetIdx = orsapCatalog.findIndex(item => item.src === imgSrc);
       }
+      openOrsapLightbox(targetIdx >= 0 ? targetIdx : 0);
     });
   });
+
+  // Fade viewport hint on scroll inside homepage browser viewport
+  const orsapScreenViewport = document.getElementById('orsapScreenViewport');
+  const orsapViewportHint = document.getElementById('orsapViewportHint');
+  if (orsapScreenViewport && orsapViewportHint) {
+    orsapScreenViewport.addEventListener('scroll', () => {
+      if (orsapScreenViewport.scrollTop > 40) {
+        orsapViewportHint.style.opacity = '0';
+        orsapViewportHint.style.pointerEvents = 'none';
+      } else {
+        orsapViewportHint.style.opacity = '1';
+      }
+    });
+  }
 
   // ========================================================================
   // 6. Internationalization / Language Switcher (EN <-> FR)

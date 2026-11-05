@@ -360,12 +360,17 @@
                   </button>
                 </div>
 
-                <div class="orsap-screen-viewport">
-                  <img src="assets/orsap/orsap_01_home.jpg" alt="ORSAP.ma B2B Industrial Distribution Platform" class="orsap-screen-img" id="orsapActiveImg" loading="lazy">
+                <div class="orsap-screen-viewport" id="orsapScreenViewport">
+                  <div class="orsap-screen-inner">
+                    <img src="assets/orsap/orsap_01_home.jpg" alt="ORSAP.ma B2B Industrial Distribution Platform" class="orsap-screen-img" id="orsapActiveImg" loading="lazy">
+                  </div>
+                  <div class="orsap-viewport-hint" id="orsapViewportHint">
+                    <span>Scroll to explore full page ↓</span>
+                  </div>
                   <div class="orsap-overlay-action">
                     <span class="flagship-featured-badge">FLAGSHIP CASE STUDY</span>
                     <button type="button" class="btn-inspect-pill" id="orsapInspectPill">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7-7M3 21l7-7"/></svg>
                       <span>Click to Inspect Full Capture</span>
                     </button>
                   </div>
@@ -741,14 +746,32 @@
   <!-- ORSAP Full-Screen Architecture Inspection Lightbox -->
   <div class="orsap-lightbox-modal" id="orsapLightboxModal" role="dialog" aria-modal="true" aria-label="ORSAP Full Architecture Viewer" aria-hidden="true">
     <div class="lightbox-header">
-      <div>
-        <span class="lightbox-title" id="lightboxTitle">ORSAP.MA — Storefront &amp; Value Proposition</span>
+      <div class="lightbox-header-info">
+        <span class="lightbox-title" id="lightboxTitle">ORSAP.MA — Storefront Architecture</span>
         <span class="lightbox-subtitle" id="lightboxSubtitle">Brand hero, video presentation, stats counters &amp; BUTEC client proof</span>
       </div>
-      <button type="button" class="lightbox-close-btn" id="closeLightboxBtn" aria-label="Close Full Screen View">✕ CLOSE</button>
+      <div class="lightbox-controls">
+        <button type="button" class="lightbox-nav-btn" id="lightboxPrevBtn" aria-label="Previous screen">← Prev</button>
+        <span class="lightbox-counter" id="lightboxCounter">01 / 12</span>
+        <button type="button" class="lightbox-nav-btn" id="lightboxNextBtn" aria-label="Next screen">Next →</button>
+        <div class="lightbox-divider"></div>
+        <button type="button" class="lightbox-size-btn" id="lightboxSizeBtn" aria-label="Toggle display width">Toggle Wide (820px)</button>
+        <button type="button" class="lightbox-close-btn" id="closeLightboxBtn" aria-label="Close Full Screen View">✕ CLOSE</button>
+      </div>
     </div>
     <div class="lightbox-scroll-stage" id="lightboxScrollStage">
-      <img src="assets/orsap/orsap_01_home.jpg" alt="ORSAP Full Screenshot" class="lightbox-full-img" id="lightboxFullImg">
+      <div class="lightbox-device-window" id="lightboxDeviceWindow">
+        <div class="lightbox-device-bar">
+          <div class="lightbox-device-dots">
+            <span class="browser-dot dot-red"></span>
+            <span class="browser-dot dot-amber"></span>
+            <span class="browser-dot dot-green"></span>
+          </div>
+          <div class="lightbox-device-url" id="lightboxDeviceUrl">https://orsap.ma/architecture/preview</div>
+          <span class="lightbox-scroll-tip">Scroll inside to inspect full page capture ↓</span>
+        </div>
+        <img src="assets/orsap/orsap_01_home.jpg" alt="ORSAP Full Screenshot" class="lightbox-full-img" id="lightboxFullImg">
+      </div>
     </div>
   </div>
 
