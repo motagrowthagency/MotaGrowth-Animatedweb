@@ -65,6 +65,8 @@
       <div class="hero-backdrop" aria-hidden="true">
         <div class="hero-cinematic-visuals">
           <div class="cinematic-slide slide-orsap"></div>
+          <div class="cinematic-slide slide-tg2d"></div>
+          <div class="cinematic-slide slide-creche"></div>
         </div>
         <div class="hero-cinematic-overlay"></div>
       </div>
@@ -120,7 +122,13 @@
           <h1 class="hero-headline-desktop" aria-label="We turn attention into growth">
             <span class="headline-block block-top" data-i18n="hero.line1">WE TURN</span> 
             <span class="headline-block block-mid" data-i18n="hero.line2">ATTENTION</span> 
-            <span class="headline-block block-bot"><span data-i18n="hero.line3prefix">INTO </span><span class="growth-word" data-i18n="hero.line3accent">GROWTH</span></span>
+            <span class="headline-block block-bot">
+              <span data-i18n="hero.line3prefix">INTO </span>
+              <span class="growth-word" id="hero-growth-word">
+                <span class="growth-text-base" data-i18n="hero.line3accent">GROWTH</span>
+                <span class="growth-reveal-layer" data-i18n="hero.line3accent" aria-hidden="true">GROWTH</span>
+              </span>
+            </span>
           </h1>
 
           <!-- Mobile Staggered Headline -->
@@ -132,17 +140,21 @@
             </span>
             <span class="mobile-stack-left">
               <span data-i18n="hero.m4">INTO</span> 
-              <span class="growth-word" data-i18n="hero.m5">GROWTH</span>
+              <span class="growth-word"><span class="growth-text-base" data-i18n="hero.m5">GROWTH</span></span>
             </span>
           </h1>
 
           <!-- Concrete Offer Description & Core Deliverables Strip -->
           <div class="hero-sub-split">
-            <p class="sub-split-left" data-i18n="hero.supportingCopy">
-              We build websites, brands, and paid campaigns that help ambitious businesses attract customers and turn attention into enquiries, bookings, and sales.
-            </p>
+            <div class="sub-split-left">
+              <p class="hero-proposition-text" data-i18n="hero.supportingCopy">
+                We build websites, brands, and paid campaigns that help ambitious businesses attract customers and turn attention into enquiries, bookings, and sales.
+              </p>
+            </div>
             <div class="sub-split-right">
-              <span class="hero-service-badge" data-i18n="hero.serviceLine">WEB DESIGN &amp; DEVELOPMENT • PAID MEDIA • BRAND IDENTITY</span>
+              <div class="hero-service-badge" data-i18n="hero.serviceLine">
+                WEB DESIGN &amp; DEVELOPMENT • PAID MEDIA • BRAND IDENTITY
+              </div>
             </div>
           </div>
 
@@ -152,7 +164,17 @@
               <span class="btn-text" data-i18n="btn.proposal">REQUEST A PROPOSAL ↗</span>
             </a>
             <a href="#cases" class="btn-ref btn-ref-outline">
-              <span class="btn-text" data-i18n="btn.cases">EXPLORE OUR WORK ↗</span>
+              <span class="btn-text" data-i18n="btn.cases">OUR CASES ↗</span>
+            </a>
+          </div>
+
+          <!-- Subtle Editorial Scroll Indicator -->
+          <div class="hero-scroll-indicator" id="hero-scroll-indicator" aria-hidden="true">
+            <a href="#audiences" class="scroll-link-minimal" aria-label="Scroll to explore">
+              <span class="scroll-label" data-i18n="hero.scroll">SCROLL TO EXPLORE</span>
+              <div class="scroll-track">
+                <span class="scroll-wheel"></span>
+              </div>
             </a>
           </div>
 

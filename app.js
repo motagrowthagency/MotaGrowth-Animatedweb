@@ -559,6 +559,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      // Fade out hero scroll indicator on initial scroll
+      const scrollIndicator = document.getElementById('hero-scroll-indicator');
+      if (scrollIndicator) {
+        if (currentScrollY > 45) {
+          scrollIndicator.style.opacity = '0';
+          scrollIndicator.style.pointerEvents = 'none';
+        } else {
+          scrollIndicator.style.opacity = '';
+          scrollIndicator.style.pointerEvents = '';
+        }
+      }
+
       lastScrollY = currentScrollY;
       ticking = false;
     };
@@ -661,6 +673,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (blockBot) blockBot.style.transform = `translate3d(${(normX * -6).toFixed(1)}px, ${(normY * 4).toFixed(1)}px, 0)`;
 
       wakeAmbient();
+    }, { passive: true });
+  }
+
+  // Signature GROWTH Word Image Reveal (Desktop Pointer Tracking)
+  const growthWord = document.getElementById('hero-growth-word');
+  if (growthWord && isFinePointer && !prefersReducedMotion) {
+    growthWord.addEventListener('mousemove', (e) => {
+      const rect = growthWord.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const pctX = Math.max(0, Math.min(100, ((x / rect.width) * 100))).toFixed(1);
+      const pctY = Math.max(0, Math.min(100, ((y / rect.height) * 100))).toFixed(1);
+      growthWord.style.setProperty('--growth-reveal-x', `${pctX}%`);
+      growthWord.style.setProperty('--growth-reveal-y', `${pctY}%`);
+      growthWord.style.setProperty('--growth-reveal-pos', `${pctX}% ${pctY}%`);
     }, { passive: true });
   }
 
@@ -852,7 +879,8 @@ document.addEventListener('DOMContentLoaded', () => {
       'nav.cases': 'Cases',
       'nav.about': 'About',
       'btn.proposal': 'Request Proposal',
-      'btn.cases': 'EXPLORE OUR WORK ↗',
+      'btn.cases': 'OUR CASES ↗',
+      'hero.scroll': 'SCROLL TO EXPLORE',
       'hero.eyebrow': 'INDEPENDENT DIGITAL GROWTH STUDIO',
       'hero.eyebrowLoc': 'BARCELONA · CASABLANCA · WORKING GLOBALLY',
       'hero.line1': 'WE TURN',
@@ -912,6 +940,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'nav.about': 'À Propos',
       'btn.proposal': 'Demander un devis',
       'btn.cases': 'NOS PROJETS ↗',
+      'hero.scroll': 'DÉCOUVRIR',
       'hero.eyebrow': 'STUDIO INDÉPENDANT DE CROISSANCE DIGITALE',
       'hero.eyebrowLoc': 'BARCELONE · CASABLANCA · IMPACT MONDIAL',
       'hero.line1': 'NOUS TRANSFORMONS',
