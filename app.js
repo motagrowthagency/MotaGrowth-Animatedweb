@@ -864,7 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event delegation for hover states
     document.addEventListener('mouseover', (e) => {
-      const target = e.target.closest('a, button, [role="button"], .btn-ref, .btn-outcomes-gold, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot');
+      const target = e.target.closest('a, button, [role="button"], .btn-ref, .btn-outcomes-gold, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .orsap-tab-btn, .btn-inspect-pill, .browser-inspect-action');
       if (target) {
         document.body.classList.add('cursor-hover');
       } else {
@@ -872,6 +872,103 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // ========================================================================
+  // 5B. ORSAP Interactive Showcase Tabs & Lightbox Viewer
+  // ========================================================================
+  const orsapTabs = document.querySelectorAll('.orsap-tab-btn');
+  const orsapActiveImg = document.getElementById('orsapActiveImg');
+  const orsapLightboxModal = document.getElementById('orsapLightboxModal');
+  const lightboxFullImg = document.getElementById('lightboxFullImg');
+  const lightboxTitle = document.getElementById('lightboxTitle');
+  const lightboxSubtitle = document.getElementById('lightboxSubtitle');
+  const closeLightboxBtn = document.getElementById('closeLightboxBtn');
+  const inspectBtns = [document.getElementById('orsapInspectBtn'), document.getElementById('orsapInspectPill')];
+
+  if (orsapTabs.length > 0 && orsapActiveImg) {
+    let currentImgSrc = orsapActiveImg.getAttribute('src');
+    let currentTitle = 'Storefront & Value Proposition';
+    let currentDesc = 'Brand hero, video presentation, stats counters & BUTEC client proof';
+
+    orsapTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        orsapTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        const imgSrc = tab.getAttribute('data-img');
+        const title = tab.getAttribute('data-title');
+        const desc = tab.getAttribute('data-desc');
+
+        if (imgSrc) {
+          currentImgSrc = imgSrc;
+          currentTitle = title || 'Platform View';
+          currentDesc = desc || 'Architecture Capture';
+          orsapActiveImg.style.opacity = '0.3';
+          setTimeout(() => {
+            orsapActiveImg.src = imgSrc;
+            orsapActiveImg.style.opacity = '1';
+          }, 120);
+        }
+      });
+    });
+
+    const openLightbox = () => {
+      if (!orsapLightboxModal || !lightboxFullImg) return;
+      lightboxFullImg.src = currentImgSrc;
+      if (lightboxTitle) lightboxTitle.textContent = `ORSAP.MA — ${currentTitle}`;
+      if (lightboxSubtitle) lightboxSubtitle.textContent = currentDesc;
+      orsapLightboxModal.classList.add('active');
+      orsapLightboxModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeLightbox = () => {
+      if (!orsapLightboxModal) return;
+      orsapLightboxModal.classList.remove('active');
+      orsapLightboxModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+
+    inspectBtns.forEach(btn => {
+      if (btn) btn.addEventListener('click', openLightbox);
+    });
+
+    if (closeLightboxBtn) {
+      closeLightboxBtn.addEventListener('click', closeLightbox);
+    }
+
+    if (orsapLightboxModal) {
+      orsapLightboxModal.addEventListener('click', (e) => {
+        if (e.target === orsapLightboxModal || e.target.id === 'lightboxScrollStage') {
+          closeLightbox();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && orsapLightboxModal && orsapLightboxModal.classList.contains('active')) {
+        closeLightbox();
+      }
+    });
+  }
+
+  // Support for general case inspection buttons (across cases.html)
+  document.querySelectorAll('[data-case-inspect]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const imgSrc = btn.getAttribute('data-case-inspect');
+      const title = btn.getAttribute('data-case-title') || 'Case Study Architecture';
+      const desc = btn.getAttribute('data-case-desc') || 'Full Platform Capture';
+      if (orsapLightboxModal && lightboxFullImg) {
+        lightboxFullImg.src = imgSrc;
+        if (lightboxTitle) lightboxTitle.textContent = `ORSAP.MA — ${title}`;
+        if (lightboxSubtitle) lightboxSubtitle.textContent = desc;
+        orsapLightboxModal.classList.add('active');
+        orsapLightboxModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+  });
 
   // ========================================================================
   // 6. Internationalization / Language Switcher (EN <-> FR)
