@@ -4856,6 +4856,114 @@ function initMotaGrowthApp() {
     renderHomeTasksTable();
     bindDownloadButtons();
     updateTasksCounters();
+
+    // --- Universal Studio Precision Cursor for Client Space ---
+    const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (isFinePointer) {
+      let cursorDot = document.getElementById('cursor-dot');
+      let cursorRing = document.getElementById('cursor-ring');
+
+      if (!cursorDot) {
+        cursorDot = document.createElement('div');
+        cursorDot.className = 'studio-cursor-dot';
+        cursorDot.id = 'cursor-dot';
+        cursorDot.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(cursorDot);
+      }
+      if (!cursorRing) {
+        cursorRing = document.createElement('div');
+        cursorRing.className = 'studio-cursor-ring';
+        cursorRing.id = 'cursor-ring';
+        cursorRing.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(cursorRing);
+      }
+
+      let mouseX = -100;
+      let mouseY = -100;
+      let ringX = -100;
+      let ringY = -100;
+      let hasMoved = false;
+      let ringRafId = null;
+
+      const stepRing = () => {
+        const dx = mouseX - ringX;
+        const dy = mouseY - ringY;
+        ringX += dx * 0.22;
+        ringY += dy * 0.22;
+
+        cursorRing.style.left = `${ringX.toFixed(1)}px`;
+        cursorRing.style.top = `${ringY.toFixed(1)}px`;
+
+        if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+          ringRafId = requestAnimationFrame(stepRing);
+        } else {
+          ringRafId = null;
+        }
+      };
+
+      const wakeRing = () => {
+        if (!ringRafId) {
+          ringRafId = requestAnimationFrame(stepRing);
+        }
+      };
+
+      window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        if (!hasMoved) {
+          hasMoved = true;
+          ringX = mouseX;
+          ringY = mouseY;
+        }
+
+        if (!document.documentElement.classList.contains('has-custom-cursor')) {
+          document.documentElement.classList.add('has-custom-cursor');
+        }
+        if (!document.body.classList.contains('cursor-active')) {
+          document.body.classList.add('cursor-active');
+        }
+
+        cursorDot.style.left = `${mouseX}px`;
+        cursorDot.style.top = `${mouseY}px`;
+        wakeRing();
+      }, { passive: true });
+
+      document.addEventListener('mouseleave', () => {
+        document.body.classList.remove('cursor-active');
+      });
+
+      document.addEventListener('mouseenter', () => {
+        if (hasMoved) document.body.classList.add('cursor-active');
+      });
+
+      window.addEventListener('mousedown', () => {
+        document.body.classList.add('cursor-clicking');
+      });
+
+      window.addEventListener('mouseup', () => {
+        document.body.classList.remove('cursor-clicking');
+      });
+
+      document.addEventListener('mouseover', (e) => {
+        const target = e.target;
+        if (!target) return;
+
+        const textInput = target.closest('input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="search"], textarea, [contenteditable="true"]');
+        const interactive = target.closest('a, button, [role="button"], input[type="submit"], input[type="button"], select, label, summary, .portal-nav-btn, .tab-btn, .portal-btn, .action-btn, .btn-gold-pill, .btn-ghost, .folder-card, .btn-file-action, .chip');
+
+        if (textInput) {
+          document.body.classList.remove('cursor-hover');
+          document.body.classList.add('cursor-text');
+        } else if (interactive) {
+          document.body.classList.remove('cursor-text');
+          document.body.classList.add('cursor-hover');
+        } else {
+          document.body.classList.remove('cursor-hover');
+          document.body.classList.remove('cursor-text');
+        }
+      });
+    }
   }
 }
 

@@ -778,11 +778,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ========================================================================
-  // 5. Studio Precision Cursor (Only for Pointer-Fine Devices on Marketing Pages)
+  // 5. Universal Studio Precision Cursor (All Pages & Lightbox Modals)
   // ========================================================================
-  const isClientRoute = document.body && (document.body.classList.contains('is-client-route') || document.body.classList.contains('portal-body'));
-
-  if (isFinePointer && !isClientRoute) {
+  if (isFinePointer) {
     let cursorDot = document.getElementById('cursor-dot');
     let cursorRing = document.getElementById('cursor-ring');
 
@@ -800,6 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
       cursorRing.setAttribute('aria-hidden', 'true');
       document.body.appendChild(cursorRing);
     }
+
     let mouseX = -100;
     let mouseY = -100;
     let ringX = -100;
@@ -810,8 +809,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const stepRing = () => {
       const dx = mouseX - ringX;
       const dy = mouseY - ringY;
-      ringX += dx * 0.2;
-      ringY += dy * 0.2;
+      ringX += dx * 0.22;
+      ringY += dy * 0.22;
 
       cursorRing.style.left = `${ringX.toFixed(1)}px`;
       cursorRing.style.top = `${ringY.toFixed(1)}px`;
@@ -837,7 +836,12 @@ document.addEventListener('DOMContentLoaded', () => {
         hasMoved = true;
         ringX = mouseX;
         ringY = mouseY;
+      }
+
+      if (!document.documentElement.classList.contains('has-custom-cursor')) {
         document.documentElement.classList.add('has-custom-cursor');
+      }
+      if (!document.body.classList.contains('cursor-active')) {
         document.body.classList.add('cursor-active');
       }
 
@@ -862,13 +866,23 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove('cursor-clicking');
     });
 
-    // Event delegation for hover states
+    // Intelligent Event Delegation for Hover States Everywhere (including lightbox screenshots)
     document.addEventListener('mouseover', (e) => {
-      const target = e.target.closest('a, button, [role="button"], .btn-ref, .btn-outcomes-gold, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .orsap-tab-btn, .btn-inspect-pill, .browser-inspect-action');
-      if (target) {
+      const target = e.target;
+      if (!target) return;
+
+      const textInput = target.closest('input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="search"], textarea, [contenteditable="true"]');
+      const interactive = target.closest('a, button, [role="button"], input[type="submit"], input[type="button"], select, label, summary, [data-case-inspect], .case-screen-card, .btn-ref, .btn-inspect-pill, .browser-inspect-action, .orsap-tab-btn, .lightbox-nav-btn, .lightbox-size-btn, .lightbox-close-btn, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .portal-nav-btn, .tab-btn, .portal-btn, .action-btn, .document-card, .deliverable-card');
+
+      if (textInput) {
+        document.body.classList.remove('cursor-hover');
+        document.body.classList.add('cursor-text');
+      } else if (interactive) {
+        document.body.classList.remove('cursor-text');
         document.body.classList.add('cursor-hover');
       } else {
         document.body.classList.remove('cursor-hover');
+        document.body.classList.remove('cursor-text');
       }
     });
   }

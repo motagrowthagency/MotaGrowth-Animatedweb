@@ -3824,58 +3824,40 @@ a:hover .btn-arrow {
 }
 
 /* ==========================================================================
-   STUDIO PRECISION CURSOR & MICRO-INTERACTIONS
+   STUDIO PRECISION CURSOR & MICRO-INTERACTIONS (UNIVERSAL)
    ========================================================================== */
 
-/* Hide default OS cursor ONLY when custom cursor has initialized on marketing pages */
+/* Hide default OS cursor ONLY when custom cursor has initialized on pointer-fine desktop devices */
 @media (hover: hover) and (pointer: fine) {
-  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body),
-  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) a,
-  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) button,
-  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) [role="button"],
-  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) .comma-card,
-  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) .work-flagship-card,
-  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) .work-secondary-card {
+  html.has-custom-cursor,
+  html.has-custom-cursor body,
+  html.has-custom-cursor body *,
+  html.has-custom-cursor .orsap-lightbox-modal,
+  html.has-custom-cursor .orsap-lightbox-modal *,
+  html.has-custom-cursor .legal-modal,
+  html.has-custom-cursor .legal-modal *,
+  html.has-custom-cursor .studio-menu-overlay,
+  html.has-custom-cursor .studio-menu-overlay * {
     cursor: none !important;
   }
 
-  /* Form inputs & interactive controls always preserve standard text/pointer cursor */
-  input, textarea {
+  /* Form text inputs & editable areas always preserve standard text cursor for editing */
+  html.has-custom-cursor input[type="text"],
+  html.has-custom-cursor input[type="password"],
+  html.has-custom-cursor input[type="email"],
+  html.has-custom-cursor input[type="number"],
+  html.has-custom-cursor input[type="search"],
+  html.has-custom-cursor textarea,
+  html.has-custom-cursor [contenteditable="true"] {
     cursor: text !important;
   }
-  select {
+
+  html.has-custom-cursor select {
     cursor: pointer !important;
   }
 }
 
-/* Explicitly guarantee native, responsive cursor for Client Space & Portal Views */
-body.is-client-route,
-body.is-client-route *,
-body.is-client-route *::before,
-body.is-client-route *::after,
-body.portal-body,
-body.portal-body * {
-  cursor: auto !important;
-}
-
-body.is-client-route a,
-body.is-client-route button,
-body.is-client-route select,
-body.is-client-route [role="button"],
-body.portal-body a,
-body.portal-body button,
-body.portal-body select,
-body.portal-body [role="button"] {
-  cursor: pointer !important;
-}
-
-body.is-client-route input,
-body.is-client-route textarea,
-body.portal-body input,
-body.portal-body textarea {
-  cursor: text !important;
-}
-
+/* Precision Cursor Dot - Maximum possible z-index (2147483647) floats above all modals & screenshots */
 .studio-cursor-dot {
   position: fixed;
   top: 0;
@@ -3884,14 +3866,15 @@ body.portal-body textarea {
   height: 6px;
   border-radius: 50%;
   background: #FFFFFF;
-  pointer-events: none;
-  z-index: 99999;
+  pointer-events: none !important;
+  z-index: 2147483647 !important;
   transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.2s ease, transform 0.15s ease, background-color 0.2s ease;
   will-change: left, top;
 }
 
+/* Precision Cursor Ring - Maximum possible z-index (2147483646) floats right under the dot */
 .studio-cursor-ring {
   position: fixed;
   top: 0;
@@ -3899,9 +3882,9 @@ body.portal-body textarea {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  pointer-events: none;
-  z-index: 99998;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  pointer-events: none !important;
+  z-index: 2147483646 !important;
   transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.25s ease, width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, background 0.25s ease;
@@ -3910,14 +3893,16 @@ body.portal-body textarea {
 
 body.cursor-active .studio-cursor-dot,
 body.cursor-active .studio-cursor-ring {
-  opacity: 1;
+  opacity: 1 !important;
 }
 
+/* Gold expansion on interactive hover */
 body.cursor-hover .studio-cursor-ring {
-  width: 54px;
-  height: 54px;
+  width: 52px;
+  height: 52px;
   border-color: var(--brand-gold);
-  background: rgba(245, 176, 20, 0.08);
+  background: rgba(245, 176, 20, 0.09);
+  box-shadow: 0 0 16px rgba(245, 176, 20, 0.25);
 }
 
 body.cursor-hover .studio-cursor-dot {
@@ -3925,14 +3910,34 @@ body.cursor-hover .studio-cursor-dot {
   transform: translate(-50%, -50%) scale(1.6);
 }
 
+/* Clicking / Pressing state */
 body.cursor-clicking .studio-cursor-ring {
-  transform: translate(-50%, -50%) scale(0.8);
+  transform: translate(-50%, -50%) scale(0.75);
   border-color: var(--brand-gold);
+  background: rgba(245, 176, 20, 0.18);
 }
 
 body.cursor-clicking .studio-cursor-dot {
-  transform: translate(-50%, -50%) scale(0.8);
+  transform: translate(-50%, -50%) scale(0.75);
   background: var(--brand-gold);
+}
+
+/* Text editing state - ring gracefully shrinks so it doesn't obstruct typing */
+body.cursor-text .studio-cursor-ring {
+  opacity: 0 !important;
+  transform: translate(-50%, -50%) scale(0.3);
+}
+
+body.cursor-text .studio-cursor-dot {
+  opacity: 0.35 !important;
+  transform: translate(-50%, -50%) scale(0.6);
+}
+
+@media (hover: none) or (pointer: coarse) {
+  .studio-cursor-dot,
+  .studio-cursor-ring {
+    display: none !important;
+  }
 }
 
 /* Subtle Shimmer Beam on Solid Buttons */
