@@ -266,18 +266,14 @@ function initMotaGrowthApp() {
 
   const portalHomeLink = document.getElementById('portalHomeLink');
   if (portalHomeLink) {
-    portalHomeLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.location.hash = '';
-      showLandingView();
+    portalHomeLink.addEventListener('click', () => {
+      window.location.href = 'index.html';
     });
   }
 
   if (clientSignInHomeLink) {
-    clientSignInHomeLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.location.hash = '';
-      showLandingView();
+    clientSignInHomeLink.addEventListener('click', () => {
+      window.location.href = 'index.html';
     });
   }
 
@@ -920,17 +916,17 @@ function initMotaGrowthApp() {
     } else {
       grid.innerHTML = filtered.map(item => {
         const plat = (item.platform || 'General').toLowerCase();
-        let platLabel = '✦ GENERAL';
+        let platLabel = 'GENERAL';
         let platClass = 'meta';
 
         if (plat === 'tiktok') {
-          platLabel = '🎵 TIKTOK REELS';
+          platLabel = 'TIKTOK REELS';
           platClass = 'tiktok';
         } else if (plat === 'instagram') {
-          platLabel = '📸 INSTAGRAM';
+          platLabel = 'INSTAGRAM';
           platClass = 'instagram';
         } else if (plat === 'meta') {
-          platLabel = '⚡ META ADS';
+          platLabel = 'META ADS';
           platClass = 'meta';
         }
 
@@ -1026,7 +1022,7 @@ function initMotaGrowthApp() {
 
     list.innerHTML = items.map((item, idx) => {
       const priorityClass = (item.priority || 'Medium').toLowerCase();
-      const priorityLabel = item.priority === 'High' ? '🔥 HIGH PRIORITY' : (item.priority === 'Medium' ? '⚡ MEDIUM PRIORITY' : '✦ LOW PRIORITY');
+      const priorityLabel = item.priority === 'High' ? 'HIGH PRIORITY' : (item.priority === 'Medium' ? 'MEDIUM PRIORITY' : 'LOW PRIORITY');
       
       let statusPillHtml = '';
       if (item.status === 'Approved') {
@@ -1593,14 +1589,14 @@ function initMotaGrowthApp() {
     meetingsTableBody.innerHTML = filtered.map(m => {
       const initials = (m.clientName || 'CL').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
       const meetLink = m.link || 'https://meet.google.com/new';
-      const cleanTitle = (m.title || 'Rendez-vous Stratégique').replace('📅 Rendez-vous : ', '').trim();
+      const cleanTitle = (m.title || 'Rendez-vous Stratégique').replace('Rendez-vous : ', '').trim();
       const dateStr = m.date || m.rawDate || '—';
 
       return `
         <tr>
           <td>
             <div class="date-stamp" style="font-weight: 700; color: #0f172a;">
-              📅 ${escapeHtml(dateStr)}
+              ${escapeHtml(dateStr)}
             </div>
           </td>
           <td>
@@ -1878,7 +1874,7 @@ function initMotaGrowthApp() {
         `"${m.companyName || '—'}"`,
         `"${m.clientEmail || '—'}"`,
         `"${m.clientPhone || '—'}"`,
-        `"${(m.title || 'Session').replace('📅 Rendez-vous : ', '')}"`,
+        `"${(m.title || 'Session').replace('Rendez-vous : ', '')}"`,
         `"${m.status || 'Planifié'}"`,
         `"${(m.description || '—').replace(/"/g, '""')}"`,
         `"${m.link || '—'}"`
@@ -2287,7 +2283,7 @@ function initMotaGrowthApp() {
             <span class="status-tag scheduled" style="font-size: 0.72rem;">${escapeHtml(item.status || 'Planifié')}</span>
           </div>
           <div style="font-size: 0.8rem; color: #0284c7; font-weight: 600; margin-top: 0.2rem;">
-            📅 ${escapeHtml(item.date || item.rawDate || 'Date non spécifiée')}
+            ${escapeHtml(item.date || item.rawDate || 'Date non spécifiée')}
           </div>
           ${item.description ? `<p style="font-size: 0.82rem; color: var(--text-gray); margin-top: 0.2rem; margin-bottom: 0;">${escapeHtml(item.description)}</p>` : ''}
           ${item.link ? `<div style="margin-top: 0.3rem;"><a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" style="font-size: 0.78rem; color: #0088ff; text-decoration: underline; display: inline-flex; align-items: center; gap: 0.25rem;"><i data-lucide="video" style="width:12px;height:12px;"></i> Ouvrir le lien de réunion</a></div>` : ''}
@@ -2379,7 +2375,7 @@ function initMotaGrowthApp() {
         id: meetId,
         date: displayDate,
         rawDate: date,
-        title: `📅 Rendez-vous : ${title} (${format})`,
+        title: `Rendez-vous : ${title} (${format})`,
         description: `${time}${agenda ? ` — ${agenda}` : ''}`,
         link: link,
         type: 'Meeting',
@@ -4573,7 +4569,7 @@ function initMotaGrowthApp() {
             id: meetingId,
             date: displayDate,
             rawDate: date,
-            title: `📅 Rendez-vous : ${format}`,
+            title: `Rendez-vous : ${format}`,
             description: `${time}${agenda ? ` — Ordre du jour : ${agenda}` : ''}`,
             type: 'Meeting',
             status: 'Scheduled'
@@ -4608,7 +4604,7 @@ function initMotaGrowthApp() {
               clientPhone: client.phone || '—',
               services: [`Rendez-vous : ${format}`],
               sector: client.servicesTier || 'WORKSPACE CLIENT',
-              notes: `📅 Rendez-vous prévu le ${displayDate} à ${time}.${agenda ? `\nOrdre du jour : ${agenda}` : ''}`,
+              notes: `Rendez-vous prévu le ${displayDate} à ${time}.${agenda ? `\nOrdre du jour : ${agenda}` : ''}`,
               status: 'Nouveau RDV'
             });
 
@@ -4690,7 +4686,7 @@ function initMotaGrowthApp() {
               <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                 <span class="type-chip meeting" style="padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; background: #e0f2fe; color: #0284c7;">
                   <i data-lucide="video" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 3px;"></i>
-                  ${escapeHtml(meet.title.replace('📅 Rendez-vous : ', ''))}
+                  ${escapeHtml(meet.title.replace('Rendez-vous : ', ''))}
                 </span>
                 <span class="status-tag scheduled" style="font-size: 0.72rem;">${escapeHtml(meet.status || 'Confirmed')}</span>
               </div>
@@ -4701,7 +4697,7 @@ function initMotaGrowthApp() {
 
             <div class="meeting-feed-body">
               <div style="font-size: 0.88rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">
-                📅 ${escapeHtml(meet.date || meet.rawDate || 'Date to be confirmed')}
+                ${escapeHtml(meet.date || meet.rawDate || 'Date to be confirmed')}
               </div>
               <div style="font-size: 0.82rem; color: #475569; line-height: 1.45;">
                 ${escapeHtml(meet.description || 'Dedicated 1-on-1 strategy alignment session with Mohamed Tazi.')}
@@ -4777,7 +4773,7 @@ function initMotaGrowthApp() {
           id: meetingId,
           date: displayDate,
           rawDate: date,
-          title: `📅 Rendez-vous : ${format}`,
+          title: `Rendez-vous : ${format}`,
           description: `${time}${agenda ? ` — Ordre du jour : ${agenda}` : ''}`,
           type: 'Meeting',
           status: 'Scheduled'
@@ -4812,7 +4808,7 @@ function initMotaGrowthApp() {
             clientPhone: client.phone || '—',
             services: [`Rendez-vous : ${format}`],
             sector: client.servicesTier || 'WORKSPACE CLIENT',
-            notes: `📅 Rendez-vous prévu le ${displayDate} à ${time}.${agenda ? `\nOrdre du jour : ${agenda}` : ''}`,
+            notes: `Rendez-vous prévu le ${displayDate} à ${time}.${agenda ? `\nOrdre du jour : ${agenda}` : ''}`,
             status: 'Nouveau RDV'
           });
 

@@ -929,84 +929,6 @@ body.lang-transition .comma-card-inner {
   transform: translateY(-2px);
 }
 
-/* Subtle Editorial Scroll Indicator */
-.hero-scroll-indicator {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 12;
-  opacity: 0;
-  animation: heroFadeUpLine 0.9s cubic-bezier(0.16, 1, 0.3, 1) 2.5s both;
-  transition: opacity 0.3s ease;
-}
-
-.scroll-link-minimal {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.45rem;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.scroll-label {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
-  transition: color 0.25s ease;
-}
-
-.scroll-track {
-  width: 1px;
-  height: 22px;
-  background: rgba(255, 255, 255, 0.15);
-  position: relative;
-  overflow: hidden;
-}
-
-.scroll-wheel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 7px;
-  background: var(--brand-gold);
-  box-shadow: 0 0 8px var(--brand-gold-glow);
-  animation: scrollWheelDrop 2s infinite ease-in-out;
-}
-
-@keyframes scrollWheelDrop {
-  0% {
-    transform: translateY(-7px);
-    opacity: 0;
-  }
-  30% {
-    opacity: 1;
-  }
-  80% {
-    transform: translateY(22px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(22px);
-    opacity: 0;
-  }
-}
-
-.scroll-link-minimal:hover .scroll-label {
-  color: var(--brand-gold);
-}
-
-.scroll-link-minimal:hover .scroll-track {
-  background: rgba(245, 176, 20, 0.35);
-}
-
 /* Button Inner Text & Arrow */
 .btn-text {
   display: inline-flex;
@@ -3163,10 +3085,6 @@ a:hover .btn-arrow {
     font-size: 0.78rem;
     min-height: 48px;
   }
-
-  .hero-scroll-indicator {
-    display: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3178,7 +3096,6 @@ a:hover .btn-arrow {
   .growth-text-base,
   .hero-sub-split,
   .hero-action-buttons,
-  .hero-scroll-indicator,
   .cinematic-slide {
     animation: none !important;
     opacity: 1 !important;
@@ -3208,12 +3125,53 @@ a:hover .btn-arrow {
    STUDIO PRECISION CURSOR & MICRO-INTERACTIONS
    ========================================================================== */
 
-/* Hide default OS cursor across all elements on desktop */
+/* Hide default OS cursor ONLY when custom cursor has initialized on marketing pages */
 @media (hover: hover) and (pointer: fine) {
-  *, *::before, *::after,
-  html, body, a, button, input, textarea, select, [role="button"] {
+  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body),
+  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) a,
+  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) button,
+  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) [role="button"],
+  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) .comma-card,
+  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) .work-flagship-card,
+  html.has-custom-cursor:not(.is-client-route) body:not(.is-client-route):not(.portal-body) .work-secondary-card {
     cursor: none !important;
   }
+
+  /* Form inputs & interactive controls always preserve standard text/pointer cursor */
+  input, textarea {
+    cursor: text !important;
+  }
+  select {
+    cursor: pointer !important;
+  }
+}
+
+/* Explicitly guarantee native, responsive cursor for Client Space & Portal Views */
+body.is-client-route,
+body.is-client-route *,
+body.is-client-route *::before,
+body.is-client-route *::after,
+body.portal-body,
+body.portal-body * {
+  cursor: auto !important;
+}
+
+body.is-client-route a,
+body.is-client-route button,
+body.is-client-route select,
+body.is-client-route [role="button"],
+body.portal-body a,
+body.portal-body button,
+body.portal-body select,
+body.portal-body [role="button"] {
+  cursor: pointer !important;
+}
+
+body.is-client-route input,
+body.is-client-route textarea,
+body.portal-body input,
+body.portal-body textarea {
+  cursor: text !important;
 }
 
 .studio-cursor-dot {

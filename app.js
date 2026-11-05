@@ -559,18 +559,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Fade out hero scroll indicator on initial scroll
-      const scrollIndicator = document.getElementById('hero-scroll-indicator');
-      if (scrollIndicator) {
-        if (currentScrollY > 45) {
-          scrollIndicator.style.opacity = '0';
-          scrollIndicator.style.pointerEvents = 'none';
-        } else {
-          scrollIndicator.style.opacity = '';
-          scrollIndicator.style.pointerEvents = '';
-        }
-      }
-
       lastScrollY = currentScrollY;
       ticking = false;
     };
@@ -790,12 +778,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ========================================================================
-  // 5. Studio Precision Cursor (Only for Pointer-Fine Devices)
+  // 5. Studio Precision Cursor (Only for Pointer-Fine Devices on Marketing Pages)
   // ========================================================================
-  const cursorDot = document.getElementById('cursor-dot');
-  const cursorRing = document.getElementById('cursor-ring');
+  const isClientRoute = document.body && (document.body.classList.contains('is-client-route') || document.body.classList.contains('portal-body'));
 
-  if (cursorDot && cursorRing && isFinePointer) {
+  if (isFinePointer && !isClientRoute) {
+    let cursorDot = document.getElementById('cursor-dot');
+    let cursorRing = document.getElementById('cursor-ring');
+
+    if (!cursorDot) {
+      cursorDot = document.createElement('div');
+      cursorDot.className = 'studio-cursor-dot';
+      cursorDot.id = 'cursor-dot';
+      cursorDot.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(cursorDot);
+    }
+    if (!cursorRing) {
+      cursorRing = document.createElement('div');
+      cursorRing.className = 'studio-cursor-ring';
+      cursorRing.id = 'cursor-ring';
+      cursorRing.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(cursorRing);
+    }
     let mouseX = -100;
     let mouseY = -100;
     let ringX = -100;
@@ -880,9 +884,8 @@ document.addEventListener('DOMContentLoaded', () => {
       'nav.about': 'About',
       'btn.proposal': 'Request Proposal',
       'btn.cases': 'OUR CASES ↗',
-      'hero.scroll': 'SCROLL TO EXPLORE',
       'hero.eyebrow': 'INDEPENDENT DIGITAL GROWTH STUDIO',
-      'hero.eyebrowLoc': 'BARCELONA · CASABLANCA · WORKING GLOBALLY',
+      'hero.eyebrowLoc': 'BARCELONA & CASABLANCA · INTERNATIONAL PRACTICE',
       'hero.line1': 'WE TURN',
       'hero.line2': 'ATTENTION',
       'hero.line3prefix': 'INTO ',
@@ -940,9 +943,8 @@ document.addEventListener('DOMContentLoaded', () => {
       'nav.about': 'À Propos',
       'btn.proposal': 'Demander un devis',
       'btn.cases': 'NOS PROJETS ↗',
-      'hero.scroll': 'DÉCOUVRIR',
       'hero.eyebrow': 'STUDIO INDÉPENDANT DE CROISSANCE DIGITALE',
-      'hero.eyebrowLoc': 'BARCELONE · CASABLANCA · IMPACT MONDIAL',
+      'hero.eyebrowLoc': 'BARCELONE & CASABLANCA · PRATIQUE INTERNATIONALE',
       'hero.line1': 'NOUS TRANSFORMONS',
       'hero.line2': "L'ATTENTION",
       'hero.line3prefix': 'EN ',
