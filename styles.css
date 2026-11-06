@@ -5434,42 +5434,44 @@ a:hover .btn-arrow {
    STUDIO PRECISION CURSOR & MICRO-INTERACTIONS (UNIVERSAL)
    ========================================================================== */
 
-/* Hide default OS cursor ONLY when custom cursor has initialized on pointer-fine desktop devices */
-@media (hover: hover) and (pointer: fine) {
-  html.has-custom-cursor,
-  html.has-custom-cursor body,
-  html.has-custom-cursor body *,
-  html.has-custom-cursor dialog,
-  html.has-custom-cursor dialog *,
-  html.has-custom-cursor .ocs-viewer,
-  html.has-custom-cursor .ocs-viewer *,
-  html.has-custom-cursor .orsap-lightbox-modal,
-  html.has-custom-cursor .orsap-lightbox-modal *,
-  html.has-custom-cursor .legal-modal,
-  html.has-custom-cursor .legal-modal *,
-  html.has-custom-cursor .studio-menu-overlay,
-  html.has-custom-cursor .studio-menu-overlay * {
-    cursor: none !important;
-  }
+/* Hide default OS cursor when custom cursor has initialized on any desktop / device */
+html.has-custom-cursor,
+html.has-custom-cursor body,
+html.has-custom-cursor body *,
+html.has-custom-cursor dialog,
+html.has-custom-cursor dialog *,
+html.has-custom-cursor .ocs-viewer,
+html.has-custom-cursor .ocs-viewer *,
+html.has-custom-cursor .orsap-lightbox-modal,
+html.has-custom-cursor .orsap-lightbox-modal *,
+html.has-custom-cursor .legal-modal,
+html.has-custom-cursor .legal-modal *,
+html.has-custom-cursor .studio-menu-overlay,
+html.has-custom-cursor .studio-menu-overlay * {
+  cursor: none !important;
+}
 
-  /* Form text inputs & editable areas always preserve standard text cursor for editing */
-  html.has-custom-cursor input[type="text"],
-  html.has-custom-cursor input[type="password"],
-  html.has-custom-cursor input[type="email"],
-  html.has-custom-cursor input[type="number"],
-  html.has-custom-cursor input[type="search"],
-  html.has-custom-cursor textarea,
-  html.has-custom-cursor [contenteditable="true"] {
-    cursor: text !important;
-  }
+/* Form text inputs & editable areas always preserve standard text cursor for editing */
+html.has-custom-cursor input[type="text"],
+html.has-custom-cursor input[type="password"],
+html.has-custom-cursor input[type="email"],
+html.has-custom-cursor input[type="tel"],
+html.has-custom-cursor input[type="url"],
+html.has-custom-cursor input[type="number"],
+html.has-custom-cursor input[type="search"],
+html.has-custom-cursor textarea,
+html.has-custom-cursor [contenteditable="true"] {
+  cursor: text !important;
+}
 
-  html.has-custom-cursor select {
-    cursor: pointer !important;
-  }
+html.has-custom-cursor select {
+  cursor: pointer !important;
 }
 
 /* Precision Cursor Dot - Maximum possible z-index (2147483647) floats above all modals & screenshots */
-.studio-cursor-dot {
+.studio-cursor-dot,
+#cursor-dot,
+.cursor-dot {
   position: fixed;
   top: 0;
   left: 0;
@@ -5486,7 +5488,9 @@ a:hover .btn-arrow {
 }
 
 /* Precision Cursor Ring - Maximum possible z-index (2147483646) floats right under the dot */
-.studio-cursor-ring {
+.studio-cursor-ring,
+#cursor-ring,
+.cursor-ring {
   position: fixed;
   top: 0;
   left: 0;
@@ -5503,7 +5507,11 @@ a:hover .btn-arrow {
 }
 
 body.cursor-active .studio-cursor-dot,
+body.cursor-active #cursor-dot,
+body.cursor-active .cursor-dot,
 body.cursor-active .studio-cursor-ring,
+body.cursor-active #cursor-ring,
+body.cursor-active .cursor-ring,
 .ocs-viewer[open] .studio-cursor-dot,
 .ocs-viewer[open] .studio-cursor-ring,
 dialog[open] .studio-cursor-dot,
@@ -5513,47 +5521,52 @@ dialog[open] .studio-cursor-ring {
 }
 
 /* Gold expansion on interactive hover */
-body.cursor-hover .studio-cursor-ring {
+body.cursor-hover .studio-cursor-ring,
+body.cursor-hover #cursor-ring,
+body.cursor-hover .cursor-ring {
   width: 52px;
   height: 52px;
-  border-color: var(--brand-gold);
-  background: rgba(245, 176, 20, 0.09);
-  box-shadow: 0 0 16px rgba(245, 176, 20, 0.25);
+  border-color: var(--brand-gold) !important;
+  background: rgba(245, 176, 20, 0.09) !important;
+  box-shadow: 0 0 16px rgba(245, 176, 20, 0.25) !important;
 }
 
-body.cursor-hover .studio-cursor-dot {
-  background: var(--brand-gold);
-  transform: translate(-50%, -50%) scale(1.6);
+body.cursor-hover .studio-cursor-dot,
+body.cursor-hover #cursor-dot,
+body.cursor-hover .cursor-dot {
+  background: var(--brand-gold) !important;
+  transform: translate(-50%, -50%) scale(1.6) !important;
 }
 
 /* Clicking / Pressing state */
-body.cursor-clicking .studio-cursor-ring {
+body.cursor-clicking .studio-cursor-ring,
+body.cursor-clicking #cursor-ring,
+body.cursor-clicking .cursor-ring {
   transform: translate(-50%, -50%) scale(0.75);
   border-color: var(--brand-gold);
   background: rgba(245, 176, 20, 0.18);
 }
 
-body.cursor-clicking .studio-cursor-dot {
+body.cursor-clicking .studio-cursor-dot,
+body.cursor-clicking #cursor-dot,
+body.cursor-clicking .cursor-dot {
   transform: translate(-50%, -50%) scale(0.75);
   background: var(--brand-gold);
 }
 
 /* Text editing state - ring gracefully shrinks so it doesn't obstruct typing */
-body.cursor-text .studio-cursor-ring {
+body.cursor-text .studio-cursor-ring,
+body.cursor-text #cursor-ring,
+body.cursor-text .cursor-ring {
   opacity: 0 !important;
   transform: translate(-50%, -50%) scale(0.3);
 }
 
-body.cursor-text .studio-cursor-dot {
+body.cursor-text .studio-cursor-dot,
+body.cursor-text #cursor-dot,
+body.cursor-text .cursor-dot {
   opacity: 0.35 !important;
   transform: translate(-50%, -50%) scale(0.6);
-}
-
-@media (hover: none) or (pointer: coarse) {
-  .studio-cursor-dot,
-  .studio-cursor-ring {
-    display: none !important;
-  }
 }
 
 /* Subtle Shimmer Beam on Solid Buttons */

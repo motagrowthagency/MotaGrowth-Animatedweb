@@ -778,25 +778,30 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ========================================================================
-  // 5. Universal Studio Precision Cursor (All Pages & Lightbox Modals)
+  // 5. Universal Studio Precision Cursor (Every Device, OS & Platform)
   // ========================================================================
-  if (isFinePointer) {
+  (function initUniversalCursor() {
     let cursorDot = document.getElementById('cursor-dot');
     let cursorRing = document.getElementById('cursor-ring');
 
     if (!cursorDot) {
       cursorDot = document.createElement('div');
-      cursorDot.className = 'studio-cursor-dot';
+      cursorDot.className = 'studio-cursor-dot cursor-dot';
       cursorDot.id = 'cursor-dot';
       cursorDot.setAttribute('aria-hidden', 'true');
       document.body.appendChild(cursorDot);
+    } else {
+      cursorDot.classList.add('studio-cursor-dot');
     }
+
     if (!cursorRing) {
       cursorRing = document.createElement('div');
-      cursorRing.className = 'studio-cursor-ring';
+      cursorRing.className = 'studio-cursor-ring cursor-ring';
       cursorRing.id = 'cursor-ring';
       cursorRing.setAttribute('aria-hidden', 'true');
       document.body.appendChild(cursorRing);
+    } else {
+      cursorRing.classList.add('studio-cursor-ring');
     }
 
     let mouseX = -100;
@@ -828,9 +833,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    window.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+    const updatePosition = (x, y) => {
+      mouseX = x;
+      mouseY = y;
 
       if (!hasMoved) {
         hasMoved = true;
@@ -848,6 +853,36 @@ document.addEventListener('DOMContentLoaded', () => {
       cursorDot.style.left = `${mouseX}px`;
       cursorDot.style.top = `${mouseY}px`;
       wakeRing();
+    };
+
+    // Desktop mice, trackpads & styluses across Mac, Windows, Linux, Chromebook
+    window.addEventListener('pointermove', (e) => {
+      updatePosition(e.clientX, e.clientY);
+    }, { passive: true });
+
+    window.addEventListener('mousemove', (e) => {
+      updatePosition(e.clientX, e.clientY);
+    }, { passive: true });
+
+    // Touch & tablet devices (iPad, Surface, Android tablet, mobile)
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches[0]) {
+        updatePosition(e.touches[0].clientX, e.touches[0].clientY);
+      }
+      document.body.classList.add('cursor-clicking');
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches[0]) {
+        updatePosition(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      document.body.classList.remove('cursor-clicking');
+      setTimeout(() => {
+        document.body.classList.remove('cursor-active');
+      }, 700);
     }, { passive: true });
 
     document.addEventListener('mouseleave', () => {
@@ -866,13 +901,13 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove('cursor-clicking');
     });
 
-    // Intelligent Event Delegation for Hover States Everywhere (including lightbox screenshots)
+    // Intelligent Event Delegation for Hover States Everywhere (including questionnaire, options & modals)
     document.addEventListener('mouseover', (e) => {
       const target = e.target;
       if (!target) return;
 
-      const textInput = target.closest('input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="search"], textarea, [contenteditable="true"]');
-      const interactive = target.closest('a, button, [role="button"], input[type="submit"], input[type="button"], select, label, summary, [data-case-inspect], .case-screen-card, .btn-ref, .btn-inspect-pill, .browser-inspect-action, .orsap-tab-btn, .orsap-tab-item, .orsap-tab-arrow, .orsap-laptop-viewport, .orsap-mockup-frame, .orsap-mockup-img, .orsap-title-link, .orsap-eyebrow-link, .orsap-cta-primary, .orsap-cta-secondary, .lightbox-nav-btn, .lightbox-size-btn, .lightbox-close-btn, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .portal-nav-btn, .tab-btn, .portal-btn, .action-btn, .document-card, .deliverable-card');
+      const textInput = target.closest('input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="url"], input[type="number"], input[type="search"], textarea, [contenteditable="true"]');
+      const interactive = target.closest('a, button, [role="button"], [role="radio"], [role="checkbox"], input[type="submit"], input[type="button"], input[type="checkbox"], input[type="radio"], select, label, summary, [data-case-inspect], .case-screen-card, .btn-ref, .btn-inspect-pill, .browser-inspect-action, .orsap-tab-btn, .orsap-tab-item, .orsap-tab-arrow, .orsap-laptop-viewport, .orsap-mockup-frame, .orsap-mockup-img, .orsap-title-link, .orsap-eyebrow-link, .orsap-cta-primary, .orsap-cta-secondary, .lightbox-nav-btn, .lightbox-size-btn, .lightbox-close-btn, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .portal-nav-btn, .tab-btn, .portal-btn, .action-btn, .document-card, .deliverable-card, .q-service-box, .q-option-row, .q-service-card, .btn-wizard-nav, .wizard-exit-btn, .q-agree-row');
 
       if (textInput) {
         document.body.classList.remove('cursor-hover');
@@ -885,7 +920,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('cursor-text');
       }
     });
-  }
+  })();
 
   // ========================================================================
   // 5B. ORSAP Interactive Showcase Tabs & High-Fidelity Lightbox Viewer
