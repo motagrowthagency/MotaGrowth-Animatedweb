@@ -892,73 +892,73 @@ document.addEventListener('DOMContentLoaded', () => {
   // ========================================================================
   const orsapCatalog = [
     {
-      src: 'assets/orsap/orsap_01_home.jpg',
+      src: 'assets/orsap/orsap_01_home.svg',
       title: 'Storefront Architecture & Value Proposition',
       desc: 'Brand hero, video presentation, 4 key commercial stats & BUTEC corporate proof',
       url: 'https://orsap.ma'
     },
     {
-      src: 'assets/orsap/orsap_02_about.jpg',
+      src: 'assets/orsap/orsap_02_about.svg',
       title: 'Strategic Story & Market Differentiation',
       desc: 'Company heritage, 5 core operational values & 4 pillar differentiators for Moroccan industry',
       url: 'https://orsap.ma/a-propos'
     },
     {
-      src: 'assets/orsap/orsap_03_services.jpg',
+      src: 'assets/orsap/orsap_03_services.svg',
       title: '7 Technical Industrial Services Engine',
       desc: 'End-to-end solutions: importation, industrial flooring, fluids, air handling & site fitting',
       url: 'https://orsap.ma/services'
     },
     {
-      src: 'assets/orsap/orsap_04_services_detail.jpg',
+      src: 'assets/orsap/orsap_04_services_detail.svg',
       title: '5-Step Engineering & Delivery Process',
       desc: 'Rigorous execution method: Audit, Étude, Validation, Réalisation & Suivi SAV with SLA',
       url: 'https://orsap.ma/methode'
     },
     {
-      src: 'assets/orsap/orsap_05_catalog.jpg',
+      src: 'assets/orsap/orsap_05_catalog.svg',
       title: '15-Sector Industrial Catalog Taxonomy',
       desc: 'Structured browsing for 15,000+ references: EPI, work at heights, heavy handling & tooling',
       url: 'https://orsap.ma/catalogue'
     },
     {
-      src: 'assets/orsap/orsap_06_temoignages.jpg',
+      src: 'assets/orsap/orsap_06_temoignages.svg',
       title: 'Enterprise Proof & Client Dossiers',
       desc: 'Validated testimonials from BUTEC (1,200 employees), Dislog Group, SNEP, and Ventec',
       url: 'https://orsap.ma/temoignages'
     },
     {
-      src: 'assets/orsap/orsap_07_marques.png',
+      src: 'assets/orsap/orsap_07_marques.svg',
       title: '300+ Global Brand Directory',
       desc: 'International distributor partnerships with 3M, Makita, Bosch, DeWalt, ABB, Honeywell, Sika',
       url: 'https://orsap.ma/marques'
     },
     {
-      src: 'assets/orsap/orsap_08_recrutement.jpg',
+      src: 'assets/orsap/orsap_08_recrutement.svg',
       title: 'Corporate Careers & Talent Acquisition',
       desc: 'Inbound recruitment pipeline, employer value proposition & structured CV intake portal',
       url: 'https://orsap.ma/recrutement'
     },
     {
-      src: 'assets/orsap/orsap_09_contact_rfq.jpg',
+      src: 'assets/orsap/orsap_09_contact_rfq.svg',
       title: 'Casablanca RFQ Hub & Inbound Engine',
       desc: 'Multi-channel procurement engine: direct WhatsApp, phone desk & Casablanca depot coordinates',
       url: 'https://orsap.ma/contact-devis'
     },
     {
-      src: 'assets/orsap/orsap_10_blog_technique.jpg',
+      src: 'assets/orsap/orsap_10_blog_technique.svg',
       title: 'HSE Technical Knowledge Base & SEO Hub',
       desc: 'Educational guides on Moroccan workplace safety standards (Loi 65-99) & high-intent B2B SEO',
       url: 'https://orsap.ma/blog-technique'
     },
     {
-      src: 'assets/orsap/orsap_11_navigation_menu.png',
+      src: 'assets/orsap/orsap_11_navigation_menu.svg',
       title: 'Slide-Out Architecture & Navigation Drawer',
       desc: 'Frictionless information architecture designed for high-conversion B2B buyer journeys',
       url: 'https://orsap.ma/#menu'
     },
     {
-      src: 'assets/orsap/orsap_12_ecommerce_store.jpg',
+      src: 'assets/orsap/orsap_12_ecommerce_store.svg',
       title: 'B2B E-Commerce & Express Outillage Store',
       desc: 'Real-time pricing in MAD, stock availability, digital cart and corporate account portal',
       url: 'https://orsap.ma/boutique-express'
