@@ -1513,7 +1513,8 @@ a:hover .btn-arrow {
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: rgba(245, 176, 20, 0.35) transparent;
-  padding: 0 4px;
+  padding: 0 4px 0.65rem 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .orsap-showcase-tabs::-webkit-scrollbar {
