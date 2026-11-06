@@ -872,7 +872,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!target) return;
 
       const textInput = target.closest('input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="search"], textarea, [contenteditable="true"]');
-      const interactive = target.closest('a, button, [role="button"], input[type="submit"], input[type="button"], select, label, summary, [data-case-inspect], .case-screen-card, .btn-ref, .btn-inspect-pill, .browser-inspect-action, .orsap-tab-btn, .orsap-tab-item, .orsap-laptop-viewport, .orsap-mockup-frame, .orsap-mockup-img, .orsap-title-link, .orsap-eyebrow-link, .orsap-cta-primary, .orsap-cta-secondary, .lightbox-nav-btn, .lightbox-size-btn, .lightbox-close-btn, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .portal-nav-btn, .tab-btn, .portal-btn, .action-btn, .document-card, .deliverable-card');
+      const interactive = target.closest('a, button, [role="button"], input[type="submit"], input[type="button"], select, label, summary, [data-case-inspect], .case-screen-card, .btn-ref, .btn-inspect-pill, .browser-inspect-action, .orsap-tab-btn, .orsap-tab-item, .orsap-tab-arrow, .orsap-laptop-viewport, .orsap-mockup-frame, .orsap-mockup-img, .orsap-title-link, .orsap-eyebrow-link, .orsap-cta-primary, .orsap-cta-secondary, .lightbox-nav-btn, .lightbox-size-btn, .lightbox-close-btn, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .portal-nav-btn, .tab-btn, .portal-btn, .action-btn, .document-card, .deliverable-card');
 
       if (textInput) {
         document.body.classList.remove('cursor-hover');
@@ -1013,6 +1013,7 @@ document.addEventListener('DOMContentLoaded', () => {
     orsapLightboxModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
   }
+  window.openOrsapLightbox = openOrsapLightbox;
 
   function closeOrsapLightbox() {
     if (!orsapLightboxModal) return;
@@ -1020,6 +1021,60 @@ document.addEventListener('DOMContentLoaded', () => {
     orsapLightboxModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   }
+  window.closeOrsapLightbox = closeOrsapLightbox;
+
+  // Global Tab Switcher Function (Works from HTML onclick and event listeners)
+  function switchOrsapTab(tab) {
+    if (!tab) return;
+    const tabs = document.querySelectorAll('.orsap-tab-item, .orsap-tab-btn');
+    const mockupImg = document.getElementById('orsapMockupImg') || document.getElementById('orsapActiveImg');
+    const wasActive = tab.classList.contains('active');
+
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    const svgSrc = tab.getAttribute('data-svg') || tab.getAttribute('data-img');
+    const mockupSrc = tab.getAttribute('data-mockup') || tab.getAttribute('data-img');
+
+    if (svgSrc) {
+      const foundIdx = orsapCatalog.findIndex(item => item.src === svgSrc);
+      if (foundIdx !== -1) {
+        currentOrsapIndex = foundIdx;
+        window.currentOrsapIndex = foundIdx;
+      }
+    }
+
+    if (mockupImg && mockupSrc) {
+      mockupImg.style.opacity = '0.35';
+      setTimeout(() => {
+        mockupImg.src = mockupSrc;
+        mockupImg.style.opacity = '1';
+      }, 90);
+    }
+
+    // Scroll active tab smoothly into view if near edges
+    if (typeof tab.scrollIntoView === 'function') {
+      try {
+        tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      } catch (err) {}
+    }
+
+    // If clicking an already active tab, open the full-screen 2358px SVG lightbox modal
+    if (wasActive) {
+      openOrsapLightbox(currentOrsapIndex);
+    }
+  }
+  window.switchOrsapTab = switchOrsapTab;
+  window.currentOrsapIndex = 0;
+
+  // Global Tab Strip Scroller
+  function scrollOrsapTabs(offset) {
+    const tabsStrip = document.getElementById('orsapTabsStrip');
+    if (tabsStrip) {
+      tabsStrip.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  }
+  window.scrollOrsapTabs = scrollOrsapTabs;
 
   if (lightboxPrevBtn) {
     lightboxPrevBtn.addEventListener('click', () => {
@@ -1069,51 +1124,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Homepage flagship tabs & 3D laptop mockup interactions
   const orsapTabs = document.querySelectorAll('.orsap-tab-item, .orsap-tab-btn');
-  const orsapMockupImg = document.getElementById('orsapMockupImg') || document.getElementById('orsapActiveImg');
   const orsapLaptopViewport = document.getElementById('orsapLaptopViewport');
+  const orsapTabsStrip = document.getElementById('orsapTabsStrip');
   const inspectBtns = [document.getElementById('orsapInspectBtn'), document.getElementById('orsapInspectPill')];
+
+  // Mouse wheel horizontal scrolling over the tabs strip
+  if (orsapTabsStrip) {
+    orsapTabsStrip.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        orsapTabsStrip.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+  }
 
   if (orsapTabs.length > 0) {
     orsapTabs.forEach(tab => {
       tab.addEventListener('click', () => {
-        const wasActive = tab.classList.contains('active');
-
-        orsapTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        const svgSrc = tab.getAttribute('data-svg') || tab.getAttribute('data-img');
-        const mockupSrc = tab.getAttribute('data-mockup') || tab.getAttribute('data-img');
-
-        if (svgSrc) {
-          const foundIdx = orsapCatalog.findIndex(item => item.src === svgSrc);
-          if (foundIdx !== -1) {
-            currentOrsapIndex = foundIdx;
-          }
-        }
-
-        if (orsapMockupImg && mockupSrc) {
-          orsapMockupImg.style.opacity = '0.35';
-          setTimeout(() => {
-            orsapMockupImg.src = mockupSrc;
-            orsapMockupImg.style.opacity = '1';
-          }, 100);
-        }
-
-        // Clicking the title of an active tab opens the full 2358px SVG lightbox modal
-        if (wasActive) {
-          openOrsapLightbox(currentOrsapIndex);
-        }
+        switchOrsapTab(tab);
       });
     });
 
     if (orsapLaptopViewport) {
       orsapLaptopViewport.addEventListener('click', () => {
-        openOrsapLightbox(currentOrsapIndex);
+        openOrsapLightbox(window.currentOrsapIndex || 0);
       });
       orsapLaptopViewport.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          openOrsapLightbox(currentOrsapIndex);
+          openOrsapLightbox(window.currentOrsapIndex || 0);
         }
       });
     }

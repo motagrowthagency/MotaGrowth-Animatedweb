@@ -1464,30 +1464,72 @@ a:hover .btn-arrow {
   box-shadow: 0 35px 80px rgba(0, 0, 0, 0.98), 0 0 45px rgba(245, 176, 20, 0.08);
 }
 
-/* Top Horizontal Architecture Tabs (All 5 Fit Width & Are Clickable) */
+/* Top Horizontal Architecture Tabs Wrapper & Smooth Scroller */
+.orsap-tabs-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.65rem;
+  box-sizing: border-box;
+}
+
+.orsap-tab-arrow {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  font-size: 1.25rem;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  z-index: 5;
+  user-select: none;
+}
+
+.orsap-tab-arrow:hover {
+  background: var(--brand-gold);
+  color: #000000;
+  border-color: var(--brand-gold);
+  box-shadow: 0 0 10px rgba(245, 176, 20, 0.4);
+}
+
 .orsap-showcase-tabs {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: clamp(0.5rem, 1.8vw, 1.75rem);
+  justify-content: space-between;
+  gap: clamp(0.5rem, 1.5vw, 1.5rem);
   width: 100%;
   box-sizing: border-box;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 0.65rem;
   overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 176, 20, 0.35) transparent;
+  padding: 0 4px;
 }
 
 .orsap-showcase-tabs::-webkit-scrollbar {
-  display: none;
+  height: 3px;
+}
+
+.orsap-showcase-tabs::-webkit-scrollbar-thumb {
+  background: rgba(245, 176, 20, 0.35);
+  border-radius: 2px;
 }
 
 .orsap-tab-item {
   position: relative;
   background: transparent;
   border: none;
-  padding: 0.35rem 0.45rem 0.65rem;
+  padding: 0.4rem 0.5rem 0.65rem;
   cursor: pointer;
   display: inline-flex;
   flex-direction: column;
@@ -1496,11 +1538,12 @@ a:hover .btn-arrow {
   white-space: nowrap;
   border-radius: 3px;
   outline: none;
+  flex-shrink: 0;
 }
 
 .orsap-tab-item .tab-label {
   font-family: var(--font-mono);
-  font-size: clamp(0.72rem, 0.85vw, 0.82rem);
+  font-size: clamp(0.72rem, 0.84vw, 0.82rem);
   font-weight: 500;
   letter-spacing: 0.04em;
   color: rgba(255, 255, 255, 0.45);
