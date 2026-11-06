@@ -17,7 +17,7 @@
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=3.2">
+  <link rel="stylesheet" href="styles.css?v=4.4">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -40,14 +40,13 @@
 
       <!-- Center: Navigation -->
       <nav class="nav-menu" aria-label="Primary Navigation">
-        <a href="#hero" class="nav-link active" data-i18n="nav.home">Home</a>
-        <a href="#audiences" class="nav-link" data-i18n="nav.audiences">Audiences</a>
-        <a href="#philosophy" class="nav-link">Strategy</a>
-        <a href="#cases" class="nav-link" data-i18n="nav.cases">Cases</a>
-        <a href="#about" class="nav-link" data-i18n="nav.about">About</a>
+        <a href="index.html" class="nav-link active" data-i18n="nav.home">Home</a>
+        <a href="services.html" class="nav-link" data-i18n="nav.services">Services</a>
+        <a href="cases.html" class="nav-link" data-i18n="nav.cases">Cases</a>
+        <a href="about.html" class="nav-link" data-i18n="nav.about">About</a>
       </nav>
 
-      <!-- Right: Client Space · EN / FR · Request Proposal -->
+      <!-- Right: Client Space · EN / FR · Request Proposal · Menu Trigger -->
       <div class="header-actions">
         <a href="client-space.html" class="nav-link nav-link-client">Client Space</a>
         <div class="lang-selector" role="group" aria-label="Language Selector">
@@ -58,6 +57,12 @@
         <a href="#proposal" class="btn-contact-header">
           <span data-i18n="btn.proposal">Request Proposal</span>
         </a>
+        <button type="button" class="frame-menu-dots menu-chooser-trigger" aria-label="Open Studio Menu" title="Studio Menu" aria-haspopup="dialog" aria-expanded="false">
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+        </button>
       </div>
     </div>
   </header>
@@ -89,14 +94,13 @@
 
           <!-- Center: Navigation -->
           <nav class="nav-menu" aria-label="Primary Navigation">
-            <a href="#hero" class="nav-link active" data-i18n="nav.home">Home</a>
-            <a href="#audiences" class="nav-link" data-i18n="nav.audiences">Audiences</a>
-            <a href="#philosophy" class="nav-link">Strategy</a>
-            <a href="#cases" class="nav-link" data-i18n="nav.cases">Cases</a>
-            <a href="#about" class="nav-link" data-i18n="nav.about">About</a>
+            <a href="index.html" class="nav-link active" data-i18n="nav.home">Home</a>
+            <a href="services.html" class="nav-link" data-i18n="nav.services">Services</a>
+            <a href="cases.html" class="nav-link" data-i18n="nav.cases">Cases</a>
+            <a href="about.html" class="nav-link" data-i18n="nav.about">About</a>
           </nav>
 
-          <!-- Right: Client Space · EN / FR · Request Proposal -->
+          <!-- Right: Client Space · EN / FR · Request Proposal · Menu Trigger -->
           <div class="header-actions">
             <a href="client-space.html" class="nav-link nav-link-client">Client Space</a>
             <div class="lang-selector" role="group" aria-label="Language Selector">
@@ -107,6 +111,12 @@
             <a href="#proposal" class="btn-contact-header">
               <span data-i18n="btn.proposal">Request Proposal</span>
             </a>
+            <button type="button" class="frame-menu-dots menu-chooser-trigger" aria-label="Open Studio Menu" title="Studio Menu" aria-haspopup="dialog" aria-expanded="false">
+              <span class="grid-dot"></span>
+              <span class="grid-dot"></span>
+              <span class="grid-dot"></span>
+              <span class="grid-dot"></span>
+            </button>
           </div>
         </div>
 
@@ -170,7 +180,7 @@
             <a href="#proposal" class="btn-ref btn-ref-solid">
               <span class="btn-text" data-i18n="btn.proposal">REQUEST A PROPOSAL ↗</span>
             </a>
-            <a href="#cases" class="btn-ref btn-ref-outline">
+            <a href="cases.html" class="btn-ref btn-ref-outline">
               <span class="btn-text" data-i18n="btn.cases">OUR CASES ↗</span>
             </a>
           </div>
@@ -210,7 +220,7 @@
 
           <!-- Card 2 (Hospitality & Experiences) -->
           <div class="comma-card card-hospitality" tabindex="0">
-            <div class="comma-card-bg" style="background-image: url('assets/hospitality_nightlife_new.jpg');"></div>
+            <div class="comma-card-bg" style="background-image: url('assets/hospitality_nightlife_perfect.jpg');"></div>
             <div class="comma-card-gradient"></div>
             <div class="card-glare" aria-hidden="true"></div>
             <div class="comma-card-inner">
@@ -236,7 +246,7 @@
 
         <!-- Bottom Action Button -->
         <div class="comma-sec-footer">
-          <a href="#cases" class="btn-ref btn-ref-solid comma-btn-examples">
+          <a href="cases.html" class="btn-ref btn-ref-solid comma-btn-examples">
             <span class="btn-text" data-i18n="btn.examples">EXPLORE SELECTED CASES ↗</span>
           </a>
         </div>
@@ -342,108 +352,68 @@
         <!-- Editorial Composition: 1 Dominant Flagship + 2 Curated Secondary Grid -->
         <div class="work-showcase-grid">
 
-          <!-- Dominant Flagship Project: ORSAP.MA -->
-          <article class="work-flagship-card" id="flagship-orsap">
+          <!-- ORSAP project showcase (one project, three views) -->
+          <article class="ocs" id="flagship-orsap" data-ocs aria-labelledby="ocs-title">
 
-            <!-- Top Horizontal Architecture Tabs -->
-            <div class="orsap-showcase-tabs" id="orsapTabsStrip" role="tablist" aria-label="ORSAP Architecture Views">
-              <button type="button" class="orsap-tab-item orsap-tab-btn active" data-orsap-tab="home" data-mockup="assets/orsap_mockups/mockup_clean_1.webp?v=3.0" data-svg="assets/orsap/orsap_01_home.svg" data-title="Storefront Architecture &amp; Value Proposition" data-desc="Brand hero, video presentation, stats counters &amp; BUTEC client proof" onclick="switchOrsapTab(this)">
-                <span class="tab-label">01 / Storefront</span>
-                <span class="tab-underline"></span>
-              </button>
-              <button type="button" class="orsap-tab-item orsap-tab-btn" data-orsap-tab="store" data-mockup="assets/orsap_mockups/mockup_clean_2.webp?v=3.0" data-svg="assets/orsap/orsap_12_ecommerce_store.svg" data-title="B2B E-Commerce &amp; Client Portal" data-desc="Live MAD pricing, stock availability, express outillage &amp; procurement cart" onclick="switchOrsapTab(this)">
-                <span class="tab-label">02 / B2B E-Store</span>
-                <span class="tab-underline"></span>
-              </button>
-              <button type="button" class="orsap-tab-item orsap-tab-btn" data-orsap-tab="catalog" data-mockup="assets/orsap_mockups/mockup_clean_3.webp?v=3.0" data-svg="assets/orsap/orsap_05_catalog.svg" data-title="15-Category Industrial Catalog" data-desc="15,000+ reference taxonomy (EPI, Heights, Handling, Fluids, Power Tools)" onclick="switchOrsapTab(this)">
-                <span class="tab-label">03 / 15k+ SKU Catalog</span>
-                <span class="tab-underline"></span>
-              </button>
-              <button type="button" class="orsap-tab-item orsap-tab-btn" data-orsap-tab="marques" data-mockup="assets/orsap_mockups/mockup_clean_4.webp?v=3.0" data-svg="assets/orsap/orsap_07_marques.svg" data-title="300+ Brand Directory" data-desc="International partnerships with 3M, Makita, Bosch, DeWalt, ABB, Honeywell" onclick="switchOrsapTab(this)">
-                <span class="tab-label">04 / 300+ Brands</span>
-                <span class="tab-underline"></span>
-              </button>
-              <button type="button" class="orsap-tab-item orsap-tab-btn" data-orsap-tab="proof" data-mockup="assets/orsap_mockups/mockup_clean_5.webp?v=3.0" data-svg="assets/orsap/orsap_06_temoignages.svg" data-title="Enterprise Client Proof" data-desc="Institutional validation (BUTEC 1,200 workers, Dislog Group, SNEP, Ventec)" onclick="switchOrsapTab(this)">
-                <span class="tab-label">05 / Enterprise Proof</span>
-                <span class="tab-underline"></span>
-              </button>
-            </div>
+            <header class="ocs-intro">
+              <p class="ocs-eyebrow">ORSAP / CONNECTED B2B PLATFORM</p>
+              <h3 class="ocs-title" id="ocs-title">ORSAP — 700,000+ MAD in reported lead value. No paid ads.</h3>
+              <p class="ocs-lede">MotaGrowth developed a connected B2B website combining product discovery, quotation workflows, content, and customer administration.</p>
+            </header>
 
-            <!-- Two-Column Editorial Composition -->
-            <div class="orsap-editorial-body">
-
-              <!-- Left Column: 3D Angled MacBook Mockup -->
-              <div class="orsap-laptop-col">
-                <div class="orsap-laptop-viewport" id="orsapLaptopViewport" role="button" tabindex="0" aria-label="Inspect Full High-Resolution Capture (2358px SVG)" onclick="openOrsapLightbox(window.currentOrsapIndex || 0)">
-                  <div class="orsap-mockup-frame">
-                    <img src="assets/orsap_mockups/mockup_clean_1.webp?v=3.0" alt="ORSAP.MA 3D Interactive MacBook Mockup"
-                      class="orsap-mockup-img" id="orsapMockupImg" loading="lazy">
-                    <div class="orsap-mockup-hover-hint">
-                      <span class="hover-hint-icon">↗</span>
-                      <span>Click to Inspect Full Capture (2358px SVG)</span>
-                    </div>
-                  </div>
-                </div>
+            <div class="ocs-media">
+              <div class="ocs-tabs" role="tablist" aria-label="ORSAP project views">
+                <button type="button" role="tab" class="ocs-tab" id="ocs-tab-storefront" aria-controls="ocs-panel" aria-selected="true"
+                  data-src="assets/orsap/showcase/storefront.webp"
+                  data-full="assets/orsap/showcase/storefront_full.webp"
+                  data-alt="ORSAP homepage with an industrial safety hero, and the cart and “Demander un devis” quote button in the header"
+                  data-caption="Storefront. A redesigned presentation of ORSAP’s industrial offer and multi-channel inquiry routes.">Storefront</button>
+                <button type="button" role="tab" class="ocs-tab" id="ocs-tab-catalog" aria-controls="ocs-panel" aria-selected="false" tabindex="-1"
+                  data-src="assets/orsap/showcase/catalog.webp"
+                  data-full="assets/orsap/showcase/catalog_full.webp"
+                  data-alt="ORSAP B2B catalogue with search by reference code, department and product-family filters, and product cards showing stock status and HT/TTC prices"
+                  data-caption="Catalog-based commerce. Product-selection requests with quantities and calculated quotation totals.">Catalog &amp; quotes</button>
+                <button type="button" role="tab" class="ocs-tab" id="ocs-tab-quotes" aria-controls="ocs-panel" aria-selected="false" tabindex="-1"
+                  data-src="assets/orsap/showcase/quotes.webp"
+                  data-full="assets/orsap/showcase/quotes_full.webp"
+                  data-alt="ORSAP client space with New quote, quote history, B2B cart and off-catalogue item request actions; account details redacted"
+                  data-caption="Quotation &amp; customer administration. Dedicated views for reviewing requests, accounts, and contact directories.">Accounts &amp; admin</button>
               </div>
 
-              <!-- Right Column: Editorial Narrative, Metrics & CTAs -->
-              <div class="orsap-narrative-col">
-                <div class="orsap-eyebrow">CASE STUDY —</div>
-                <h3 class="orsap-hero-title">ORSAP MA</h3>
-                <p class="orsap-hero-desc">
-                  From traditional physical supplier to Morocco's leading digital industrial distribution platform.
-                  MotaGrowth designed and built a synchronized commercial engine with e-commerce, quotation automation,
-                  and enterprise-grade client proof.
-                </p>
-
-                <!-- 4-Stat Metrics Grid with Vertical Divider Borders -->
-                <div class="orsap-metrics-grid">
-                  <div class="orsap-metric-col">
-                    <span class="orsap-metric-number">15,000+</span>
-                    <span class="orsap-metric-caption">INDUSTRIAL SKUS</span>
-                  </div>
-                  <div class="orsap-metric-col">
-                    <span class="orsap-metric-number">300+</span>
-                    <span class="orsap-metric-caption">GLOBAL BRANDS</span>
-                  </div>
-                  <div class="orsap-metric-col">
-                    <span class="orsap-metric-number">24h</span>
-                    <span class="orsap-metric-caption">DELIVERY IN MOROCCO</span>
-                  </div>
-                  <div class="orsap-metric-col">
-                    <span class="orsap-metric-number">Tier-1</span>
-                    <span class="orsap-metric-caption">CLIENTS EQUIPPED</span>
-                  </div>
+              <figure class="ocs-figure" id="ocs-panel" role="tabpanel" aria-labelledby="ocs-tab-storefront">
+                <div class="ocs-frame">
+                  <img class="ocs-img" src="assets/orsap/showcase/storefront.webp" width="1600" height="999" loading="lazy" decoding="async"
+                    alt="ORSAP homepage with an industrial safety hero, and the cart and “Demander un devis” quote button in the header">
                 </div>
-
-                <!-- Disciplines / Taxonomy Bar -->
-                <div class="orsap-taxonomy-bar">
-                  <span>B2B E-Commerce</span>
-                  <span class="sep">/</span>
-                  <span>RFQ Funnel</span>
-                  <span class="sep">/</span>
-                  <span>SKU Taxonomy</span>
-                  <span class="sep">/</span>
-                  <span>Brand Authority</span>
-                </div>
-
-                <!-- Action CTAs -->
-                <div class="orsap-actions-row">
-                  <a href="cases.html#orsap" class="orsap-cta-primary">
-                    <span class="cta-label">EXPLORE FULL CASE STUDY</span>
-                    <span class="cta-arrow">↗</span>
-                    <span class="cta-underline"></span>
-                  </a>
-                  <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20saw%20the%20Orsap.ma%20case%20study%20and%20want%20to%20build%20a%20similar%20high-converting%20platform"
-                    target="_blank" rel="noopener" class="orsap-cta-secondary">
-                    <span>DISCUSS YOUR BRIEF</span>
-                    <span class="cta-arrow">↗</span>
-                  </a>
-                </div>
-
-              </div>
+                <figcaption class="ocs-figcaption">
+                  <span class="ocs-caption" aria-live="polite">Storefront. A redesigned presentation of ORSAP’s industrial offer and multi-channel inquiry routes.</span>
+                  <button type="button" class="ocs-enlarge" aria-haspopup="dialog">Enlarge screen</button>
+                </figcaption>
+              </figure>
             </div>
 
+            <div class="ocs-details">
+              <div class="ocs-impact-badge">
+                <div class="ocs-impact-num">700,000+ MAD</div>
+                <p class="ocs-impact-label">Reported lead value generated without paid advertising (Sept 1–Nov 6, 2026: 1.5k views · 243 new users · 1m 12s engagement).</p>
+              </div>
+
+              <p style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand-gold); margin: 0.5rem 0 0 0;">What we delivered</p>
+              <ul class="ocs-deliverables">
+                <li class="ocs-deliverable-item"><strong>Storefront:</strong> Redesigned presentation of ORSAP’s industrial offer.</li>
+                <li class="ocs-deliverable-item"><strong>Catalog-based commerce:</strong> Selection requests with quantities and calculated quotation totals.</li>
+                <li class="ocs-deliverable-item"><strong>Clear calls to action:</strong> Routes to browse, request a quote, or consult an expert.</li>
+                <li class="ocs-deliverable-item"><strong>Blog &amp; documents:</strong> Dedicated content-management section.</li>
+                <li class="ocs-deliverable-item"><strong>Quotation management:</strong> Segregated general inquiries and product-based quotes.</li>
+                <li class="ocs-deliverable-item"><strong>Customer administration:</strong> Account records and centralized subscriber directory.</li>
+              </ul>
+
+              <div class="ocs-value-quote">
+                “Not just a redesigned website—a connected platform for presenting the offer, capturing buying intent, and reviewing incoming opportunities.”
+              </div>
+
+              <a href="case-orsap.html" class="ocs-link">Explore the full case study <span aria-hidden="true">→</span></a>
+            </div>
           </article>
 
           <!-- Secondary Curated Pair -->
@@ -702,34 +672,29 @@
         <div class="menu-nav-col">
           <span class="menu-col-label">Navigation</span>
           <nav class="menu-links-list">
-            <a href="#hero" class="menu-link-item" data-menu-close>
+            <a href="index.html" class="menu-link-item" data-menu-close>
               <span class="menu-item-num">01</span>
-              <span class="menu-item-text">Overview</span>
-              <span class="menu-item-arrow">↗</span>
-            </a>
-            <a href="#audiences" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">02</span>
-              <span class="menu-item-text">Sectors &amp; Audiences</span>
-              <span class="menu-item-arrow">↗</span>
-            </a>
-            <a href="#philosophy" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">03</span>
-              <span class="menu-item-text">Strategy &amp; Performance</span>
-              <span class="menu-item-arrow">↗</span>
-            </a>
-            <a href="cases.html" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">04</span>
-              <span class="menu-item-text">Selected Cases</span>
+              <span class="menu-item-text">Home</span>
               <span class="menu-item-arrow">↗</span>
             </a>
             <a href="services.html" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">05</span>
+              <span class="menu-item-num">02</span>
               <span class="menu-item-text">Services &amp; Disciplines</span>
               <span class="menu-item-arrow">↗</span>
             </a>
+            <a href="cases.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">03</span>
+              <span class="menu-item-text">Selected Cases</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
             <a href="about.html" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">06</span>
+              <span class="menu-item-num">04</span>
               <span class="menu-item-text">About &amp; Founder</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="client-space.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">05</span>
+              <span class="menu-item-text">Client Space</span>
               <span class="menu-item-arrow">↗</span>
             </a>
           </nav>
@@ -786,42 +751,20 @@
     </div>
   </div>
 
-  <!-- ORSAP Full-Screen Architecture Inspection Lightbox -->
-  <div class="orsap-lightbox-modal" id="orsapLightboxModal" role="dialog" aria-modal="true"
-    aria-label="ORSAP Full Architecture Viewer" aria-hidden="true">
-    <div class="lightbox-header">
-      <div class="lightbox-header-info">
-        <span class="lightbox-title" id="lightboxTitle">ORSAP.MA — Storefront Architecture</span>
-        <span class="lightbox-subtitle" id="lightboxSubtitle">Brand hero, video presentation, stats counters &amp; BUTEC
-          client proof</span>
-      </div>
-      <div class="lightbox-controls">
-        <button type="button" class="lightbox-nav-btn" id="lightboxPrevBtn" aria-label="Previous screen">← Prev</button>
-        <span class="lightbox-counter" id="lightboxCounter">01 / 12</span>
-        <button type="button" class="lightbox-nav-btn" id="lightboxNextBtn" aria-label="Next screen">Next →</button>
-        <div class="lightbox-divider"></div>
-        <button type="button" class="lightbox-size-btn" id="lightboxSizeBtn" aria-label="Toggle display width">Toggle
-          Wide (820px)</button>
-        <button type="button" class="lightbox-close-btn" id="closeLightboxBtn" aria-label="Close Full Screen View">✕
-          CLOSE</button>
+  <!-- ORSAP enlarged screen viewer -->
+  <dialog class="ocs-viewer" id="ocsViewer" aria-labelledby="ocsViewerTitle">
+    <div class="ocs-viewer-bar">
+      <p class="ocs-viewer-title" id="ocsViewerTitle">ORSAP — Storefront</p>
+      <div class="ocs-viewer-actions">
+        <button type="button" class="ocs-viewer-btn" data-ocs-prev aria-label="Previous screen">←</button>
+        <button type="button" class="ocs-viewer-btn" data-ocs-next aria-label="Next screen">→</button>
+        <button type="button" class="ocs-viewer-btn ocs-viewer-close" data-ocs-close>Close <span aria-hidden="true">✕</span></button>
       </div>
     </div>
-    <div class="lightbox-scroll-stage" id="lightboxScrollStage">
-      <div class="lightbox-device-window" id="lightboxDeviceWindow">
-        <div class="lightbox-device-bar">
-          <div class="lightbox-device-dots">
-            <span class="browser-dot dot-red"></span>
-            <span class="browser-dot dot-amber"></span>
-            <span class="browser-dot dot-green"></span>
-          </div>
-          <div class="lightbox-device-url" id="lightboxDeviceUrl">https://orsap.ma/architecture/preview</div>
-          <span class="lightbox-scroll-tip">Scroll inside to inspect full page capture ↓</span>
-        </div>
-        <img src="assets/orsap/orsap_01_home.svg" alt="ORSAP Full Screenshot" class="lightbox-full-img"
-          id="lightboxFullImg">
-      </div>
+    <div class="ocs-viewer-body" tabindex="0" aria-label="Full screen capture. Scroll to see the whole page.">
+      <img class="ocs-viewer-img" src="" alt="" decoding="async">
     </div>
-  </div>
+  </dialog>
 
   <!-- Accessible Legal Modals (Transparent Statements) -->
   <div class="legal-modal" id="legalModal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
@@ -845,7 +788,7 @@
   <div class="studio-cursor-dot" id="cursor-dot" aria-hidden="true"></div>
   <div class="studio-cursor-ring" id="cursor-ring" aria-hidden="true"></div>
 
-  <script src="app.js?v=3.1"></script>
+  <script src="app.js?v=4.4"></script>
 </body>
 
 </html>

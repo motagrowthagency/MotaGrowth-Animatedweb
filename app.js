@@ -1886,8 +1886,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   menuCloseLinks.forEach(link => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
       closeStudioMenu();
+      if (href && !href.startsWith('#') && !href.startsWith('https://') && !href.startsWith('mailto:')) {
+        window.location.href = href;
+      }
     });
   });
 
@@ -1925,5 +1929,256 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   };
+
+  // 11. ORSAP Editorial Showcase Controller (.ocs & #ocsViewer)
+  // ========================================================================
+  (function initOcsShowcase() {
+    const ocs = document.querySelector('[data-ocs]');
+    const viewer = document.getElementById('ocsViewer');
+    if (!ocs) return;
+
+    const tabs = Array.from(ocs.querySelectorAll('.ocs-tab'));
+    const img = ocs.querySelector('.ocs-img');
+    const caption = ocs.querySelector('.ocs-caption');
+    const panel = ocs.querySelector('.ocs-figure');
+    const enlargeBtn = ocs.querySelector('.ocs-enlarge');
+
+    let currentIndex = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
+    if (currentIndex < 0) currentIndex = 0;
+    let lastActiveTrigger = null;
+
+    function selectTab(index, moveFocus = false) {
+      if (index < 0 || index >= tabs.length) return;
+      currentIndex = index;
+      const tab = tabs[index];
+
+      tabs.forEach((t, i) => {
+        const isSelected = i === index;
+        t.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        t.setAttribute('tabindex', isSelected ? '0' : '-1');
+      });
+
+      if (moveFocus) tab.focus();
+      if (panel) panel.setAttribute('aria-labelledby', tab.id);
+
+      if (img && tab.dataset.src) {
+        img.style.opacity = '0.5';
+        setTimeout(() => {
+          img.src = tab.dataset.src;
+          if (tab.dataset.alt) img.alt = tab.dataset.alt;
+          img.style.opacity = '1';
+        }, 80);
+      }
+
+      if (caption && tab.dataset.caption) {
+        caption.textContent = tab.dataset.caption;
+      }
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectTab(index));
+      tab.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          selectTab((index + 1) % tabs.length, true);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          selectTab((index - 1 + tabs.length) % tabs.length, true);
+        }
+      });
+    });
+
+    // Enlarge modal / dialog
+    if (viewer) {
+      const viewerTitle = document.getElementById('ocsViewerTitle');
+      const viewerImg = viewer.querySelector('.ocs-viewer-img');
+      const viewerClose = viewer.querySelector('[data-ocs-close]');
+      const viewerPrev = viewer.querySelector('[data-ocs-prev]');
+      const viewerNext = viewer.querySelector('[data-ocs-next]');
+      const viewerBody = viewer.querySelector('.ocs-viewer-body');
+
+      function updateViewer() {
+        const currentTab = tabs[currentIndex];
+        if (!currentTab) return;
+        if (viewerTitle) viewerTitle.textContent = `ORSAP — ${currentTab.textContent.trim()}`;
+        if (viewerImg && currentTab.dataset.full) {
+          viewerImg.src = currentTab.dataset.full;
+          viewerImg.alt = currentTab.dataset.alt || '';
+        }
+        if (viewerBody) viewerBody.scrollTop = 0;
+      }
+
+      function openViewer() {
+        lastActiveTrigger = document.activeElement;
+        updateViewer();
+        viewer.setAttribute('open', '');
+        document.body.style.overflow = 'hidden';
+
+        // Teleport custom cursor inside the active viewer to guarantee visibility
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+        if (cursorDot && cursorRing) {
+          viewer.appendChild(cursorDot);
+          viewer.appendChild(cursorRing);
+        }
+
+        if (viewerClose) viewerClose.focus();
+      }
+
+      function closeViewer() {
+        viewer.removeAttribute('open');
+        if (typeof viewer.close === 'function') {
+          try { viewer.close(); } catch (err) {}
+        }
+        document.body.style.overflow = '';
+
+        // Teleport custom cursor back to document.body
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+        if (cursorDot && cursorRing) {
+          document.body.appendChild(cursorDot);
+          document.body.appendChild(cursorRing);
+        }
+
+        if (lastActiveTrigger && typeof lastActiveTrigger.focus === 'function') {
+          lastActiveTrigger.focus();
+        }
+      }
+
+      if (enlargeBtn) {
+        enlargeBtn.addEventListener('click', openViewer);
+      }
+
+      // Also clicking the frame opens viewer
+      const frame = ocs.querySelector('.ocs-frame');
+      if (frame) {
+        frame.style.cursor = 'pointer';
+        frame.addEventListener('click', openViewer);
+      }
+
+      if (viewerClose) {
+        viewerClose.addEventListener('click', closeViewer);
+      }
+
+      if (viewerPrev) {
+        viewerPrev.addEventListener('click', () => {
+          selectTab((currentIndex - 1 + tabs.length) % tabs.length);
+          updateViewer();
+        });
+      }
+
+      if (viewerNext) {
+        viewerNext.addEventListener('click', () => {
+          selectTab((currentIndex + 1) % tabs.length);
+          updateViewer();
+        });
+      }
+
+      viewer.addEventListener('click', (e) => {
+        if (e.target === viewer) closeViewer();
+      });
+
+      viewer.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeViewer();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          selectTab((currentIndex + 1) % tabs.length);
+          updateViewer();
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          selectTab((currentIndex - 1 + tabs.length) % tabs.length);
+          updateViewer();
+        }
+      });
+    }
+  })();
+
+  // 12. Case Study Image Zoom Controller (.cse-decision-img-wrap[data-zoom])
+  // ========================================================================
+  (function initCaseZoom() {
+    const zoomWraps = document.querySelectorAll('.cse-decision-img-wrap[data-zoom]');
+    const viewer = document.getElementById('cseViewer');
+    if (!zoomWraps.length || !viewer) return;
+
+    const viewerTitle = document.getElementById('cseViewerTitle');
+    const viewerImg = viewer.querySelector('.ocs-viewer-img');
+    const viewerClose = viewer.querySelector('[data-ocs-close]');
+    const viewerBody = viewer.querySelector('.ocs-viewer-body');
+    let lastActiveTrigger = null;
+
+    function openZoom(src, title, alt) {
+      lastActiveTrigger = document.activeElement;
+      if (viewerTitle && title) viewerTitle.textContent = title;
+      if (viewerImg && src) {
+        viewerImg.src = src;
+        viewerImg.alt = alt || '';
+      }
+      if (viewerBody) viewerBody.scrollTop = 0;
+      viewer.setAttribute('open', '');
+      document.body.style.overflow = 'hidden';
+
+      // Teleport custom cursor inside the active viewer to guarantee visibility
+      const cursorDot = document.getElementById('cursor-dot');
+      const cursorRing = document.getElementById('cursor-ring');
+      if (cursorDot && cursorRing) {
+        viewer.appendChild(cursorDot);
+        viewer.appendChild(cursorRing);
+      }
+
+      if (viewerClose) viewerClose.focus();
+    }
+
+    function closeZoom() {
+      viewer.removeAttribute('open');
+      if (typeof viewer.close === 'function') {
+        try { viewer.close(); } catch (err) {}
+      }
+      document.body.style.overflow = '';
+
+      // Teleport custom cursor back to document.body
+      const cursorDot = document.getElementById('cursor-dot');
+      const cursorRing = document.getElementById('cursor-ring');
+      if (cursorDot && cursorRing) {
+        document.body.appendChild(cursorDot);
+        document.body.appendChild(cursorRing);
+      }
+
+      if (lastActiveTrigger && typeof lastActiveTrigger.focus === 'function') {
+        lastActiveTrigger.focus();
+      }
+    }
+
+    zoomWraps.forEach(wrap => {
+      wrap.setAttribute('tabindex', '0');
+      wrap.setAttribute('role', 'button');
+      wrap.setAttribute('aria-label', 'Click to enlarge capture');
+      const action = () => {
+        const src = wrap.dataset.zoom || wrap.querySelector('img')?.src;
+        const title = wrap.dataset.title || 'ORSAP Architecture Capture';
+        const alt = wrap.querySelector('img')?.alt || '';
+        openZoom(src, title, alt);
+      };
+      wrap.addEventListener('click', action);
+      wrap.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          action();
+        }
+      });
+    });
+
+    if (viewerClose) viewerClose.addEventListener('click', closeZoom);
+    viewer.addEventListener('click', (e) => {
+      if (e.target === viewer) closeZoom();
+    });
+    viewer.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeZoom();
+      }
+    });
+  })();
 
 });

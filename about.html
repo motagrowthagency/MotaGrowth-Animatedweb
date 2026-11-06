@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Global Design System -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=4.4">
 </head>
 <body class="is-subpage">
 
@@ -38,7 +38,7 @@
         <a href="about.html" class="nav-link active">About</a>
       </nav>
 
-      <!-- Right: Client Space · EN / FR · Request Proposal -->
+      <!-- Right: Client Space · EN / FR · Request Proposal · Menu Trigger -->
       <div class="header-actions">
         <a href="client-space.html" class="nav-link nav-link-client">Client Space</a>
         <div class="lang-selector" role="group" aria-label="Language Selector">
@@ -49,6 +49,12 @@
         <a href="index.html#proposal" class="btn-contact-header">
           <span>Request Proposal</span>
         </a>
+        <button type="button" class="frame-menu-dots menu-chooser-trigger" aria-label="Open Studio Menu" title="Studio Menu" aria-haspopup="dialog" aria-expanded="false">
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+        </button>
       </div>
     </div>
   </header>
@@ -230,34 +236,29 @@
         <div class="menu-nav-col">
           <span class="menu-col-label">Navigation</span>
           <nav class="menu-links-list">
-            <a href="index.html#hero" class="menu-link-item" data-menu-close>
+            <a href="index.html" class="menu-link-item" data-menu-close>
               <span class="menu-item-num">01</span>
-              <span class="menu-item-text">Overview</span>
-              <span class="menu-item-arrow">↗</span>
-            </a>
-            <a href="index.html#audiences" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">02</span>
-              <span class="menu-item-text">Sectors &amp; Audiences</span>
-              <span class="menu-item-arrow">↗</span>
-            </a>
-            <a href="index.html#philosophy" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">03</span>
-              <span class="menu-item-text">Strategy &amp; Performance</span>
-              <span class="menu-item-arrow">↗</span>
-            </a>
-            <a href="cases.html" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">04</span>
-              <span class="menu-item-text">Selected Cases</span>
+              <span class="menu-item-text">Home</span>
               <span class="menu-item-arrow">↗</span>
             </a>
             <a href="services.html" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">05</span>
+              <span class="menu-item-num">02</span>
               <span class="menu-item-text">Services &amp; Disciplines</span>
               <span class="menu-item-arrow">↗</span>
             </a>
-            <a href="about.html" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">06</span>
+            <a href="cases.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">03</span>
+              <span class="menu-item-text">Selected Cases</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="about.html" class="menu-link-item active" data-menu-close>
+              <span class="menu-item-num">04</span>
               <span class="menu-item-text">About &amp; Founder</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="client-space.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">05</span>
+              <span class="menu-item-text">Client Space</span>
               <span class="menu-item-arrow">↗</span>
             </a>
           </nav>

@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Selected Cases &amp; Client Dossiers | MotaGrowth Digital Growth Studio</title>
-  <meta name="description" content="In-depth growth case studies for Orsap.ma, TG2D, La Centrale Crèche, and Velour. Discover how MotaGrowth builds digital architectures and performance funnels.">
+  <title>Selected Cases | MotaGrowth Digital Growth Studio</title>
+  <meta name="description" content="Curated digital platforms, high-conversion funnels, and enterprise architectures built by MotaGrowth for ORSAP, TG2D, La Centrale Crèche, and Velour.">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/mota-icon.png">
 
-  <!-- Google Fonts Preconnect -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Global Design System -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=4.4">
 </head>
 <body class="is-subpage">
 
@@ -38,7 +38,7 @@
         <a href="about.html" class="nav-link">About</a>
       </nav>
 
-      <!-- Right: Client Space · EN / FR · Request Proposal -->
+      <!-- Right: Client Space · EN / FR · Request Proposal · Menu Trigger -->
       <div class="header-actions">
         <a href="client-space.html" class="nav-link nav-link-client">Client Space</a>
         <div class="lang-selector" role="group" aria-label="Language Selector">
@@ -49,491 +49,338 @@
         <a href="index.html#proposal" class="btn-contact-header">
           <span>Request Proposal</span>
         </a>
+        <button type="button" class="frame-menu-dots menu-chooser-trigger" aria-label="Open Studio Menu" title="Studio Menu" aria-haspopup="dialog" aria-expanded="false">
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+        </button>
       </div>
     </div>
   </header>
 
   <main id="main-content">
-    
-    <!-- Subpage Hero -->
-    <section class="subpage-hero">
-      <div class="content-container">
-        <span class="subpage-tag">01 / SELECTED CLIENT CASES</span>
-        <h1 class="subpage-title">CASES THAT TELL THE STORY OF MEASURABLE GROWTH.</h1>
-        <p class="subpage-subtitle">
-          We partner with category leaders, visionary founders, and premium establishments to turn digital attention into recurring revenue and brand authority.
-        </p>
 
-        <div class="metrics-strip">
-          <div class="metric-pill">
-            <span class="metric-num">15,000+</span>
-            <span class="metric-label">Industrial SKUs (Orsap.ma)</span>
-          </div>
-          <div class="metric-pill">
-            <span class="metric-num">300+</span>
-            <span class="metric-label">Global Brands Distributed</span>
-          </div>
-          <div class="metric-pill">
-            <span class="metric-num">Tier-1</span>
-            <span class="metric-label">Clients Equipped (BUTEC, Dislog)</span>
-          </div>
-          <div class="metric-pill">
-            <span class="metric-num">100%</span>
-            <span class="metric-label">Bespoke Code &amp; Design</span>
-          </div>
+    <!-- Editorial Subpage Hero -->
+    <section class="cases-hero-editorial">
+      <div class="content-container">
+        <span class="subpage-tag">01 / SELECTED WORK</span>
+        <h1 class="cases-main-title">PROJECTS THAT DEFINE THE STANDARD.</h1>
+        <p class="cases-main-subtitle">
+          A curated selection of digital platforms, high-conversion engines, and brand systems engineered for industry leaders and ambitious founders.
+        </p>
+      </div>
+    </section>
+
+    <!-- Visual Portfolio Feed -->
+    <section class="cases-feed-section">
+      <div class="content-container">
+        <div class="cases-feed-list">
+
+          <!-- Project 01: ORSAP MA (Showcase Component) -->
+          <article class="case-feed-card orsap-featured-card" id="orsap" style="display: block; padding: 0; background: transparent; border: none; box-shadow: none;">
+            <div class="ocs" id="showcase-orsap" data-ocs aria-label="ORSAP Project Showcase">
+              <div class="ocs-intro">
+                <p class="ocs-eyebrow">ORSAP / CONNECTED B2B PLATFORM</p>
+                <h2 class="ocs-title">ORSAP — 700,000+ MAD in reported lead value. No paid ads.</h2>
+                <p class="ocs-lede">MotaGrowth developed a connected B2B website combining product discovery, quotation workflows, content, and customer administration.</p>
+              </div>
+
+              <!-- Left 60%: Interactive Preview with Curated Tabs -->
+              <div class="ocs-media">
+                <div class="ocs-tabs" role="tablist" aria-label="ORSAP Project Views">
+                  <button type="button" class="ocs-tab" role="tab" id="cases-tab-storefront" aria-selected="true" aria-controls="cases-panel-orsap" tabindex="0"
+                    data-src="assets/orsap/showcase/storefront.webp"
+                    data-full="assets/orsap/showcase/storefront_full.webp"
+                    data-caption="Storefront. A redesigned presentation of ORSAP’s industrial offer and multi-channel inquiry routes."
+                    data-alt="ORSAP Storefront: industrial B2B procurement homepage">
+                    <span class="ocs-tab-text">Storefront</span>
+                    <span class="ocs-tab-line" aria-hidden="true"></span>
+                  </button>
+
+                  <button type="button" class="ocs-tab" role="tab" id="cases-tab-catalog" aria-selected="false" aria-controls="cases-panel-orsap" tabindex="-1"
+                    data-src="assets/orsap/showcase/catalog.webp"
+                    data-full="assets/orsap/showcase/catalog_full.webp"
+                    data-caption="Catalog-based commerce. Product-selection requests with quantities and calculated quotation totals."
+                    data-alt="ORSAP Catalogue: 15,000+ reference taxonomy and industrial equipment filters">
+                    <span class="ocs-tab-text">Catalog &amp; quotes</span>
+                    <span class="ocs-tab-line" aria-hidden="true"></span>
+                  </button>
+
+                  <button type="button" class="ocs-tab" role="tab" id="cases-tab-quotes" aria-selected="false" aria-controls="cases-panel-orsap" tabindex="-1"
+                    data-src="assets/orsap/showcase/quotes.webp"
+                    data-full="assets/orsap/showcase/quotes_full.webp"
+                    data-caption="Quotation &amp; customer administration. Dedicated views for reviewing requests, accounts, and contact directories."
+                    data-alt="ORSAP Quotes &amp; Client Portal: quotation tracking and off-catalogue ordering">
+                    <span class="ocs-tab-text">Accounts &amp; admin</span>
+                    <span class="ocs-tab-line" aria-hidden="true"></span>
+                  </button>
+                </div>
+
+                <figure class="ocs-figure" id="cases-panel-orsap" role="tabpanel" aria-labelledby="cases-tab-storefront">
+                  <div class="ocs-frame">
+                    <img src="assets/orsap/showcase/storefront.webp" alt="ORSAP Storefront: industrial B2B procurement homepage" class="ocs-img" width="1600" height="999" loading="lazy">
+                  </div>
+                  <figcaption class="ocs-figcaption">
+                    <p class="ocs-caption">Storefront. A redesigned presentation of ORSAP’s industrial offer and multi-channel inquiry routes.</p>
+                    <button type="button" class="ocs-enlarge" aria-haspopup="dialog" aria-label="Enlarge ORSAP screenshot">
+                      <span aria-hidden="true">⤢</span>
+                      <span>Enlarge screen</span>
+                    </button>
+                  </figcaption>
+                </figure>
+              </div>
+
+              <!-- Right 40%: Project Explanation, Scope & Deliverables -->
+              <div class="ocs-details">
+                <div class="ocs-impact-badge">
+                  <div class="ocs-impact-num">700,000+ MAD</div>
+                  <p class="ocs-impact-label">Reported lead value generated without paid advertising (Sept 1–Nov 6, 2026: 1.5k views · 243 new users · 1m 12s engagement).</p>
+                </div>
+
+                <p style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand-gold); margin: 0.5rem 0 0 0;">What we delivered</p>
+                <ul class="ocs-deliverables">
+                  <li class="ocs-deliverable-item"><strong>Storefront:</strong> Redesigned presentation of ORSAP’s industrial offer.</li>
+                  <li class="ocs-deliverable-item"><strong>Catalog-based commerce:</strong> Selection requests with quantities and calculated quotation totals.</li>
+                  <li class="ocs-deliverable-item"><strong>Clear calls to action:</strong> Routes to browse, request a quote, or consult an expert.</li>
+                  <li class="ocs-deliverable-item"><strong>Blog &amp; documents:</strong> Dedicated content-management section.</li>
+                  <li class="ocs-deliverable-item"><strong>Quotation management:</strong> Segregated general inquiries and product-based quotes.</li>
+                  <li class="ocs-deliverable-item"><strong>Customer administration:</strong> Account records and centralized subscriber directory.</li>
+                </ul>
+
+                <div class="ocs-value-quote">
+                  “Not just a redesigned website—a connected platform for presenting the offer, capturing buying intent, and reviewing incoming opportunities.”
+                </div>
+
+                <div class="ocs-actions">
+                  <a href="case-orsap.html" class="ocs-link">
+                    <span>Explore the full case study</span>
+                    <span class="ocs-arrow" aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 02: TG2D (Reverse Layout) -->
+          <article class="case-feed-card reverse" id="tg2d">
+            <div class="case-feed-media">
+              <div class="case-browser-chrome">
+                <div class="case-browser-dots">
+                  <span class="case-browser-dot d-red"></span>
+                  <span class="case-browser-dot d-amber"></span>
+                  <span class="case-browser-dot d-green"></span>
+                </div>
+                <span class="case-browser-url">tg2d.ma / corporate-portal</span>
+                <span class="case-live-badge"><span class="badge-pulse"></span> Live Portal</span>
+              </div>
+              <img src="assets/card2_clean_hd.jpg" alt="TG2D Engineering Platform" class="case-feed-img" loading="lazy">
+            </div>
+            <div class="case-feed-info">
+              <span class="case-feed-kicker">02 / CIVIL ENGINEERING &amp; INFRASTRUCTURE · MOROCCO</span>
+              <h2 class="case-feed-title">TG2D</h2>
+              <p class="case-feed-pitch">
+                Built an authoritative corporate platform for one of Morocco's leading structural engineering firms, reflecting technical certifications, major infrastructure portfolios, and executive qualification for multi-million-dirham public and private tenders.
+              </p>
+
+              <!-- Plain-English 3-Part Overview -->
+              <div class="case-story-trio">
+                <div class="story-col">
+                  <span class="story-kicker">01 / The Challenge</span>
+                  <p class="story-body">A premier structural engineering firm lacked an executive digital portal to pre-qualify for multi-million-dirham public and private infrastructure tenders.</p>
+                </div>
+                <div class="story-col">
+                  <span class="story-kicker">02 / What We Built</span>
+                  <p class="story-body">An authoritative technical portal showcasing complex engineering achievements, laboratory testing accreditations, and direct executive tender channels.</p>
+                </div>
+                <div class="story-col">
+                  <span class="story-kicker">03 / The Business Impact</span>
+                  <p class="story-body">100% direct executive inbound inquiries, institutional authority established with major project owners, and pre-qualification for Tier-1 tenders.</p>
+                </div>
+              </div>
+
+              <div class="case-feed-metrics">
+                <div class="case-feed-metric">
+                  <span class="metric-big">Institutional</span>
+                  <span class="metric-label">Credibility Standard</span>
+                </div>
+                <div class="case-feed-metric">
+                  <span class="metric-big">100% Direct</span>
+                  <span class="metric-label">Executive Inquiries</span>
+                </div>
+                <div class="case-feed-metric">
+                  <span class="metric-big">Tier-1</span>
+                  <span class="metric-label">Tender Pre-Qualified</span>
+                </div>
+              </div>
+              <div class="case-feed-tags">
+                <span>Civil Engineering</span>
+                <span class="tag-sep">/</span>
+                <span>Infrastructure</span>
+                <span class="tag-sep">/</span>
+                <span>B2B Authority Portal</span>
+              </div>
+              <div class="case-feed-cta-row">
+                <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20would%20like%20to%20discuss%20a%20corporate%20platform%20like%20TG2D" target="_blank" rel="noopener" class="case-feed-cta">
+                  <span>Discuss Engineering Portal <span class="cta-arrow">↗</span></span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 03: LA CENTRALE CRÈCHE -->
+          <article class="case-feed-card" id="creche">
+            <div class="case-feed-media">
+              <div class="case-browser-chrome">
+                <div class="case-browser-dots">
+                  <span class="case-browser-dot d-red"></span>
+                  <span class="case-browser-dot d-amber"></span>
+                  <span class="case-browser-dot d-green"></span>
+                </div>
+                <span class="case-browser-url">lacentralecreche.ma / admissions</span>
+                <span class="case-live-badge"><span class="badge-pulse"></span> 100% Full</span>
+              </div>
+              <img src="assets/card3_clean_hd.jpg" alt="La Centrale Crèche Admissions Funnel" class="case-feed-img" loading="lazy">
+            </div>
+            <div class="case-feed-info">
+              <span class="case-feed-kicker">03 / EDUCATION &amp; PARENT TRUST · CASABLANCA</span>
+              <h2 class="case-feed-title">LA CENTRALE CRÈCHE</h2>
+              <p class="case-feed-pitch">
+                Engineered a high-trust digital presence and a localized Meta Ads acquisition funnel for Casablanca's premier early childhood campus, converting parent curiosity into scheduled private campus tours and early enrolments.
+              </p>
+
+              <!-- Plain-English 3-Part Overview -->
+              <div class="case-story-trio">
+                <div class="story-col">
+                  <span class="story-kicker">01 / The Challenge</span>
+                  <p class="story-body">Casablanca's premium early childhood campus needed to fill student capacity across all age brackets before the school year without resorting to price discounting.</p>
+                </div>
+                <div class="story-col">
+                  <span class="story-kicker">02 / What We Built</span>
+                  <p class="story-body">A high-trust parent landing page paired with hyper-targeted Meta Ads and an instant WhatsApp booking funnel for scheduled campus immersion tours.</p>
+                </div>
+                <div class="story-col">
+                  <span class="story-kicker">03 / The Business Impact</span>
+                  <p class="story-body">100% campus enrolment capacity reached 2 months ahead of schedule, with a +310% waitlist created for upcoming academic terms.</p>
+                </div>
+              </div>
+
+              <div class="case-feed-metrics">
+                <div class="case-feed-metric">
+                  <span class="metric-big">100% Full</span>
+                  <span class="metric-label">Capacity Achieved</span>
+                </div>
+                <div class="case-feed-metric">
+                  <span class="metric-big">2 Months</span>
+                  <span class="metric-label">Ahead of Launch</span>
+                </div>
+                <div class="case-feed-metric">
+                  <span class="metric-big">+310%</span>
+                  <span class="metric-label">Waitlist Growth</span>
+                </div>
+              </div>
+              <div class="case-feed-tags">
+                <span>Parent Trust Architecture</span>
+                <span class="tag-sep">/</span>
+                <span>Hyper-Local Paid Ads</span>
+                <span class="tag-sep">/</span>
+                <span>WhatsApp Tour Booking</span>
+              </div>
+              <div class="case-feed-cta-row">
+                <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20would%20like%20to%20discuss%20an%20acquisition%20funnel%20like%20La%20Centrale%20Cr%C3%A8che" target="_blank" rel="noopener" class="case-feed-cta">
+                  <span>Discuss Acquisition Funnel <span class="cta-arrow">↗</span></span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 04: VELOUR APPAREL (Reverse Layout) -->
+          <article class="case-feed-card reverse" id="velour">
+            <div class="case-feed-media">
+              <div class="case-browser-chrome">
+                <div class="case-browser-dots">
+                  <span class="case-browser-dot d-red"></span>
+                  <span class="case-browser-dot d-amber"></span>
+                  <span class="case-browser-dot d-green"></span>
+                </div>
+                <span class="case-browser-url">velourapparel.com / private-store</span>
+                <span class="case-live-badge"><span class="badge-pulse"></span> 3.8x ROAS</span>
+              </div>
+              <img src="assets/founders_ecommerce.jpg" alt="Velour Luxury DTC Apparel" class="case-feed-img" loading="lazy">
+            </div>
+            <div class="case-feed-info">
+              <span class="case-feed-kicker">04 / LUXURY DTC FASHION · BARCELONA &amp; CASABLANCA</span>
+              <h2 class="case-feed-title">VELOUR APPAREL</h2>
+              <p class="case-feed-pitch">
+                Scaled an independent ready-to-wear luxury fashion label into competitive European markets through lightning-fast mobile product pages, automated creative testing, and high-retention performance marketing.
+              </p>
+
+              <!-- Plain-English 3-Part Overview -->
+              <div class="case-story-trio">
+                <div class="story-col">
+                  <span class="story-kicker">01 / The Challenge</span>
+                  <p class="story-body">Scaling an independent luxury ready-to-wear label across France and Spain where rising customer acquisition costs eroded margins.</p>
+                </div>
+                <div class="story-col">
+                  <span class="story-kicker">02 / What We Built</span>
+                  <p class="story-body">A headless, sub-second mobile checkout experience paired with automated creative testing and multi-currency localized conversion funnels.</p>
+                </div>
+                <div class="story-col">
+                  <span class="story-kicker">03 / The Business Impact</span>
+                  <p class="story-body">Achieved a sustained 3.8x blended ROAS, a 44% decrease in cost-per-acquisition, and repeat customer retention above 38% across Europe.</p>
+                </div>
+              </div>
+
+              <div class="case-feed-metrics">
+                <div class="case-feed-metric">
+                  <span class="metric-big">3.8x</span>
+                  <span class="metric-label">Blended ROAS</span>
+                </div>
+                <div class="case-feed-metric">
+                  <span class="metric-big">-44%</span>
+                  <span class="metric-label">Acquisition Cost</span>
+                </div>
+                <div class="case-feed-metric">
+                  <span class="metric-big">EU Scale</span>
+                  <span class="metric-label">France &amp; Spain</span>
+                </div>
+              </div>
+              <div class="case-feed-tags">
+                <span>Creative Testing Framework</span>
+                <span class="tag-sep">/</span>
+                <span>Headless Storefront</span>
+                <span class="tag-sep">/</span>
+                <span>Meta &amp; TikTok Ads</span>
+              </div>
+              <div class="case-feed-cta-row">
+                <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20would%20like%20to%20discuss%20scaling%20a%20DTC%20e-commerce%20brand%20like%20Velour" target="_blank" rel="noopener" class="case-feed-cta">
+                  <span>Discuss DTC Scaling <span class="cta-arrow">↗</span></span>
+                </a>
+              </div>
+            </div>
+          </article>
+
         </div>
       </div>
     </section>
 
-    <!-- Case Dossiers Section -->
-    <section class="dossiers-section" id="cases-list">
+    <!-- Bottom Studio CTA Banner -->
+    <section class="cases-bottom-cta" id="proposal">
       <div class="content-container">
-
-        <!-- ====================================================================
-             FLAGSHIP DEEP DIVE: ORSAP.MA (Enterprise B2B Digital Platform)
-             ==================================================================== -->
-        <article class="orsap-deep-dossier" id="orsap">
-          
-          <div class="dossier-meta-bar">
-            <span class="dossier-badge">FLAGSHIP CASE STUDY • B2B INDUSTRIAL COMMERCE &amp; PROCUREMENT</span>
-            <span class="work-industry" style="color: var(--brand-gold); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em;">CASABLANCA, MOROCCO • NATIONAL DISTRIBUTION</span>
-          </div>
-
-          <h2 class="dossier-title" style="font-size: clamp(2rem, 3.2vw, 3rem); margin: 0.75rem 0 1rem 0; line-height: 1.15;">
-            ORSAP.MA — DIGITAL TRANSFORMATION OF MOROCCO’S INDUSTRIAL SUPPLY LEADER
-          </h2>
-
-          <div class="dossier-discipline" style="color: var(--brand-gold); margin-bottom: 1.5rem; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;">
-            15,000+ SKU Catalog Taxonomy • B2B E-Commerce &amp; Inbound RFQ Engine • 300+ Brand Directory • Institutional Trust Architecture
-          </div>
-
-          <p class="dossier-desc" style="font-size: 1.05rem; line-height: 1.7; max-width: 900px; color: rgba(255, 255, 255, 0.85); margin-bottom: 2rem;">
-            From a traditional brick-and-mortar industrial distributor to Morocco’s leading digital procurement platform: MotaGrowth architected and engineered a synchronized commercial engine managing 15,000+ references and 300+ international brands. The platform equips ORSAP with live MAD e-commerce ordering, automated quote generation for corporate tenders, and validated enterprise proof for industry leaders like BUTEC (1,200+ workers), Dislog Group, SNEP, and Ventec.
+        <div class="cases-cta-inner">
+          <span class="case-feed-kicker">COLLABORATE WITH MOTAGROWTH</span>
+          <h2 class="cases-cta-title">READY TO BUILD A PLATFORM THAT GROWS YOUR BUSINESS?</h2>
+          <p class="cases-cta-desc">
+            Whether you manage a 15,000+ SKU inventory or offer high-ticket services, we build digital revenue infrastructure engineered to attract, convince, and convert ambitious clients.
           </p>
-
-          <!-- Verified Commercial Deliverables Strip -->
-          <div class="flagship-metrics-grid" style="margin-bottom: 2.5rem;">
-            <div class="flagship-metric-item">
-              <span class="flagship-metric-val">15,000+</span>
-              <span class="flagship-metric-label">Industrial SKUs Online</span>
-            </div>
-            <div class="flagship-metric-item">
-              <span class="flagship-metric-val">300+</span>
-              <span class="flagship-metric-label">Global Brands Distributed</span>
-            </div>
-            <div class="flagship-metric-item">
-              <span class="flagship-metric-val">48h SLA</span>
-              <span class="flagship-metric-label">National Delivery Standard</span>
-            </div>
-            <div class="flagship-metric-item">
-              <span class="flagship-metric-val">Tier-1</span>
-              <span class="flagship-metric-label">Clients (BUTEC, SNEP, Dislog)</span>
-            </div>
+          <div class="cases-cta-btns">
+            <a href="index.html#proposal" class="btn-ref btn-ref-solid">
+              <span class="btn-text">REQUEST A STUDIO PROPOSAL ↗</span>
+            </a>
+            <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20am%20interested%20in%20discussing%20a%20project" target="_blank" rel="noopener" class="btn-ref btn-ref-outline">
+              <span class="btn-text">WhatsApp Founder Direct ↗</span>
+            </a>
           </div>
-
-          <!-- Interactive 8-Screen Architecture Gallery (Click to Inspect) -->
-          <div style="margin: 2.5rem 0 1rem 0;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem;">
-              <div>
-                <span class="work-industry" style="color: var(--brand-gold);">ARCHITECTURE GALLERY</span>
-                <h3 style="color: #FFFFFF; font-size: 1.35rem; margin: 0.25rem 0 0 0;">8 Core Platform Modules Designed &amp; Engineered</h3>
-              </div>
-              <span style="font-family: var(--font-mono); font-size: 0.72rem; color: rgba(255, 255, 255, 0.5);">CLICK ANY SCREEN TO INSPECT FULL VIEW ↗</span>
-            </div>
-
-            <div class="case-screens-gallery">
-              
-              <!-- Screen 1: Storefront Home -->
-              <div class="case-screen-card" data-case-index="0" data-case-inspect="assets/orsap/orsap_01_home.svg" data-case-title="Storefront Architecture &amp; Value Proposition" data-case-desc="Brand hero, video presentation, 4 key commercial stats &amp; BUTEC corporate proof">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / home</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_01_home.svg" alt="ORSAP Storefront Architecture" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">01 / Storefront Architecture</span>
-                  <span class="screen-card-role">Brand Hero, Video &amp; Proof</span>
-                </div>
-              </div>
-
-              <!-- Screen 2: Strategic Story & Differentiation -->
-              <div class="case-screen-card" data-case-index="1" data-case-inspect="assets/orsap/orsap_02_about.svg" data-case-title="Strategic Story &amp; Market Differentiation" data-case-desc="Company heritage, 5 core operational values &amp; 4 pillar differentiators for Moroccan industry">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / a-propos</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_02_about.svg" alt="ORSAP Strategic Differentiation" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">02 / Institutional Heritage</span>
-                  <span class="screen-card-role">5 Core Values &amp; Competitive Moat</span>
-                </div>
-              </div>
-
-              <!-- Screen 3: 7 Technical Industrial Services -->
-              <div class="case-screen-card" data-case-index="2" data-case-inspect="assets/orsap/orsap_03_services.svg" data-case-title="7 Technical Industrial Services Engine" data-case-desc="End-to-end solutions: importation, industrial flooring, fluids, air handling &amp; site fitting">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / services</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_03_services.svg" alt="ORSAP Technical Services Engine" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">03 / 7 Technical Services</span>
-                  <span class="screen-card-role">Turnkey B2B Engineering</span>
-                </div>
-              </div>
-
-              <!-- Screen 4: 5-Step Process & Methodology -->
-              <div class="case-screen-card" data-case-index="3" data-case-inspect="assets/orsap/orsap_04_services_detail.svg" data-case-title="5-Step Engineering &amp; Delivery Process" data-case-desc="Rigorous execution method: Audit, Étude, Validation, Réalisation &amp; Suivi SAV with performance SLA">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / methode</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_04_services_detail.svg" alt="ORSAP Delivery Process" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">04 / 5-Step Methodology</span>
-                  <span class="screen-card-role">From Technical Audit to SAV</span>
-                </div>
-              </div>
-
-              <!-- Screen 5: 15-Sector Catalog -->
-              <div class="case-screen-card" data-case-index="4" data-case-inspect="assets/orsap/orsap_05_catalog.svg" data-case-title="15-Sector Industrial Catalog Taxonomy" data-case-desc="Structured browsing for 15,000+ references: EPI, work at heights, heavy handling &amp; tooling">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / catalogue</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_05_catalog.svg" alt="ORSAP 15-Sector Catalog" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">05 / 15k+ SKU Taxonomy</span>
-                  <span class="screen-card-role">Rapid Procurement Navigation</span>
-                </div>
-              </div>
-
-              <!-- Screen 6: Enterprise Social Proof -->
-              <div class="case-screen-card" data-case-index="5" data-case-inspect="assets/orsap/orsap_06_temoignages.svg" data-case-title="Enterprise Proof &amp; Client Dossiers" data-case-desc="Validated testimonials from BUTEC (1,200 employees), Dislog Group, SNEP, and Ventec">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / temoignages</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_06_temoignages.svg" alt="ORSAP Client Proof" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">06 / Enterprise Client Proof</span>
-                  <span class="screen-card-role">BUTEC (1,200 workers), Dislog, SNEP</span>
-                </div>
-              </div>
-
-              <!-- Screen 7: 300+ Brands -->
-              <div class="case-screen-card" data-case-index="6" data-case-inspect="assets/orsap/orsap_07_marques.svg" data-case-title="300+ Global Brand Directory" data-case-desc="International distributor partnerships with 3M, Makita, Bosch, DeWalt, ABB, Honeywell, Sika">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / marques</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_07_marques.svg" alt="ORSAP Brand Directory" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">07 / 300+ Brand Directory</span>
-                  <span class="screen-card-role">Authorized OEM Distribution</span>
-                </div>
-              </div>
-
-              <!-- Screen 8: Recruitment Portal -->
-              <div class="case-screen-card" data-case-index="7" data-case-inspect="assets/orsap/orsap_08_recrutement.svg" data-case-title="Corporate Careers &amp; Talent Acquisition" data-case-desc="Inbound recruitment pipeline, employer value proposition &amp; structured CV intake portal">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / recrutement</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_08_recrutement.svg" alt="ORSAP Talent Portal" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">08 / Careers &amp; Talent Hub</span>
-                  <span class="screen-card-role">Employer Brand &amp; Intake Engine</span>
-                </div>
-              </div>
-
-              <!-- Screen 9: Contact & Inbound RFQ Engine -->
-              <div class="case-screen-card" data-case-index="8" data-case-inspect="assets/orsap/orsap_09_contact_rfq.svg" data-case-title="Casablanca RFQ Hub &amp; Inbound Engine" data-case-desc="Multi-channel procurement engine: direct WhatsApp, phone desk &amp; Casablanca depot coordinates">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / contact-devis</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_09_contact_rfq.svg" alt="ORSAP RFQ Engine" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">09 / Inbound RFQ Engine</span>
-                  <span class="screen-card-role">Direct WhatsApp &amp; Casablanca Depot</span>
-                </div>
-              </div>
-
-              <!-- Screen 10: Technical HSE Blog -->
-              <div class="case-screen-card" data-case-index="9" data-case-inspect="assets/orsap/orsap_10_blog_technique.svg" data-case-title="HSE Technical Knowledge Base &amp; SEO Hub" data-case-desc="Educational guides on Moroccan workplace safety standards (Loi 65-99) &amp; high-intent B2B SEO">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / blog-technique</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_10_blog_technique.svg" alt="ORSAP HSE Technical Blog" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">10 / HSE Technical Blog</span>
-                  <span class="screen-card-role">Regulatory Authority &amp; SEO</span>
-                </div>
-              </div>
-
-              <!-- Screen 11: Architecture Navigation Menu -->
-              <div class="case-screen-card" data-case-index="10" data-case-inspect="assets/orsap/orsap_11_navigation_menu.svg" data-case-title="Slide-Out Architecture &amp; Navigation Drawer" data-case-desc="Frictionless information architecture designed for high-conversion B2B buyer journeys">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / drawer-menu</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_11_navigation_menu.svg" alt="ORSAP Navigation Drawer" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">11 / Mobile UX Architecture</span>
-                  <span class="screen-card-role">Frictionless Drawer Navigation</span>
-                </div>
-              </div>
-
-              <!-- Screen 12: B2B E-Commerce & Express Outillage -->
-              <div class="case-screen-card" data-case-index="11" data-case-inspect="assets/orsap/orsap_12_ecommerce_store.svg" data-case-title="B2B E-Commerce &amp; Express Outillage Store" data-case-desc="Real-time pricing in MAD, stock availability, digital cart and corporate account portal">
-                <div class="screen-card-topbar">
-                  <div class="screen-card-dots">
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                    <span class="screen-card-dot"></span>
-                  </div>
-                  <span class="screen-card-tag">orsap.ma / boutique-express</span>
-                </div>
-                <div class="screen-thumb-wrap">
-                  <img src="assets/orsap/orsap_12_ecommerce_store.svg" alt="ORSAP B2B E-Commerce Store" class="screen-thumb-img" loading="lazy">
-                  <span class="screen-hover-badge">Hover to scroll · Click to expand ↗</span>
-                </div>
-                <div class="screen-card-caption">
-                  <span class="screen-card-title">12 / B2B E-Commerce Engine</span>
-                  <span class="screen-card-role">Live MAD Pricing &amp; Express Cart</span>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- Strategic Transformation Pillars -->
-          <div class="strategic-pillars-grid">
-            
-            <div class="strategic-pillar-card">
-              <span class="pillar-num">PILLAR 01</span>
-              <h4 class="pillar-title">From Brick-and-Mortar to B2B Digital Commerce</h4>
-              <p class="pillar-text">
-                Legacy industrial procurement was slow, reliant on phone quotes, and restricted to offline relationship selling. MotaGrowth engineered an express digital outillage store with real-time MAD pricing, stock availability, and automated cart-to-quote conversion that enables procurement departments to place orders 24/7 with a 48h delivery guarantee.
-              </p>
-            </div>
-
-            <div class="strategic-pillar-card">
-              <span class="pillar-num">PILLAR 02</span>
-              <h4 class="pillar-title">15,000+ SKU Taxonomy &amp; 300+ Brand Directory</h4>
-              <p class="pillar-text">
-                Large B2B catalogs often fail due to confusing navigation. We architected a clean, 15-sector taxonomy (EPI, Heights, Handling, Fluids, Power Tools) paired with a searchable directory of 300+ global brands (3M, Makita, Bosch, DeWalt, ABB, Honeywell, Sika), establishing instant trust and rapid product discovery.
-              </p>
-            </div>
-
-            <div class="strategic-pillar-card">
-              <span class="pillar-num">PILLAR 03</span>
-              <h4 class="pillar-title">Multi-Tier Institutional Social Proof</h4>
-              <p class="pillar-text">
-                Enterprise buyers don't buy from untested vendors. We engineered prominent client proof modules showcasing tier-1 corporate partnerships: BUTEC (equipping 1,200+ workers), Dislog Group (logistics hubs), SNEP (chemical industry), and Ventec, proving operational capacity for high-stakes tenders.
-              </p>
-            </div>
-
-            <div class="strategic-pillar-card">
-              <span class="pillar-num">PILLAR 04</span>
-              <h4 class="pillar-title">Organic Inbound SEO &amp; Regulatory Authority</h4>
-              <p class="pillar-text">
-                Instead of relying solely on paid ads, we integrated a technical HSE knowledge hub featuring compliance guides, safety regulations, and equipment selection criteria. This positions ORSAP as the authoritative technical partner in Morocco and captures high-intent organic corporate procurement searches.
-              </p>
-            </div>
-
-          </div>
-
-          <!-- High-Converting Case Conversion Banner -->
-          <div class="case-conversion-banner">
-            <div class="conversion-banner-text">
-              <h3>Ready to Dominate Your Industry with an Enterprise Platform?</h3>
-              <p>Whether you manage a 15,000+ SKU inventory or sell high-ticket services, MotaGrowth builds digital revenue infrastructure engineered to attract, convince, and convert ambitious clients.</p>
-            </div>
-            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-              <a href="index.html#proposal" class="btn-ref btn-ref-solid" style="white-space: nowrap;">
-                <span class="btn-text">REQUEST A STUDIO PROPOSAL ↗</span>
-              </a>
-              <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20reviewed%20the%20Orsap.ma%20case%20study%20and%20want%20to%20build%20a%20similar%20high-converting%20platform%20for%20my%20business" target="_blank" rel="noopener" class="btn-ref btn-ref-outline" style="white-space: nowrap;">
-                <span class="btn-text">WhatsApp Founder Direct ↗</span>
-              </a>
-            </div>
-          </div>
-
-        </article>
-
-        <!-- Secondary Case Studies Grid -->
-        <div class="dossiers-grid">
-
-          <!-- Case 02: TG2D -->
-          <article class="dossier-card">
-            <div class="dossier-media">
-              <img src="assets/card2_clean_hd.jpg" alt="TG2D Engineering Infrastructure" class="dossier-img" loading="lazy">
-            </div>
-            <div class="dossier-content">
-              <span class="dossier-badge">CASE STUDY 02 • ENGINEERING &amp; INFRASTRUCTURE</span>
-              <h2 class="dossier-title">TG2D — CORPORATE AUTHORITY &amp; TENDER PORTAL</h2>
-              <div class="dossier-discipline">Corporate Infrastructure • B2B Authority • High-Stakes Procurement</div>
-              <p class="dossier-desc">
-                TG2D leads major civil engineering, structural design, and large-scale infrastructure projects across Morocco. MotaGrowth designed a commanding corporate portal reflecting engineering rigor, technical certifications, and enterprise capability.
-              </p>
-              <div class="dossier-results">
-                <div>
-                  <div class="res-item-num">Institutional</div>
-                  <div class="res-item-label">Credibility Standard</div>
-                </div>
-                <div>
-                  <div class="res-item-num">100% Direct</div>
-                  <div class="res-item-label">Executive Inquiries</div>
-                </div>
-              </div>
-              <div>
-                <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20would%20like%20to%20discuss%20a%20corporate%20project%20similar%20to%20TG2D" target="_blank" rel="noopener" class="btn-ref btn-ref-solid">
-                  <span class="btn-text">INQUIRE ABOUT THIS CASE ↗</span>
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <!-- Case 03: La Centrale Crèche -->
-          <article class="dossier-card">
-            <div class="dossier-media">
-              <img src="assets/card3_clean_hd.jpg" alt="La Centrale Crèche Educational Hub" class="dossier-img" loading="lazy">
-            </div>
-            <div class="dossier-content">
-              <span class="dossier-badge">CASE STUDY 03 • EDUCATION &amp; HOSPITALITY</span>
-              <h2 class="dossier-title">LA CENTRALE CRÈCHE — ENROLLMENT ACQUISITION FUNNEL</h2>
-              <div class="dossier-discipline">Parent Trust Architecture • Hyper-Local Paid Ads • Tour Booking</div>
-              <p class="dossier-desc">
-                Casablanca’s premier early childhood educational campus. MotaGrowth built an empathetic brand presence and a localized Meta Ads acquisition funnel driving campus discovery, tour bookings, and early admissions.
-              </p>
-              <div class="dossier-results">
-                <div>
-                  <div class="res-item-num">+310%</div>
-                  <div class="res-item-label">Waitlist Signups</div>
-                </div>
-                <div>
-                  <div class="res-item-num">2 Months Ahead</div>
-                  <div class="res-item-label">Full Capacity Achieved</div>
-                </div>
-              </div>
-              <div>
-                <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20would%20like%20to%20discuss%20an%20acquisition%20funnel%20similar%20to%20La%20Centrale%20Cr%C3%A8che" target="_blank" rel="noopener" class="btn-ref btn-ref-solid">
-                  <span class="btn-text">INQUIRE ABOUT THIS CASE ↗</span>
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <!-- Case 04: Velour Luxury Apparel -->
-          <article class="dossier-card">
-            <div class="dossier-media">
-              <img src="assets/founders_ecommerce.jpg" alt="Velour Luxury DTC Apparel" class="dossier-img" loading="lazy">
-            </div>
-            <div class="dossier-content">
-              <span class="dossier-badge">CASE STUDY 04 • LUXURY DTC E-COMMERCE</span>
-              <h2 class="dossier-title">VELOUR APPAREL — PERFORMANCE MARKETING &amp; SCALE</h2>
-              <div class="dossier-discipline">Meta Ads Performance • Creative Testing • Headless Storefront</div>
-              <p class="dossier-desc">
-                A modern ready-to-wear luxury fashion house scaling from Casablanca into European markets. MotaGrowth implemented our proprietary ad testing framework and storefront conversion optimization.
-              </p>
-              <div class="dossier-results">
-                <div>
-                  <div class="res-item-num">3.8x</div>
-                  <div class="res-item-label">Sustained Blended ROAS</div>
-                </div>
-                <div>
-                  <div class="res-item-num">-44%</div>
-                  <div class="res-item-label">Customer Acquisition Cost</div>
-                </div>
-              </div>
-              <div>
-                <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20would%20like%20to%20discuss%20an%20e-commerce%20growth%20engine%20like%20Velour" target="_blank" rel="noopener" class="btn-ref btn-ref-solid">
-                  <span class="btn-text">INQUIRE ABOUT THIS CASE ↗</span>
-                </a>
-              </div>
-            </div>
-          </article>
-
         </div>
       </div>
     </section>
@@ -541,7 +388,7 @@
   </main>
 
   <!-- Site Footer -->
-  <footer class="site-footer" id="proposal">
+  <footer class="site-footer">
     <div class="content-container">
       
       <div class="footer-top">
@@ -565,7 +412,7 @@
           <div class="f-col">
             <span class="f-heading">Portals</span>
             <ul class="f-links">
-              <li><a href="index.html#client-space">Client Space ↗</a></li>
+              <li><a href="client-space.html">Client Space ↗</a></li>
               <li><a href="index.html#admin">Studio Admin CRM ↗</a></li>
             </ul>
           </div>
@@ -593,10 +440,13 @@
     </div>
   </footer>
 
-    <!-- Studio Menu Chooser Overlay -->
+  <!-- =========================================================================
+       STUDIO MENU CHOOSER OVERLAY
+       ========================================================================= -->
   <div class="studio-menu-overlay" id="studioMenuModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Studio Menu">
     <div class="studio-menu-backdrop" id="studioMenuBackdrop"></div>
     <div class="studio-menu-panel">
+
       <div class="studio-menu-header">
         <div class="menu-brand">
           <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
@@ -604,42 +454,42 @@
         </div>
         <button type="button" class="studio-menu-close" id="closeStudioMenuBtn" aria-label="Close Menu">✕</button>
       </div>
+
       <div class="studio-menu-body">
+
+        <!-- Main Navigation Links -->
         <div class="menu-nav-col">
           <span class="menu-col-label">Navigation</span>
           <nav class="menu-links-list">
-            <a href="index.html#hero" class="menu-link-item" data-menu-close>
+            <a href="index.html" class="menu-link-item" data-menu-close>
               <span class="menu-item-num">01</span>
-              <span class="menu-item-text">Overview</span>
-              <span class="menu-item-arrow">↗</span>
-            </a>
-            <a href="index.html#audiences" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">02</span>
-              <span class="menu-item-text">Sectors &amp; Audiences</span>
-              <span class="menu-item-arrow">↗</span>
-            </a>
-            <a href="index.html#philosophy" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">03</span>
-              <span class="menu-item-text">Strategy &amp; Performance</span>
-              <span class="menu-item-arrow">↗</span>
-            </a>
-            <a href="cases.html" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">04</span>
-              <span class="menu-item-text">Selected Cases</span>
+              <span class="menu-item-text">Home</span>
               <span class="menu-item-arrow">↗</span>
             </a>
             <a href="services.html" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">05</span>
+              <span class="menu-item-num">02</span>
               <span class="menu-item-text">Services &amp; Disciplines</span>
               <span class="menu-item-arrow">↗</span>
             </a>
+            <a href="cases.html" class="menu-link-item active" data-menu-close>
+              <span class="menu-item-num">03</span>
+              <span class="menu-item-text">Selected Cases</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
             <a href="about.html" class="menu-link-item" data-menu-close>
-              <span class="menu-item-num">06</span>
+              <span class="menu-item-num">04</span>
               <span class="menu-item-text">About &amp; Founder</span>
+              <span class="menu-item-arrow">↗</span>
+            </a>
+            <a href="client-space.html" class="menu-link-item" data-menu-close>
+              <span class="menu-item-num">05</span>
+              <span class="menu-item-text">Client Space</span>
               <span class="menu-item-arrow">↗</span>
             </a>
           </nav>
         </div>
+
+        <!-- Portals & Direct Channels -->
         <div class="menu-portals-col">
           <div class="menu-box-card">
             <span class="menu-col-label">Workspaces</span>
@@ -660,90 +510,49 @@
                 </div>
                 <div class="ws-info">
                   <strong>Studio Admin CRM</strong>
-                  <span>Leads pipeline, calendar &amp; client management</span>
+                  <span>Internal leads, active accounts &amp; pipeline</span>
                 </div>
                 <span class="ws-arrow">↗</span>
               </a>
             </div>
           </div>
+
           <div class="menu-box-card">
-            <span class="menu-col-label">Direct Connect</span>
+            <span class="menu-col-label">Direct Line</span>
             <div class="menu-contact-links">
-              <a href="https://wa.me/34675194956" target="_blank" rel="noopener">WhatsApp Direct (+34 675 194 956) ↗</a>
-              <a href="https://www.instagram.com/motagrowth/" target="_blank" rel="noopener">Instagram (@motagrowth) ↗</a>
-              <a href="mailto:contact@motagrowth.com">contact@motagrowth.com</a>
+              <a href="mailto:contact@motagrowth.com">contact@motagrowth.com ↗</a>
+              <a href="https://wa.me/34675194956" target="_blank" rel="noopener">WhatsApp Founder Direct (+34 675 194 956) ↗</a>
             </div>
           </div>
         </div>
+
       </div>
+
     </div>
   </div>
 
-  <!-- ORSAP Full-Screen Architecture Inspection Lightbox -->
-  <div class="orsap-lightbox-modal" id="orsapLightboxModal" role="dialog" aria-modal="true" aria-label="ORSAP Full Architecture Viewer" aria-hidden="true">
-    <div class="lightbox-header">
-      <div class="lightbox-header-info">
-        <span class="lightbox-title" id="lightboxTitle">ORSAP.MA — Storefront Architecture</span>
-        <span class="lightbox-subtitle" id="lightboxSubtitle">Brand hero, video presentation, stats counters &amp; BUTEC client proof</span>
-      </div>
-      <div class="lightbox-controls">
-        <button type="button" class="lightbox-nav-btn" id="lightboxPrevBtn" aria-label="Previous screen">← Prev</button>
-        <span class="lightbox-counter" id="lightboxCounter">01 / 12</span>
-        <button type="button" class="lightbox-nav-btn" id="lightboxNextBtn" aria-label="Next screen">Next →</button>
-        <div class="lightbox-divider"></div>
-        <button type="button" class="lightbox-size-btn" id="lightboxSizeBtn" aria-label="Toggle display width">Toggle Wide (820px)</button>
-        <button type="button" class="lightbox-close-btn" id="closeLightboxBtn" aria-label="Close Full Screen View">✕ CLOSE</button>
-      </div>
-    </div>
-    <div class="lightbox-scroll-stage" id="lightboxScrollStage">
-      <div class="lightbox-device-window" id="lightboxDeviceWindow">
-        <div class="lightbox-device-bar">
-          <div class="lightbox-device-dots">
-            <span class="browser-dot dot-red"></span>
-            <span class="browser-dot dot-amber"></span>
-            <span class="browser-dot dot-green"></span>
-          </div>
-          <div class="lightbox-device-url" id="lightboxDeviceUrl">https://orsap.ma/architecture/preview</div>
-          <span class="lightbox-scroll-tip">Scroll inside to inspect full page capture ↓</span>
+  <!-- Accessible Enlarged Screenshot Dialog -->
+  <dialog id="ocsViewer" class="ocs-viewer" aria-labelledby="ocsViewerTitle">
+    <div class="ocs-viewer-container">
+      <header class="ocs-viewer-header">
+        <h2 id="ocsViewerTitle" class="ocs-viewer-title">ORSAP — Storefront</h2>
+        <div class="ocs-viewer-controls">
+          <button type="button" class="ocs-viewer-btn" data-ocs-prev aria-label="Previous view">← Prev</button>
+          <button type="button" class="ocs-viewer-btn" data-ocs-next aria-label="Next view">Next →</button>
+          <button type="button" class="ocs-viewer-btn ocs-viewer-close" data-ocs-close aria-label="Close enlarged preview">✕ Close</button>
         </div>
-        <img src="assets/orsap/orsap_01_home.svg" alt="ORSAP Full Screenshot" class="lightbox-full-img" id="lightboxFullImg">
+      </header>
+      <div class="ocs-viewer-body" tabindex="0">
+        <img src="assets/orsap/showcase/storefront_full.webp" alt="Full interface capture" class="ocs-viewer-img">
       </div>
     </div>
-  </div>
+  </dialog>
 
   <!-- Studio Precision Cursor -->
   <div class="studio-cursor-dot" id="cursor-dot" aria-hidden="true"></div>
   <div class="studio-cursor-ring" id="cursor-ring" aria-hidden="true"></div>
 
-  <!-- Accessible Legal Modals -->
-  <div class="legal-modal" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle" aria-hidden="true">
-    <div class="legal-modal-backdrop" id="privacyBackdrop"></div>
-    <div class="legal-modal-box">
-      <div class="legal-modal-header">
-        <h3 class="legal-modal-title" id="privacyTitle">Privacy Statement</h3>
-        <button type="button" class="legal-modal-close" id="closePrivacyBtn" aria-label="Close dialog">✕</button>
-      </div>
-      <div class="legal-modal-body">
-        <p>MotaGrowth operates under strict data privacy principles. We respect client confidentiality and adhere to international data security best practices across all digital pipelines.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="legal-modal" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsTitle" aria-hidden="true">
-    <div class="legal-modal-backdrop" id="termsBackdrop"></div>
-    <div class="legal-modal-box">
-      <div class="legal-modal-header">
-        <h3 class="legal-modal-title" id="termsTitle">Terms of Engagement</h3>
-        <button type="button" class="legal-modal-close" id="closeTermsBtn" aria-label="Close dialog">✕</button>
-      </div>
-      <div class="legal-modal-body">
-        <p>All client partnerships are governed by customized Service Level Agreements (SLAs), protecting intellectual property and outlining milestone deliverables.</p>
-      </div>
-    </div>
-  </div>
-
   <!-- Scripts -->
-  <script src="app.js"></script>
+  <script src="app.js?v=4.4"></script>
 </body>
 </html>
-
