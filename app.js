@@ -872,7 +872,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!target) return;
 
       const textInput = target.closest('input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="search"], textarea, [contenteditable="true"]');
-      const interactive = target.closest('a, button, [role="button"], input[type="submit"], input[type="button"], select, label, summary, [data-case-inspect], .case-screen-card, .btn-ref, .btn-inspect-pill, .browser-inspect-action, .orsap-tab-btn, .orsap-tab-item, .orsap-laptop-viewport, .orsap-cta-primary, .orsap-cta-secondary, .lightbox-nav-btn, .lightbox-size-btn, .lightbox-close-btn, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .portal-nav-btn, .tab-btn, .portal-btn, .action-btn, .document-card, .deliverable-card');
+      const interactive = target.closest('a, button, [role="button"], input[type="submit"], input[type="button"], select, label, summary, [data-case-inspect], .case-screen-card, .btn-ref, .btn-inspect-pill, .browser-inspect-action, .orsap-tab-btn, .orsap-tab-item, .orsap-laptop-viewport, .orsap-mockup-frame, .orsap-mockup-img, .orsap-title-link, .orsap-eyebrow-link, .orsap-cta-primary, .orsap-cta-secondary, .lightbox-nav-btn, .lightbox-size-btn, .lightbox-close-btn, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .portal-nav-btn, .tab-btn, .portal-btn, .action-btn, .document-card, .deliverable-card');
 
       if (textInput) {
         document.body.classList.remove('cursor-hover');
@@ -1076,6 +1076,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (orsapTabs.length > 0) {
     orsapTabs.forEach(tab => {
       tab.addEventListener('click', () => {
+        const wasActive = tab.classList.contains('active');
+
         orsapTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
@@ -1094,7 +1096,12 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => {
             orsapMockupImg.src = mockupSrc;
             orsapMockupImg.style.opacity = '1';
-          }, 120);
+          }, 100);
+        }
+
+        // Clicking the title of an active tab opens the full 2358px SVG lightbox modal
+        if (wasActive) {
+          openOrsapLightbox(currentOrsapIndex);
         }
       });
     });
