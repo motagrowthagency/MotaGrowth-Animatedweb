@@ -5944,3 +5944,688 @@ body.cursor-text .studio-cursor-dot {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+
+/* ==========================================================================
+   MotaGrowth Dynamic Project Inquiry Questionnaire System
+   ========================================================================== */
+
+.studio-proposal-section {
+  position: relative;
+  padding: 6.5rem 1.5rem 8rem 1.5rem;
+  background: radial-gradient(circle at 50% 0%, rgba(245, 176, 20, 0.05) 0%, transparent 65%), var(--bg-canvas);
+  border-top: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.proposal-shell {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.proposal-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.proposal-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--brand-gold);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.proposal-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #FFFFFF;
+  margin: 0 auto 1rem auto;
+}
+
+.proposal-subtitle {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.proposal-card {
+  background: rgba(6, 12, 28, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  padding: 3rem 2.75rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.q-section {
+  margin-bottom: 3.5rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.q-section:last-of-type {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.q-section-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand-gold);
+  margin-bottom: 0.35rem;
+}
+
+.q-section-title {
+  font-family: var(--font-sans);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 0.5rem 0;
+}
+
+.q-section-desc {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.75rem 0;
+  line-height: 1.5;
+}
+
+/* Service Selection Grid */
+.q-service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.q-service-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-out);
+  user-select: none;
+}
+
+.q-service-card:hover {
+  background: rgba(245, 176, 20, 0.03);
+  border-color: rgba(245, 176, 20, 0.35);
+  transform: translateY(-2px);
+}
+
+.q-service-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.q-service-card.is-selected,
+.q-service-card:has(input[type="radio"]:checked) {
+  border-color: var(--brand-gold);
+  background: rgba(245, 176, 20, 0.07);
+  box-shadow: 0 0 28px rgba(245, 176, 20, 0.14), inset 0 0 12px rgba(245, 176, 20, 0.04);
+}
+
+.q-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.q-card-radio-indicator {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.q-service-card.is-selected .q-card-radio-indicator,
+.q-service-card:has(input[type="radio"]:checked) .q-card-radio-indicator {
+  border-color: var(--brand-gold);
+  background: var(--brand-gold);
+}
+
+.q-service-card.is-selected .q-card-radio-indicator::after,
+.q-service-card:has(input[type="radio"]:checked) .q-card-radio-indicator::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #020612;
+}
+
+.q-service-title {
+  font-family: var(--font-sans);
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.q-service-price {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--brand-gold);
+  background: rgba(245, 176, 20, 0.12);
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  width: fit-content;
+  margin: 0.65rem 0 0.35rem 0;
+  border: 1px solid rgba(245, 176, 20, 0.2);
+}
+
+.q-service-desc {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Question Fields & Layouts */
+.q-field {
+  margin-bottom: 1.75rem;
+}
+
+.q-field:last-child {
+  margin-bottom: 0;
+}
+
+.q-grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.q-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin-bottom: 0.55rem;
+}
+
+.q-badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.q-badge-req {
+  color: var(--brand-gold);
+}
+
+.q-badge-opt {
+  color: var(--text-muted);
+}
+
+.q-input,
+.q-textarea,
+.q-select {
+  width: 100%;
+  background: rgba(2, 6, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  color: #FFFFFF;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.q-input:focus,
+.q-textarea:focus,
+.q-select:focus {
+  outline: none;
+  border-color: var(--brand-gold);
+  background: rgba(2, 6, 18, 0.98);
+  box-shadow: 0 0 0 3px rgba(245, 176, 20, 0.16);
+}
+
+.q-input::placeholder,
+.q-textarea::placeholder {
+  color: rgba(245, 245, 243, 0.32);
+}
+
+.q-textarea {
+  min-height: 108px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.q-helper-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.45rem;
+  line-height: 1.45;
+}
+
+/* Choice Option Tiles (Radio / Checkboxes) */
+.q-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.q-choice-grid.single-col {
+  grid-template-columns: 1fr;
+}
+
+.q-choice-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.q-choice-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  color: #FFFFFF;
+}
+
+.q-choice-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.q-choice-card.is-checked,
+.q-choice-card:has(input:checked) {
+  border-color: var(--brand-gold);
+  background: rgba(245, 176, 20, 0.08);
+  color: #FFFFFF;
+}
+
+.q-choice-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.q-choice-card.is-checked .q-choice-dot,
+.q-choice-card:has(input[type="radio"]:checked) .q-choice-dot {
+  border-color: var(--brand-gold);
+  background: var(--brand-gold);
+}
+
+.q-choice-card.is-checked .q-choice-dot::after,
+.q-choice-card:has(input[type="radio"]:checked) .q-choice-dot::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #020612;
+}
+
+.q-choice-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.q-choice-card.is-checked .q-choice-box,
+.q-choice-card:has(input[type="checkbox"]:checked) .q-choice-box {
+  border-color: var(--brand-gold);
+  background: var(--brand-gold);
+}
+
+.q-choice-card.is-checked .q-choice-box::after,
+.q-choice-card:has(input[type="checkbox"]:checked) .q-choice-box::after {
+  content: "✓";
+  font-size: 11px;
+  font-weight: 800;
+  color: #020612;
+  line-height: 1;
+}
+
+/* Service Specific Path Containers */
+.q-path {
+  display: none;
+  animation: qFadeIn 0.35s ease;
+}
+
+.q-path.is-active {
+  display: block;
+}
+
+@keyframes qFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.q-path-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background: rgba(245, 176, 20, 0.05);
+  border: 1px solid rgba(245, 176, 20, 0.25);
+  border-left: 3.5px solid var(--brand-gold);
+  border-radius: 8px;
+  padding: 1.15rem 1.35rem;
+  margin-bottom: 2.25rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: rgba(245, 245, 243, 0.9);
+}
+
+.q-path-notice-icon {
+  color: var(--brand-gold);
+  font-size: 1.1rem;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+/* Summary Box */
+.q-summary-card {
+  background: linear-gradient(135deg, rgba(245, 176, 20, 0.08) 0%, rgba(5, 14, 34, 0.6) 100%);
+  border: 1.5px solid rgba(245, 176, 20, 0.32);
+  border-radius: 14px;
+  padding: 1.75rem;
+  margin: 2rem 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.q-summary-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand-gold);
+  margin-bottom: 0.35rem;
+}
+
+.q-summary-service {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 0.35rem 0;
+}
+
+.q-summary-price {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--brand-gold);
+  margin-bottom: 0.75rem;
+}
+
+.q-summary-disclaimer {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Agreement & Privacy */
+.q-agree-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 1.5rem 0 1rem 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.q-agree-wrap input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand-gold);
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.q-agree-text {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.q-privacy-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 2.25rem;
+}
+
+.q-privacy-note .legal-link-btn {
+  color: var(--brand-gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Submit Actions */
+.q-submit-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.btn-submit-inquiry {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1.2rem 2rem;
+  background: var(--brand-gold);
+  color: #020612 !important;
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-out);
+  box-shadow: 0 8px 24px rgba(245, 176, 20, 0.3);
+}
+
+.btn-submit-inquiry:hover {
+  background: var(--brand-gold-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(245, 176, 20, 0.45);
+}
+
+.btn-submit-inquiry:active {
+  transform: translateY(0);
+}
+
+.q-direct-chat {
+  text-align: center;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.q-direct-chat a {
+  color: var(--brand-gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.q-direct-chat a:hover {
+  color: #FFFFFF;
+}
+
+/* Confirmation Success Card */
+.q-success-card {
+  display: none;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  animation: qFadeIn 0.4s ease;
+}
+
+.q-success-card.is-active {
+  display: block;
+}
+
+.q-success-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--brand-gold);
+  background: rgba(245, 176, 20, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem auto;
+  color: var(--brand-gold);
+  font-size: 2rem;
+  box-shadow: 0 0 32px rgba(245, 176, 20, 0.35);
+}
+
+.q-success-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 1rem 0;
+}
+
+.q-success-msg {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 2.5rem auto;
+}
+
+.q-success-meta {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 500px;
+  margin: 0 auto 2.5rem auto;
+  text-align: left;
+}
+
+.q-success-meta-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.88rem;
+}
+
+.q-success-meta-row:last-child {
+  border-bottom: none;
+}
+
+.q-success-meta-label {
+  color: var(--text-muted);
+}
+
+.q-success-meta-val {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.q-success-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .proposal-card {
+    padding: 2rem 1.25rem;
+    border-radius: 16px;
+  }
+  .q-service-grid {
+    grid-template-columns: 1fr;
+  }
+  .q-grid-2col {
+    grid-template-columns: 1fr;
+  }
+  .q-choice-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Questionnaire Validation & Feedback States */
+.q-input.has-error,
+.q-textarea.has-error,
+.q-field.has-error .q-input,
+.q-field.has-error .q-textarea,
+.q-choice-grid.has-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.25) !important;
+  animation: qShake 0.35s ease;
+}
+
+.q-error-tip {
+  color: #f87171;
+  font-size: 0.82rem;
+  margin-top: 0.4rem;
+  display: block;
+  font-weight: 500;
+}
+
+@keyframes qShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}

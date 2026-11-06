@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Global Design System -->
-  <link rel="stylesheet" href="styles.css?v=4.5">
+  <link rel="stylesheet" href="styles.css?v=4.6">
 </head>
 <body class="is-subpage">
 
@@ -110,7 +110,7 @@
               <li>Funnel Segmentation &amp; Retargeting Protocols</li>
             </ul>
             <div>
-              <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20am%20interested%20in%20Performance%20Marketing%20services" target="_blank" rel="noopener" class="btn-ref btn-ref-solid">
+              <a href="#proposal" data-inquire="performance-marketing" class="btn-ref btn-ref-solid">
                 <span class="btn-text">INQUIRE ABOUT ACQUISITION ↗</span>
               </a>
             </div>
@@ -130,7 +130,7 @@
               <li>Ultra-Fast Mobile Speed &amp; Technical SEO Compliance</li>
             </ul>
             <div>
-              <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20am%20interested%20in%20Web%20Design%20and%20Development" target="_blank" rel="noopener" class="btn-ref btn-ref-solid">
+              <a href="#proposal" data-inquire="digital-architecture" class="btn-ref btn-ref-solid">
                 <span class="btn-text">INQUIRE ABOUT WEB DESIGN ↗</span>
               </a>
             </div>
@@ -150,7 +150,7 @@
               <li>Packaging, Print &amp; Spatial Hospitality Collateral</li>
             </ul>
             <div>
-              <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20am%20interested%20in%20Brand%20Identity%20and%20Creative%20Direction" target="_blank" rel="noopener" class="btn-ref btn-ref-solid">
+              <a href="#proposal" data-inquire="creative-direction" class="btn-ref btn-ref-solid">
                 <span class="btn-text">INQUIRE ABOUT BRANDING ↗</span>
               </a>
             </div>
@@ -170,7 +170,7 @@
               <li>WhatsApp Direct &amp; Instant Booking Pipeline Integration</li>
             </ul>
             <div>
-              <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20am%20interested%20in%20Conversion%20Rate%20Optimization" target="_blank" rel="noopener" class="btn-ref btn-ref-solid">
+              <a href="#proposal" data-inquire="conversion-strategy" class="btn-ref btn-ref-solid">
                 <span class="btn-text">INQUIRE ABOUT CRO ↗</span>
               </a>
             </div>
@@ -180,10 +180,609 @@
       </div>
     </section>
 
+
+    <!-- ========================================================================
+         STUDIO QUESTIONNAIRE & PROPOSAL BUILDER
+         ======================================================================== -->
+    <section class="studio-proposal-section" id="proposal" aria-labelledby="proposalTitle">
+      <div class="proposal-shell">
+
+        <header class="proposal-header">
+          <p class="proposal-kicker">Project Inquiry &amp; Scope Builder</p>
+          <h2 class="proposal-title" id="proposalTitle">Let’s build your next stage of growth.</h2>
+          <p class="proposal-subtitle">Tell us about your business and what you want to achieve. Select a service below to see its starting price and share your project details.</p>
+        </header>
+
+        <div class="proposal-card">
+
+          <!-- Active Questionnaire Form -->
+          <form id="projectInquiryForm" class="q-form" novalidate>
+
+            <!-- 1. Service Selection -->
+            <div class="q-section">
+              <p class="q-section-eyebrow">01 / Scope Foundation</p>
+              <h3 class="q-section-title">Which service are you interested in?</h3>
+              <p class="q-section-desc">Required · Single selection. Select a service below to display its dedicated questions.</p>
+
+              <div class="q-service-grid" role="radiogroup" aria-label="Which service are you interested in?">
+                
+                <!-- Service 01: Performance Marketing -->
+                <label class="q-service-card" data-service="performance-marketing">
+                  <input type="radio" name="selectedService" value="performance-marketing" required>
+                  <div class="q-card-head">
+                    <h4 class="q-service-title">Performance Marketing</h4>
+                    <span class="q-card-radio-indicator" aria-hidden="true"></span>
+                  </div>
+                  <span class="q-service-price">From 5,000 MAD / month</span>
+                  <p class="q-service-desc">Paid Acquisition &amp; Revenue Scaling across Meta, Google, &amp; TikTok.</p>
+                </label>
+
+                <!-- Service 02: Digital Architecture -->
+                <label class="q-service-card" data-service="digital-architecture">
+                  <input type="radio" name="selectedService" value="digital-architecture" required>
+                  <div class="q-card-head">
+                    <h4 class="q-service-title">Digital Architecture</h4>
+                    <span class="q-card-radio-indicator" aria-hidden="true"></span>
+                  </div>
+                  <span class="q-service-price">From 15,000 MAD / project</span>
+                  <p class="q-service-desc">Bespoke Web Design, Custom Engineering &amp; High-Conversion Architecture.</p>
+                </label>
+
+                <!-- Service 03: Creative Direction -->
+                <label class="q-service-card" data-service="creative-direction">
+                  <input type="radio" name="selectedService" value="creative-direction" required>
+                  <div class="q-card-head">
+                    <h4 class="q-service-title">Creative Direction</h4>
+                    <span class="q-card-radio-indicator" aria-hidden="true"></span>
+                  </div>
+                  <span class="q-service-price">From 8,000 MAD / project</span>
+                  <p class="q-service-desc">Brand Identity, Visual Worlds, Editorial Typography &amp; Creative Production.</p>
+                </label>
+
+                <!-- Service 04: Conversion Strategy -->
+                <label class="q-service-card" data-service="conversion-strategy">
+                  <input type="radio" name="selectedService" value="conversion-strategy" required>
+                  <div class="q-card-head">
+                    <h4 class="q-service-title">Conversion Strategy</h4>
+                    <span class="q-card-radio-indicator" aria-hidden="true"></span>
+                  </div>
+                  <span class="q-service-price">Audits from 5,000 MAD</span>
+                  <p class="q-service-desc">Conversion Rate Optimization, Drop-off Audits &amp; Funnel Optimization.</p>
+                </label>
+
+              </div>
+            </div>
+
+            <!-- 2. Business & Contact Details -->
+            <div class="q-section">
+              <p class="q-section-eyebrow">02 / Business &amp; Contact Details</p>
+              <h3 class="q-section-title">Your business &amp; contact details</h3>
+              <p class="q-section-desc">These questions appear for every service so our team can review your context.</p>
+
+              <div class="q-grid-2col">
+                <div class="q-field">
+                  <label for="qFullName" class="q-label">
+                    <span>What’s your full name?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <input type="text" id="qFullName" name="fullName" class="q-input" placeholder="e.g. Alex Morgan" required autocomplete="name">
+                </div>
+
+                <div class="q-field">
+                  <label for="qCompanyName" class="q-label">
+                    <span>What’s your company or brand name?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <input type="text" id="qCompanyName" name="companyName" class="q-input" placeholder="e.g. Maison Atelier" required autocomplete="organization">
+                </div>
+
+                <div class="q-field">
+                  <label for="qEmail" class="q-label">
+                    <span>What’s your email address?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <input type="email" id="qEmail" name="email" class="q-input" placeholder="name@company.com" required autocomplete="email">
+                </div>
+
+                <div class="q-field">
+                  <label for="qPhone" class="q-label">
+                    <span>What’s your WhatsApp number?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <input type="tel" id="qPhone" name="phone" class="q-input" placeholder="with country code, e.g. +212 6... / +34 6..." required autocomplete="tel">
+                </div>
+
+                <div class="q-field">
+                  <label for="qLocation" class="q-label">
+                    <span>Where is your business based?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <input type="text" id="qLocation" name="location" class="q-input" placeholder="Country / city (e.g. Morocco, Casablanca)" required>
+                </div>
+
+                <div class="q-field">
+                  <label for="qWebsite" class="q-label">
+                    <span>What’s your website or social media profile?</span>
+                    <span class="q-badge q-badge-opt">Optional</span>
+                  </label>
+                  <input type="text" id="qWebsite" name="website" class="q-input" placeholder="https://... or @instagram">
+                </div>
+              </div>
+
+              <div class="q-field" style="margin-top: 1.25rem;">
+                <label for="qBizDesc" class="q-label">
+                  <span>Briefly describe your business.</span>
+                  <span class="q-badge q-badge-req">Required</span>
+                </label>
+                <textarea id="qBizDesc" name="businessDescription" class="q-textarea" placeholder="What do you sell, who are your customers, and where do you operate?" required></textarea>
+              </div>
+            </div>
+
+            <!-- 3. Service-Specific Questions -->
+            <div class="q-section" id="qServiceSpecificSection">
+              <p class="q-section-eyebrow">03 / Service Specification</p>
+              <h3 class="q-section-title" id="qServicePathTitle">Project requirements</h3>
+              <p class="q-section-desc" id="qServicePathSubtitle">Tailored questions for your selected service.</p>
+
+              <!-- Path 01: Performance Marketing -->
+              <div class="q-path" id="path-performance-marketing" data-path="performance-marketing">
+                <div class="q-path-notice">
+                  <span class="q-path-notice-icon">ℹ</span>
+                  <div>
+                    <strong>01 / Performance Marketing</strong> — Paid Acquisition &amp; Revenue Scaling<br>
+                    Management starts at 5,000 MAD / month for one advertising platform. Advertising spend is separate. Additional platforms, extensive creative production, and advanced tracking are quoted according to scope.
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>1. What is your main goal?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="pm_goal" value="Increase online sales"><span class="q-choice-dot"></span><span>Increase online sales</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_goal" value="Generate qualified leads"><span class="q-choice-dot"></span><span>Generate qualified leads</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_goal" value="Get more bookings"><span class="q-choice-dot"></span><span>Get more bookings</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_goal" value="Generate WhatsApp inquiries"><span class="q-choice-dot"></span><span>Generate WhatsApp inquiries</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_goal" value="Other"><span class="q-choice-dot"></span><span>Other</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>2. Which platforms are you interested in?</span>
+                    <span class="q-badge q-badge-req">Required · Multiple</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="checkbox" name="pm_platforms" value="Meta — Instagram & Facebook"><span class="q-choice-box"></span><span>Meta — Instagram &amp; Facebook</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="pm_platforms" value="Google Ads"><span class="q-choice-box"></span><span>Google Ads</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="pm_platforms" value="TikTok Ads"><span class="q-choice-box"></span><span>TikTok Ads</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="pm_platforms" value="I need your recommendation"><span class="q-choice-box"></span><span>I need your recommendation</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>3. Are you currently running paid ads?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="pm_running_ads" value="Yes, managed internally"><span class="q-choice-dot"></span><span>Yes, managed internally</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_running_ads" value="Yes, with an agency or freelancer"><span class="q-choice-dot"></span><span>Yes, with an agency or freelancer</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_running_ads" value="No, this would be our first campaign"><span class="q-choice-dot"></span><span>No, this would be our first campaign</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>4. What is your monthly advertising budget?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="pm_budget" value="Under 5,000 MAD"><span class="q-choice-dot"></span><span>Under 5,000 MAD</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_budget" value="5,000–9,999 MAD"><span class="q-choice-dot"></span><span>5,000–9,999 MAD</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_budget" value="10,000–24,999 MAD"><span class="q-choice-dot"></span><span>10,000–24,999 MAD</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_budget" value="25,000–49,999 MAD"><span class="q-choice-dot"></span><span>25,000–49,999 MAD</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_budget" value="50,000 MAD or more"><span class="q-choice-dot"></span><span>50,000 MAD or more</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_budget" value="Not decided yet"><span class="q-choice-dot"></span><span>Not decided yet</span></label>
+                  </div>
+                  <p class="q-helper-text">This is the amount paid to the advertising platforms, separate from MotaGrowth’s management fee.</p>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>5. Do you have existing ad content?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="pm_content" value="Yes, photos and videos are ready"><span class="q-choice-dot"></span><span>Yes, photos and videos are ready</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_content" value="Some content, but we need more"><span class="q-choice-dot"></span><span>Some content, but we need more</span></label>
+                    <label class="q-choice-card"><input type="radio" name="pm_content" value="No, we need creative support"><span class="q-choice-dot"></span><span>No, we need creative support</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label for="pm_improvements" class="q-label">
+                    <span>6. What would you like to improve or achieve?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <textarea id="pm_improvements" name="pm_improvements" class="q-textarea" placeholder="Tell us about your targets, previous results, or biggest acquisition challenge."></textarea>
+                </div>
+              </div>
+
+              <!-- Path 02: Digital Architecture -->
+              <div class="q-path" id="path-digital-architecture" data-path="digital-architecture">
+                <div class="q-path-notice">
+                  <span class="q-path-notice-icon">ℹ</span>
+                  <div>
+                    <strong>02 / Digital Architecture</strong> — Bespoke Web Design &amp; Development<br>
+                    Projects start at 15,000 MAD for a bespoke showcase website of up to 5 pages. E-commerce, advanced animation, custom integrations, hosting, and maintenance are quoted separately.
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>1. What are you looking to build?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="da_build_type" value="A new business website"><span class="q-choice-dot"></span><span>A new business website</span></label>
+                    <label class="q-choice-card"><input type="radio" name="da_build_type" value="A redesign of an existing website"><span class="q-choice-dot"></span><span>A redesign of an existing website</span></label>
+                    <label class="q-choice-card"><input type="radio" name="da_build_type" value="A landing page"><span class="q-choice-dot"></span><span>A landing page</span></label>
+                    <label class="q-choice-card"><input type="radio" name="da_build_type" value="An e-commerce website"><span class="q-choice-dot"></span><span>An e-commerce website</span></label>
+                    <label class="q-choice-card"><input type="radio" name="da_build_type" value="A custom platform or more complex project"><span class="q-choice-dot"></span><span>A custom platform or more complex project</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>2. What should the website help your business achieve?</span>
+                    <span class="q-badge q-badge-req">Required · Multiple</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="checkbox" name="da_goals" value="Generate inquiries"><span class="q-choice-box"></span><span>Generate inquiries</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_goals" value="Sell products"><span class="q-choice-box"></span><span>Sell products</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_goals" value="Drive bookings"><span class="q-choice-box"></span><span>Drive bookings</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_goals" value="Present our brand and services"><span class="q-choice-box"></span><span>Present our brand and services</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_goals" value="Showcase projects or a portfolio"><span class="q-choice-box"></span><span>Showcase projects or a portfolio</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_goals" value="Other"><span class="q-choice-box"></span><span>Other</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>3. Approximately how many pages do you need?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="da_pages" value="1–5 pages"><span class="q-choice-dot"></span><span>1–5 pages</span></label>
+                    <label class="q-choice-card"><input type="radio" name="da_pages" value="6–10 pages"><span class="q-choice-dot"></span><span>6–10 pages</span></label>
+                    <label class="q-choice-card"><input type="radio" name="da_pages" value="More than 10 pages"><span class="q-choice-dot"></span><span>More than 10 pages</span></label>
+                    <label class="q-choice-card"><input type="radio" name="da_pages" value="I need guidance"><span class="q-choice-dot"></span><span>I need guidance</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>4. Which features do you need?</span>
+                    <span class="q-badge q-badge-req">Required · Multiple</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="checkbox" name="da_features" value="Contact form / WhatsApp integration"><span class="q-choice-box"></span><span>Contact form / WhatsApp integration</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_features" value="Booking system"><span class="q-choice-box"></span><span>Booking system</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_features" value="Product catalogue"><span class="q-choice-box"></span><span>Product catalogue</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_features" value="Online payments"><span class="q-choice-box"></span><span>Online payments</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_features" value="Multiple languages"><span class="q-choice-box"></span><span>Multiple languages</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_features" value="Blog or editable content"><span class="q-choice-box"></span><span>Blog or editable content</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_features" value="Custom animations or 3D"><span class="q-choice-box"></span><span>Custom animations or 3D</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_features" value="CRM or other integrations"><span class="q-choice-box"></span><span>CRM or other integrations</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_features" value="Not sure yet"><span class="q-choice-box"></span><span>Not sure yet</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>5. What materials do you already have?</span>
+                    <span class="q-badge q-badge-req">Required · Multiple</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="checkbox" name="da_materials" value="Logo and brand guidelines"><span class="q-choice-box"></span><span>Logo and brand guidelines</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_materials" value="Website text"><span class="q-choice-box"></span><span>Website text</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_materials" value="Professional photos or videos"><span class="q-choice-box"></span><span>Professional photos or videos</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_materials" value="Domain and hosting"><span class="q-choice-box"></span><span>Domain and hosting</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="da_materials" value="We need help with everything"><span class="q-choice-box"></span><span>We need help with everything</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label for="da_examples" class="q-label">
+                    <span>6. Share up to three websites you like.</span>
+                    <span class="q-badge q-badge-opt">Optional</span>
+                  </label>
+                  <textarea id="da_examples" name="da_examples" class="q-textarea" placeholder="Paste the links and tell us what you like about them."></textarea>
+                </div>
+
+                <div class="q-field">
+                  <label for="da_notes" class="q-label">
+                    <span>7. Tell us anything else we should know about the project.</span>
+                    <span class="q-badge q-badge-opt">Optional</span>
+                  </label>
+                  <textarea id="da_notes" name="da_notes" class="q-textarea" placeholder="Specific technical requirements, deadlines, or integrations."></textarea>
+                </div>
+              </div>
+
+              <!-- Path 03: Creative Direction -->
+              <div class="q-path" id="path-creative-direction" data-path="creative-direction">
+                <div class="q-path-notice">
+                  <span class="q-path-notice-icon">ℹ</span>
+                  <div>
+                    <strong>03 / Creative Direction</strong> — Brand Identity &amp; Visual Worlds<br>
+                    Projects start at 8,000 MAD for a core visual identity: logo system, color palette, typography, and concise brand guidelines. Photography, video production, packaging, and additional collateral are quoted separately.
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>1. What stage is your brand at?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="cd_stage" value="Launching a new brand"><span class="q-choice-dot"></span><span>Launching a new brand</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cd_stage" value="Refreshing an existing identity"><span class="q-choice-dot"></span><span>Refreshing an existing identity</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cd_stage" value="Full rebrand"><span class="q-choice-dot"></span><span>Full rebrand</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cd_stage" value="Expanding an existing visual identity"><span class="q-choice-dot"></span><span>Expanding an existing visual identity</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label for="cd_customer" class="q-label">
+                    <span>2. Who is your ideal customer?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <textarea id="cd_customer" name="cd_customer" class="q-textarea" placeholder="Describe the people you want to attract and what matters to them."></textarea>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>3. What do you need us to create?</span>
+                    <span class="q-badge q-badge-req">Required · Multiple</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="checkbox" name="cd_deliverables" value="Logo and core visual identity"><span class="q-choice-box"></span><span>Logo and core visual identity</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cd_deliverables" value="Brand guidelines"><span class="q-choice-box"></span><span>Brand guidelines</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cd_deliverables" value="Social media and digital assets"><span class="q-choice-box"></span><span>Social media and digital assets</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cd_deliverables" value="Packaging"><span class="q-choice-box"></span><span>Packaging</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cd_deliverables" value="Menus, print, or hospitality collateral"><span class="q-choice-box"></span><span>Menus, print, or hospitality collateral</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cd_deliverables" value="Photography or video creative direction"><span class="q-choice-box"></span><span>Photography or video creative direction</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cd_deliverables" value="A complete brand system"><span class="q-choice-box"></span><span>A complete brand system</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label for="cd_aesthetic" class="q-label">
+                    <span>4. How should your brand look and feel?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <textarea id="cd_aesthetic" name="cd_aesthetic" class="q-textarea" placeholder="Describe the impression you want to create—for example, refined, bold, understated, editorial, or energetic."></textarea>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>5. Do you have an existing identity or reference materials?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="cd_existing_materials" value="Yes, we can share them"><span class="q-choice-dot"></span><span>Yes, we can share them</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cd_existing_materials" value="Some materials, but no clear identity"><span class="q-choice-dot"></span><span>Some materials, but no clear identity</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cd_existing_materials" value="No, we’re starting from scratch"><span class="q-choice-dot"></span><span>No, we’re starting from scratch</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label for="cd_references" class="q-label">
+                    <span>6. Share brands or visual references you admire.</span>
+                    <span class="q-badge q-badge-opt">Optional</span>
+                  </label>
+                  <textarea id="cd_references" name="cd_references" class="q-textarea" placeholder="Add links and briefly explain what appeals to you."></textarea>
+                </div>
+
+                <div class="q-field">
+                  <label for="cd_launch_essentials" class="q-label">
+                    <span>7. Which deliverables are essential for launch?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <textarea id="cd_launch_essentials" name="cd_launch_essentials" class="q-textarea" placeholder="List the mandatory assets you must have for day one."></textarea>
+                </div>
+              </div>
+
+              <!-- Path 04: Conversion Strategy -->
+              <div class="q-path" id="path-conversion-strategy" data-path="conversion-strategy">
+                <div class="q-path-notice">
+                  <span class="q-path-notice-icon">ℹ</span>
+                  <div>
+                    <strong>04 / Conversion Strategy</strong> — Conversion Rate Optimization (CRO)<br>
+                    Audits start at 5,000 MAD for one website or funnel, including a conversion review and prioritized improvement plan. Implementation and ongoing testing are quoted separately.
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label for="cs_website" class="q-label">
+                    <span>1. Which website or funnel would you like us to review?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <input type="url" id="cs_website" name="cs_website" class="q-input" placeholder="https://yourwebsite.com">
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>2. What action do you want more visitors to take?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="cs_action" value="Complete a purchase"><span class="q-choice-dot"></span><span>Complete a purchase</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_action" value="Submit an inquiry"><span class="q-choice-dot"></span><span>Submit an inquiry</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_action" value="Book an appointment"><span class="q-choice-dot"></span><span>Book an appointment</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_action" value="Contact us on WhatsApp"><span class="q-choice-dot"></span><span>Contact us on WhatsApp</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_action" value="Sign up or register"><span class="q-choice-dot"></span><span>Sign up or register</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_action" value="Other"><span class="q-choice-dot"></span><span>Other</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>3. Approximately how many monthly visitors do you receive?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="cs_visitors" value="Under 1,000"><span class="q-choice-dot"></span><span>Under 1,000</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_visitors" value="1,000–4,999"><span class="q-choice-dot"></span><span>1,000–4,999</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_visitors" value="5,000–19,999"><span class="q-choice-dot"></span><span>5,000–19,999</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_visitors" value="20,000 or more"><span class="q-choice-dot"></span><span>20,000 or more</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_visitors" value="I don’t know"><span class="q-choice-dot"></span><span>I don’t know</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>4. What is your biggest conversion challenge?</span>
+                    <span class="q-badge q-badge-req">Required · Multiple</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="checkbox" name="cs_challenges" value="Visitors don’t submit inquiries"><span class="q-choice-box"></span><span>Visitors don’t submit inquiries</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cs_challenges" value="Visitors abandon checkout"><span class="q-choice-box"></span><span>Visitors abandon checkout</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cs_challenges" value="Landing pages aren’t converting"><span class="q-choice-box"></span><span>Landing pages aren’t converting</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cs_challenges" value="Mobile users drop off"><span class="q-choice-box"></span><span>Mobile users drop off</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cs_challenges" value="Bookings or WhatsApp inquiries are low"><span class="q-choice-box"></span><span>Bookings or WhatsApp inquiries are low</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cs_challenges" value="We don’t know where the problem is"><span class="q-choice-box"></span><span>We don’t know where the problem is</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cs_challenges" value="Other"><span class="q-choice-box"></span><span>Other</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>5. Which tracking tools are currently installed?</span>
+                    <span class="q-badge q-badge-opt">Optional · Multiple</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="checkbox" name="cs_tools" value="Google Analytics"><span class="q-choice-box"></span><span>Google Analytics</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cs_tools" value="Meta Pixel"><span class="q-choice-box"></span><span>Meta Pixel</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cs_tools" value="Heatmap or session-recording tools"><span class="q-choice-box"></span><span>Heatmap or session-recording tools</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cs_tools" value="Other tools"><span class="q-choice-box"></span><span>Other tools</span></label>
+                    <label class="q-choice-card"><input type="checkbox" name="cs_tools" value="None / Not sure"><span class="q-choice-box"></span><span>None / Not sure</span></label>
+                  </div>
+                </div>
+
+                <div class="q-field">
+                  <label for="cs_rate" class="q-label">
+                    <span>6. Do you know your current conversion rate?</span>
+                    <span class="q-badge q-badge-opt">Optional</span>
+                  </label>
+                  <input type="text" id="cs_rate" name="cs_rate" class="q-input" placeholder="Enter your approximate rate, or leave blank if unknown.">
+                </div>
+
+                <div class="q-field">
+                  <label class="q-label">
+                    <span>7. What kind of support are you looking for?</span>
+                    <span class="q-badge q-badge-req">Required</span>
+                  </label>
+                  <div class="q-choice-grid">
+                    <label class="q-choice-card"><input type="radio" name="cs_support" value="Audit and recommendations"><span class="q-choice-dot"></span><span>Audit and recommendations</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_support" value="Audit plus implementation"><span class="q-choice-dot"></span><span>Audit plus implementation</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_support" value="Ongoing optimization and testing"><span class="q-choice-dot"></span><span>Ongoing optimization and testing</span></label>
+                    <label class="q-choice-card"><input type="radio" name="cs_support" value="I need your recommendation"><span class="q-choice-dot"></span><span>I need your recommendation</span></label>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- 4. Timing & Price Acknowledgment -->
+            <div class="q-section">
+              <p class="q-section-eyebrow">04 / Timing &amp; Terms</p>
+              <h3 class="q-section-title">Timeline &amp; scope acknowledgment</h3>
+              <p class="q-section-desc">Confirm your target start date and review the starting price for your engagement.</p>
+
+              <div class="q-field">
+                <label class="q-label">
+                  <span>When would you like to start?</span>
+                  <span class="q-badge q-badge-req">Required</span>
+                </label>
+                <div class="q-choice-grid">
+                  <label class="q-choice-card"><input type="radio" name="timeline" value="As soon as possible" required><span class="q-choice-dot"></span><span>As soon as possible</span></label>
+                  <label class="q-choice-card"><input type="radio" name="timeline" value="Within one month"><span class="q-choice-dot"></span><span>Within one month</span></label>
+                  <label class="q-choice-card"><input type="radio" name="timeline" value="Within three months"><span class="q-choice-dot"></span><span>Within three months</span></label>
+                  <label class="q-choice-card"><input type="radio" name="timeline" value="I’m exploring options"><span class="q-choice-dot"></span><span>I’m exploring options</span></label>
+                </div>
+              </div>
+
+              <div class="q-field">
+                <label for="qAdditionalNotes" class="q-label">
+                  <span>Anything else we should know?</span>
+                  <span class="q-badge q-badge-opt">Optional</span>
+                </label>
+                <textarea id="qAdditionalNotes" name="additionalNotes" class="q-textarea" placeholder="Share any important requirements, deadlines, or questions."></textarea>
+              </div>
+
+              <!-- Dynamic Service Summary -->
+              <div class="q-summary-card" id="qSummaryCard">
+                <div class="q-summary-label">Selected Scope</div>
+                <h4 class="q-summary-service" id="qSummaryServiceName">Performance Marketing</h4>
+                <div class="q-summary-price" id="qSummaryPrice">From 5,000 MAD / month</div>
+                <p class="q-summary-disclaimer">Your final proposal will reflect the agreed scope. Submitting this form does not commit you to a purchase.</p>
+              </div>
+
+              <!-- Required Checkbox -->
+              <label class="q-agree-wrap">
+                <input type="checkbox" id="qPriceAgree" name="priceAcknowledgment" required>
+                <span class="q-agree-text" id="qPriceAgreeText">I understand this service starts at 5,000 MAD / month, and additional requirements may increase the final quote.</span>
+              </label>
+
+              <!-- Privacy Policy Text -->
+              <p class="q-privacy-note">
+                MotaGrowth will use the information you provide to review and respond to your inquiry. See our <button type="button" class="legal-link-btn" id="qPrivacyPolicyBtn">Privacy Statement</button>.
+              </p>
+
+              <!-- Submit Button -->
+              <div class="q-submit-row">
+                <button type="submit" class="btn-submit-inquiry" id="qSubmitBtn">
+                  <span>Send My Project Inquiry ↗</span>
+                </button>
+                <div class="q-direct-chat">
+                  Prefer immediate answers? <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20would%20like%20to%20discuss%20a%20new%20project" target="_blank" rel="noopener">Chat on WhatsApp Direct (+34 675 194 956) ↗</a>
+                </div>
+              </div>
+            </div>
+
+          </form>
+
+          <!-- Confirmation State Screen -->
+          <div class="q-success-card" id="qSuccessCard" aria-live="polite">
+            <div class="q-success-ring">✓</div>
+            <h3 class="q-success-title">Your next stage starts here.</h3>
+            <p class="q-success-msg">
+              Thank you for reaching out to MotaGrowth. We’ve received your inquiry and will contact you to discuss your project, scope, and next steps.
+            </p>
+            <div class="q-success-meta" id="qSuccessMeta"></div>
+            <div class="q-success-actions">
+              <a href="https://wa.me/34675194956" target="_blank" rel="noopener" class="btn-ref btn-ref-gold">
+                <span class="btn-text">Connect on WhatsApp Direct ↗</span>
+              </a>
+              <button type="button" class="btn-ref" id="qResetBtn">
+                <span class="btn-text">Submit Another Inquiry</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
   </main>
 
   <!-- Site Footer -->
-  <footer class="site-footer" id="proposal">
+  <footer class="site-footer" id="site-footer">
     <div class="content-container">
       
       <div class="footer-top">
@@ -348,7 +947,7 @@
   </div>
 
   <!-- Scripts -->
-  <script src="app.js"></script>
+  <script src="app.js?v=4.6"></script>
 </body>
 </html>
 

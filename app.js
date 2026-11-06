@@ -2181,4 +2181,646 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   })();
 
+  // ========================================================================
+  // 13. Dynamic Multi-Path Project Proposal Questionnaire & CRM Pipeline
+  // ========================================================================
+  (function initProjectQuestionnaire() {
+    const form = document.getElementById('projectInquiryForm');
+    if (!form) return;
+
+    const SERVICE_CONFIG = {
+      'performance-marketing': {
+        key: 'performance-marketing',
+        name: 'Performance Marketing',
+        discipline: 'Paid Acquisition & Revenue Scaling',
+        price: 'From 5,000 MAD / month',
+        shortPrice: '5,000 MAD / month',
+        pathId: 'path-performance-marketing'
+      },
+      'digital-architecture': {
+        key: 'digital-architecture',
+        name: 'Digital Architecture',
+        discipline: 'Bespoke Web Design & Development',
+        price: 'From 15,000 MAD / project',
+        shortPrice: '15,000 MAD',
+        pathId: 'path-digital-architecture'
+      },
+      'creative-direction': {
+        key: 'creative-direction',
+        name: 'Creative Direction',
+        discipline: 'Brand Identity & Visual Worlds',
+        price: 'From 8,000 MAD / project',
+        shortPrice: '8,000 MAD',
+        pathId: 'path-creative-direction'
+      },
+      'conversion-strategy': {
+        key: 'conversion-strategy',
+        name: 'Conversion Strategy',
+        discipline: 'Conversion Rate Optimization',
+        price: 'Audits from 5,000 MAD',
+        shortPrice: '5,000 MAD',
+        pathId: 'path-conversion-strategy'
+      }
+    };
+
+    const serviceCards = document.querySelectorAll('.q-service-card');
+    const serviceRadios = form.querySelectorAll('input[name="selectedService"]');
+    const paths = document.querySelectorAll('.q-path');
+    const summaryServiceName = document.getElementById('qSummaryServiceName');
+    const summaryPrice = document.getElementById('qSummaryPrice');
+    const priceAgreeText = document.getElementById('qPriceAgreeText');
+    const privacyBtn = document.getElementById('qPrivacyPolicyBtn');
+    const successCard = document.getElementById('qSuccessCard');
+    const successMeta = document.getElementById('qSuccessMeta');
+    const resetBtn = document.getElementById('qResetBtn');
+    const choiceCards = form.querySelectorAll('.q-choice-card');
+
+    let currentSelectedService = 'performance-marketing';
+
+    function syncChoiceCardStates() {
+      choiceCards.forEach(card => {
+        const inp = card.querySelector('input');
+        if (inp) {
+          card.classList.toggle('is-checked', inp.checked);
+        }
+      });
+    }
+
+    function selectService(serviceKey, shouldScroll) {
+      const cfg = SERVICE_CONFIG[serviceKey] || SERVICE_CONFIG['performance-marketing'];
+      currentSelectedService = cfg.key;
+
+      // 1. Radio state
+      serviceRadios.forEach(radio => {
+        radio.checked = (radio.value === cfg.key);
+      });
+
+      // 2. Card state
+      serviceCards.forEach(card => {
+        const isMatch = (card.dataset.service === cfg.key);
+        card.classList.toggle('is-selected', isMatch);
+        card.setAttribute('aria-checked', isMatch ? 'true' : 'false');
+      });
+
+      // 3. Dynamic path visibility
+      paths.forEach(path => {
+        const isMatch = (path.id === cfg.pathId || path.dataset.path === cfg.key);
+        path.classList.toggle('is-active', isMatch);
+      });
+
+      // 4. Update dynamic summary
+      if (summaryServiceName) summaryServiceName.textContent = cfg.name;
+      if (summaryPrice) summaryPrice.textContent = cfg.price;
+
+      // 5. Update required checkbox notice
+      if (priceAgreeText) {
+        priceAgreeText.textContent = `I understand this service starts at ${cfg.shortPrice}, and additional requirements may increase the final quote.`;
+      }
+
+      // 6. Smooth scroll to form if requested
+      if (shouldScroll) {
+        const proposalSec = document.getElementById('proposal');
+        if (proposalSec) {
+          proposalSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+
+    // Attach click listeners to service cards
+    serviceCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const key = card.dataset.service;
+        if (key) {
+          selectService(key, false);
+        }
+      });
+    });
+
+    // Listen to changes on service radios
+    serviceRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
+          selectService(radio.value, false);
+        }
+      });
+    });
+
+    // Listen to choice card toggles
+    form.addEventListener('change', (e) => {
+      if (e.target.matches('.q-choice-card input')) {
+        syncChoiceCardStates();
+      }
+    });
+
+    // Handle all external "data-inquire" buttons
+    document.querySelectorAll('[data-inquire]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const targetService = btn.getAttribute('data-inquire');
+        if (targetService && SERVICE_CONFIG[targetService]) {
+          const href = btn.getAttribute('href') || '';
+          if (href === '#proposal' || href.endsWith('#proposal')) {
+            e.preventDefault();
+            selectService(targetService, true);
+            if (history.pushState) {
+              history.pushState(null, null, '#proposal');
+            }
+          }
+        }
+      });
+    });
+
+    // Check URL search params for ?service=...
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramService = urlParams.get('service');
+      if (paramService && SERVICE_CONFIG[paramService]) {
+        selectService(paramService, window.location.hash === '#proposal');
+      } else {
+        const checked = form.querySelector('input[name="selectedService"]:checked');
+        selectService(checked ? checked.value : 'performance-marketing', false);
+      }
+    } catch (e) {
+      selectService('performance-marketing', false);
+    }
+
+    // Hashchange listener
+    window.addEventListener('hashchange', () => {
+      if (window.location.hash === '#proposal') {
+        const proposalSec = document.getElementById('proposal');
+        if (proposalSec) {
+          proposalSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    });
+
+    // Privacy modal trigger
+    if (privacyBtn) {
+      privacyBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const openPrivacy = document.getElementById('openPrivacyBtn');
+        if (openPrivacy) {
+          openPrivacy.click();
+        } else {
+          const privModal = document.getElementById('privacyModal');
+          if (privModal) {
+            privModal.setAttribute('open', '');
+            document.body.style.overflow = 'hidden';
+          }
+        }
+      });
+    }
+
+    // Helper: Mark field error
+    function markError(el, message) {
+      if (!el) return;
+      el.classList.add('has-error');
+      
+      const parent = el.closest('.q-field') || el.closest('.q-choice-grid') || el.parentElement;
+      if (parent) {
+        parent.classList.add('has-error');
+        let tip = parent.querySelector('.q-error-tip');
+        if (!tip) {
+          tip = document.createElement('span');
+          tip.className = 'q-error-tip';
+          parent.appendChild(tip);
+        }
+        tip.textContent = message || 'This field is required.';
+      }
+
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (typeof el.focus === 'function') {
+        try { el.focus(); } catch (err) {}
+      }
+    }
+
+    function clearAllErrors() {
+      form.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+      form.querySelectorAll('.q-error-tip').forEach(el => el.remove());
+    }
+
+    // Form submit validation & persistence
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearAllErrors();
+
+      // 1. Universal Business Details
+      const fullName = (document.getElementById('qFullName')?.value || '').trim();
+      if (!fullName) {
+        markError(document.getElementById('qFullName'), 'Please enter your full name.');
+        return;
+      }
+
+      const companyName = (document.getElementById('qCompanyName')?.value || '').trim();
+      if (!companyName) {
+        markError(document.getElementById('qCompanyName'), 'Please enter your company or brand name.');
+        return;
+      }
+
+      const email = (document.getElementById('qEmail')?.value || '').trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        markError(document.getElementById('qEmail'), 'Please enter a valid email address.');
+        return;
+      }
+
+      const phone = (document.getElementById('qPhone')?.value || '').trim();
+      if (!phone || phone.length < 5) {
+        markError(document.getElementById('qPhone'), 'Please provide your WhatsApp number with country code.');
+        return;
+      }
+
+      const locationVal = (document.getElementById('qLocation')?.value || '').trim();
+      if (!locationVal) {
+        markError(document.getElementById('qLocation'), 'Please specify where your business is based.');
+        return;
+      }
+
+      const website = (document.getElementById('qWebsite')?.value || '').trim();
+
+      const bizDesc = (document.getElementById('qBizDesc')?.value || '').trim();
+      if (!bizDesc || bizDesc.length < 5) {
+        markError(document.getElementById('qBizDesc'), 'Please briefly describe your business and what you sell.');
+        return;
+      }
+
+      // 2. Active Path Specific Validations & Data Extraction
+      const answers = {};
+      const answerNotesList = [];
+
+      if (currentSelectedService === 'performance-marketing') {
+        const goal = form.querySelector('input[name="pm_goal"]:checked');
+        if (!goal) {
+          const grid = document.querySelector('input[name="pm_goal"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select your primary performance goal.');
+          return;
+        }
+        answers['Primary Goal'] = goal.value;
+        answerNotesList.push(`Goal: ${goal.value}`);
+
+        const platforms = Array.from(form.querySelectorAll('input[name="pm_platforms"]:checked')).map(cb => cb.value);
+        if (platforms.length === 0) {
+          const grid = document.querySelector('input[name="pm_platforms"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select at least one advertising platform.');
+          return;
+        }
+        answers['Platforms'] = platforms;
+        answerNotesList.push(`Platforms: ${platforms.join(', ')}`);
+
+        const runningAds = form.querySelector('input[name="pm_running_ads"]:checked');
+        if (!runningAds) {
+          const grid = document.querySelector('input[name="pm_running_ads"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please specify if you are currently running paid ads.');
+          return;
+        }
+        answers['Currently Running Ads'] = runningAds.value;
+        answerNotesList.push(`Current Ads: ${runningAds.value}`);
+
+        const budget = form.querySelector('input[name="pm_budget"]:checked');
+        if (!budget) {
+          const grid = document.querySelector('input[name="pm_budget"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select your monthly advertising budget.');
+          return;
+        }
+        answers['Monthly Ad Budget'] = budget.value;
+        answerNotesList.push(`Ad Budget: ${budget.value}`);
+
+        const content = form.querySelector('input[name="pm_content"]:checked');
+        if (!content) {
+          const grid = document.querySelector('input[name="pm_content"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please indicate your existing ad content availability.');
+          return;
+        }
+        answers['Creative Content Status'] = content.value;
+        answerNotesList.push(`Creative Content: ${content.value}`);
+
+        const improvements = (document.getElementById('pm_improvements')?.value || '').trim();
+        if (!improvements) {
+          markError(document.getElementById('pm_improvements'), 'Please describe your targets or biggest acquisition challenge.');
+          return;
+        }
+        answers['Targets & Challenges'] = improvements;
+        answerNotesList.push(`Targets/Challenges: ${improvements}`);
+
+      } else if (currentSelectedService === 'digital-architecture') {
+        const buildType = form.querySelector('input[name="da_build_type"]:checked');
+        if (!buildType) {
+          const grid = document.querySelector('input[name="da_build_type"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please specify what you are looking to build.');
+          return;
+        }
+        answers['Build Type'] = buildType.value;
+        answerNotesList.push(`Build Type: ${buildType.value}`);
+
+        const goals = Array.from(form.querySelectorAll('input[name="da_goals"]:checked')).map(cb => cb.value);
+        if (goals.length === 0) {
+          const grid = document.querySelector('input[name="da_goals"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select at least one primary website objective.');
+          return;
+        }
+        answers['Objectives'] = goals;
+        answerNotesList.push(`Objectives: ${goals.join(', ')}`);
+
+        const pages = form.querySelector('input[name="da_pages"]:checked');
+        if (!pages) {
+          const grid = document.querySelector('input[name="da_pages"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select approximate number of pages.');
+          return;
+        }
+        answers['Scope Pages'] = pages.value;
+        answerNotesList.push(`Pages: ${pages.value}`);
+
+        const features = Array.from(form.querySelectorAll('input[name="da_features"]:checked')).map(cb => cb.value);
+        if (features.length === 0) {
+          const grid = document.querySelector('input[name="da_features"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select required features.');
+          return;
+        }
+        answers['Required Features'] = features;
+        answerNotesList.push(`Features: ${features.join(', ')}`);
+
+        const materials = Array.from(form.querySelectorAll('input[name="da_materials"]:checked')).map(cb => cb.value);
+        if (materials.length === 0) {
+          const grid = document.querySelector('input[name="da_materials"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select which materials you already have.');
+          return;
+        }
+        answers['Existing Materials'] = materials;
+        answerNotesList.push(`Existing Materials: ${materials.join(', ')}`);
+
+        const examples = (document.getElementById('da_examples')?.value || '').trim();
+        if (examples) {
+          answers['Reference Websites'] = examples;
+          answerNotesList.push(`Reference Websites: ${examples}`);
+        }
+
+        const daNotes = (document.getElementById('da_notes')?.value || '').trim();
+        if (daNotes) {
+          answers['Project Notes'] = daNotes;
+          answerNotesList.push(`Architecture Notes: ${daNotes}`);
+        }
+
+      } else if (currentSelectedService === 'creative-direction') {
+        const stage = form.querySelector('input[name="cd_stage"]:checked');
+        if (!stage) {
+          const grid = document.querySelector('input[name="cd_stage"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select what stage your brand is at.');
+          return;
+        }
+        answers['Brand Stage'] = stage.value;
+        answerNotesList.push(`Brand Stage: ${stage.value}`);
+
+        const customer = (document.getElementById('cd_customer')?.value || '').trim();
+        if (!customer) {
+          markError(document.getElementById('cd_customer'), 'Please describe your ideal customer.');
+          return;
+        }
+        answers['Ideal Customer'] = customer;
+        answerNotesList.push(`Ideal Customer: ${customer}`);
+
+        const deliverables = Array.from(form.querySelectorAll('input[name="cd_deliverables"]:checked')).map(cb => cb.value);
+        if (deliverables.length === 0) {
+          const grid = document.querySelector('input[name="cd_deliverables"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select what you need us to create.');
+          return;
+        }
+        answers['Deliverables'] = deliverables;
+        answerNotesList.push(`Deliverables: ${deliverables.join(', ')}`);
+
+        const aesthetic = (document.getElementById('cd_aesthetic')?.value || '').trim();
+        if (!aesthetic) {
+          markError(document.getElementById('cd_aesthetic'), 'Please describe how your brand should look and feel.');
+          return;
+        }
+        answers['Look & Feel'] = aesthetic;
+        answerNotesList.push(`Look & Feel: ${aesthetic}`);
+
+        const existing = form.querySelector('input[name="cd_existing_materials"]:checked');
+        if (!existing) {
+          const grid = document.querySelector('input[name="cd_existing_materials"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please specify if you have existing reference materials.');
+          return;
+        }
+        answers['Existing Assets'] = existing.value;
+        answerNotesList.push(`Existing Assets: ${existing.value}`);
+
+        const refs = (document.getElementById('cd_references')?.value || '').trim();
+        if (refs) {
+          answers['Admiration References'] = refs;
+          answerNotesList.push(`Visual References: ${refs}`);
+        }
+
+        const launchEssentials = (document.getElementById('cd_launch_essentials')?.value || '').trim();
+        if (!launchEssentials) {
+          markError(document.getElementById('cd_launch_essentials'), 'Please specify essential launch deliverables.');
+          return;
+        }
+        answers['Launch Essentials'] = launchEssentials;
+        answerNotesList.push(`Launch Essentials: ${launchEssentials}`);
+
+      } else if (currentSelectedService === 'conversion-strategy') {
+        const csWebsite = (document.getElementById('cs_website')?.value || '').trim();
+        if (!csWebsite) {
+          markError(document.getElementById('cs_website'), 'Please enter the URL of the website or funnel to review.');
+          return;
+        }
+        answers['Target URL'] = csWebsite;
+        answerNotesList.push(`Funnel URL: ${csWebsite}`);
+
+        const action = form.querySelector('input[name="cs_action"]:checked');
+        if (!action) {
+          const grid = document.querySelector('input[name="cs_action"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select the key action you want visitors to take.');
+          return;
+        }
+        answers['Desired Action'] = action.value;
+        answerNotesList.push(`Desired Action: ${action.value}`);
+
+        const visitors = form.querySelector('input[name="cs_visitors"]:checked');
+        if (!visitors) {
+          const grid = document.querySelector('input[name="cs_visitors"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select your monthly visitor tier.');
+          return;
+        }
+        answers['Monthly Visitors'] = visitors.value;
+        answerNotesList.push(`Monthly Traffic: ${visitors.value}`);
+
+        const challenges = Array.from(form.querySelectorAll('input[name="cs_challenges"]:checked')).map(cb => cb.value);
+        if (challenges.length === 0) {
+          const grid = document.querySelector('input[name="cs_challenges"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select your biggest conversion challenges.');
+          return;
+        }
+        answers['Challenges'] = challenges;
+        answerNotesList.push(`Challenges: ${challenges.join(', ')}`);
+
+        const tools = Array.from(form.querySelectorAll('input[name="cs_tools"]:checked')).map(cb => cb.value);
+        if (tools.length > 0) {
+          answers['Installed Tools'] = tools;
+          answerNotesList.push(`Tracking Tools: ${tools.join(', ')}`);
+        }
+
+        const csRate = (document.getElementById('cs_rate')?.value || '').trim();
+        if (csRate) {
+          answers['Current Rate'] = csRate;
+          answerNotesList.push(`Current Conv Rate: ${csRate}`);
+        }
+
+        const support = form.querySelector('input[name="cs_support"]:checked');
+        if (!support) {
+          const grid = document.querySelector('input[name="cs_support"]')?.closest('.q-choice-grid');
+          markError(grid, 'Please select the kind of optimization support you need.');
+          return;
+        }
+        answers['Support Type'] = support.value;
+        answerNotesList.push(`Support Type: ${support.value}`);
+      }
+
+      // 3. Timing & Price Acknowledgment
+      const timelineRadio = form.querySelector('input[name="timeline"]:checked');
+      if (!timelineRadio) {
+        const grid = document.querySelector('input[name="timeline"]')?.closest('.q-choice-grid');
+        markError(grid, 'Please select when you would like to start.');
+        return;
+      }
+      const timelineVal = timelineRadio.value;
+      answers['Target Timeline'] = timelineVal;
+
+      const additionalNotes = (document.getElementById('qAdditionalNotes')?.value || '').trim();
+      if (additionalNotes) {
+        answers['Additional Notes'] = additionalNotes;
+        answerNotesList.push(`Additional Notes: ${additionalNotes}`);
+      }
+
+      const priceAgree = document.getElementById('qPriceAgree');
+      if (!priceAgree || !priceAgree.checked) {
+        markError(priceAgree?.parentElement, 'Please acknowledge the starting price scope to proceed.');
+        return;
+      }
+
+      // 4. Build CRM Payload
+      const cfg = SERVICE_CONFIG[currentSelectedService];
+      const refSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const refId = `INQ-${cfg.name.substring(0, 4).toUpperCase().replace(/\s/g, '')}-${refSuffix}`;
+      
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const dateDisplay = `${day}/${month}/${year}<br><span style="color: #64748b; font-weight: 500;">${hours}:${minutes}</span>`;
+
+      const fullNotes = [
+        `BUSINESS CONTEXT: ${bizDesc}`,
+        website ? `WEBSITE / SOCIAL: ${website}` : '',
+        `LOCATION: ${locationVal}`,
+        `TIMELINE: ${timelineVal}`,
+        '--- SERVICE REQUIREMENTS ---',
+        ...answerNotesList
+      ].filter(Boolean).join('\n');
+
+      const inquiryRecord = {
+        id: refId,
+        createdAt: now.toISOString(),
+        dateDisplay: dateDisplay,
+        type: 'PRO',
+        clientName: fullName,
+        companyName: companyName,
+        clientEmail: email,
+        clientPhone: phone,
+        location: locationVal,
+        website: website || '—',
+        businessDescription: bizDesc,
+        serviceKey: currentSelectedService,
+        services: [`${cfg.name} (${cfg.price})`],
+        sector: locationVal || 'Studio Client',
+        timeline: timelineVal,
+        notes: fullNotes,
+        answers: answers,
+        status: 'Nouveau',
+        priceNoticeAgreed: true
+      };
+
+      // 5. Save to LocalStorage CRM DB
+      try {
+        const STORAGE_KEY = 'motagrowth_v7_inquiries_db';
+        const existingData = localStorage.getItem(STORAGE_KEY);
+        let list = [];
+        if (existingData) {
+          try {
+            const parsed = JSON.parse(existingData);
+            if (Array.isArray(parsed)) list = parsed;
+          } catch (e) { list = []; }
+        }
+        list.unshift(inquiryRecord);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (err) {
+        console.error('MotaGrowth CRM Inquiry Storage Error:', err);
+      }
+
+      // 6. Transition to Confirmation State
+      form.style.display = 'none';
+      if (successCard) {
+        successCard.classList.add('is-active');
+        successCard.style.display = 'block';
+      }
+
+      if (successMeta) {
+        successMeta.innerHTML = `
+          <div class="q-success-meta-row">
+            <span class="q-success-meta-label">Inquiry Reference</span>
+            <span class="q-success-meta-val">${refId}</span>
+          </div>
+          <div class="q-success-meta-row">
+            <span class="q-success-meta-label">Selected Service</span>
+            <span class="q-success-meta-val">${cfg.name}</span>
+          </div>
+          <div class="q-success-meta-row">
+            <span class="q-success-meta-label">Starting Scope</span>
+            <span class="q-success-meta-val">${cfg.price}</span>
+          </div>
+          <div class="q-success-meta-row">
+            <span class="q-success-meta-label">Client</span>
+            <span class="q-success-meta-val">${fullName} (${companyName})</span>
+          </div>
+          <div class="q-success-meta-row">
+            <span class="q-success-meta-label">Direct Contact</span>
+            <span class="q-success-meta-val">${phone} • ${email}</span>
+          </div>
+          <div class="q-success-meta-row">
+            <span class="q-success-meta-label">Target Launch</span>
+            <span class="q-success-meta-val">${timelineVal}</span>
+          </div>
+        `;
+      }
+
+      const proposalSec = document.getElementById('proposal');
+      if (proposalSec) {
+        proposalSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+
+    // 7. Reset Form for new inquiry
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        form.reset();
+        clearAllErrors();
+        selectService('performance-marketing', false);
+        if (successCard) {
+          successCard.classList.remove('is-active');
+          successCard.style.display = 'none';
+        }
+        form.style.display = 'block';
+        syncChoiceCardStates();
+        const proposalSec = document.getElementById('proposal');
+        if (proposalSec) {
+          proposalSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+
+    // Initial sync
+    syncChoiceCardStates();
+  })();
+
 });
