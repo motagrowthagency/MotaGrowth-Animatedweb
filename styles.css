@@ -7419,3 +7419,58 @@ body.wizard-body {
     font-size: 0.88rem;
   }
 }
+
+/* 2-Part Split Phone Input (Country Code + Phone Number) */
+.q-phone-split-group {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .q-phone-split-group {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+.q-country-code-select {
+  font-size: 1.05rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  padding: 1.15rem 1.1rem;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: #020612;
+  color: #FFFFFF;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.22s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f5b014' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1.15rem center;
+  background-size: 1.1rem;
+  padding-right: 2.75rem;
+}
+
+.q-country-code-select:focus {
+  border-color: var(--brand-gold);
+  background-color: rgba(245, 176, 20, 0.04);
+  box-shadow: 0 0 20px rgba(245, 176, 20, 0.2);
+}
+
+.q-country-code-select option {
+  background: #020612;
+  color: #FFFFFF;
+  font-size: 1rem;
+  padding: 0.75rem;
+}
+
+.q-phone-number-input {
+  font-size: 1.25rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}

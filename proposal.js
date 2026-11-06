@@ -1,11 +1,74 @@
 /**
  * MotaGrowth Studio — Project Proposal Scope Wizard Engine
  * One-question-at-a-time fluid experience with dynamic branching,
+ * split country code phone inputs, explicit budget qualification,
  * keyboard accessibility, starting prices, and direct CRM persistence.
  */
 
 (function () {
   'use strict';
+
+  // Comprehensive Country Dialing Codes List (Morocco +212 default)
+  const COUNTRY_CODES = [
+    { code: '+212', label: '🇲🇦 Morocco (+212)' },
+    { code: '+34', label: '🇪🇸 Spain (+34)' },
+    { code: '+33', label: '🇫🇷 France (+33)' },
+    { code: '+1', label: '🇺🇸 United States / Canada (+1)' },
+    { code: '+44', label: '🇬🇧 United Kingdom (+44)' },
+    { code: '+971', label: '🇦🇪 United Arab Emirates (+971)' },
+    { code: '+966', label: '🇸🇦 Saudi Arabia (+966)' },
+    { code: '+974', label: '🇶🇦 Qatar (+974)' },
+    { code: '+32', label: '🇧🇪 Belgium (+32)' },
+    { code: '+41', label: '🇨🇭 Switzerland (+41)' },
+    { code: '+49', label: '🇩🇪 Germany (+49)' },
+    { code: '+31', label: '🇳🇱 Netherlands (+31)' },
+    { code: '+39', label: '🇮🇹 Italy (+39)' },
+    { code: '+351', label: '🇵🇹 Portugal (+351)' },
+    { code: '+213', label: '🇩🇿 Algeria (+213)' },
+    { code: '+216', label: '🇹🇳 Tunisia (+216)' },
+    { code: '+20', label: '🇪🇬 Egypt (+20)' },
+    { code: '+221', label: '🇸🇳 Senegal (+221)' },
+    { code: '+225', label: '🇨🇮 Ivory Coast (+225)' },
+    { code: '+965', label: '🇰🇼 Kuwait (+965)' },
+    { code: '+973', label: '🇧🇭 Bahrain (+973)' },
+    { code: '+968', label: '🇴🇲 Oman (+968)' },
+    { code: '+961', label: '🇱🇧 Lebanon (+961)' },
+    { code: '+962', label: '🇯🇴 Jordan (+962)' },
+    { code: '+90', label: '🇹🇷 Turkey (+90)' },
+    { code: '+61', label: '🇦🇺 Australia (+61)' },
+    { code: '+86', label: '🇨🇳 China (+86)' },
+    { code: '+65', label: '🇸🇬 Singapore (+65)' },
+    { code: '+91', label: '🇮🇳 India (+91)' },
+    { code: '+55', label: '🇧🇷 Brazil (+55)' },
+    { code: '+52', label: '🇲🇽 Mexico (+52)' },
+    { code: '+27', label: '🇿🇦 South Africa (+27)' },
+    { code: '+234', label: '🇳🇬 Nigeria (+234)' },
+    { code: '+353', label: '🇮🇪 Ireland (+353)' },
+    { code: '+46', label: '🇸🇪 Sweden (+46)' },
+    { code: '+47', label: '🇳🇴 Norway (+47)' },
+    { code: '+45', label: '🇩🇰 Denmark (+45)' },
+    { code: '+43', label: '🇦🇹 Austria (+43)' },
+    { code: '+352', label: '🇱🇺 Luxembourg (+352)' },
+    { code: '+377', label: '🇲🇨 Monaco (+377)' },
+    { code: '+other', label: '🌐 Other Country (+)' }
+  ];
+
+  function detectDefaultCountryCode() {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      if (tz.includes('Casablanca')) return '+212';
+      if (tz.includes('Madrid') || tz.includes('Canary')) return '+34';
+      if (tz.includes('Paris')) return '+33';
+      if (tz.includes('London')) return '+44';
+      if (tz.includes('Dubai')) return '+971';
+      if (tz.includes('Riyadh')) return '+966';
+      if (tz.includes('Brussels')) return '+32';
+      if (tz.includes('Zurich')) return '+41';
+      if (tz.includes('Berlin')) return '+49';
+      if (tz.includes('New_York') || tz.includes('Los_Angeles') || tz.includes('Chicago') || tz.includes('Toronto')) return '+1';
+    } catch (e) {}
+    return '+212'; // Default Morocco
+  }
 
   // 1. Service Definitions & Starting Prices
   const SERVICES = {
@@ -61,18 +124,18 @@
         },
         {
           id: 'pm_budget',
-          eyebrow: '04 / Advertising Spend',
+          eyebrow: '04 / Advertising Spend Budget',
           title: 'What is your monthly advertising budget?',
           subtitle: 'Required · Single selection',
-          helper: 'This is the amount paid to the advertising platforms, separate from MotaGrowth’s management fee.',
+          helper: 'This is the amount paid directly to advertising platforms, separate from MotaGrowth’s management fee (starts at 5,000 MAD / month).',
           type: 'single',
           required: true,
           options: [
-            { value: 'Under 5,000 MAD', label: 'Under 5,000 MAD' },
-            { value: '5,000–9,999 MAD', label: '5,000–9,999 MAD' },
-            { value: '10,000–24,999 MAD', label: '10,000–24,999 MAD' },
-            { value: '25,000–49,999 MAD', label: '25,000–49,999 MAD' },
-            { value: '50,000 MAD or more', label: '50,000 MAD or more' },
+            { value: 'Under 5,000 MAD', label: 'Under 5,000 MAD / month' },
+            { value: '5,000–9,999 MAD', label: '5,000–9,999 MAD / month' },
+            { value: '10,000–24,999 MAD', label: '10,000–24,999 MAD / month' },
+            { value: '25,000–49,999 MAD', label: '25,000–49,999 MAD / month' },
+            { value: '50,000 MAD or more', label: '50,000 MAD or more / month' },
             { value: 'Not decided yet', label: 'Not decided yet' }
           ]
         },
@@ -188,8 +251,24 @@
           ]
         },
         {
+          id: 'da_budget',
+          eyebrow: '06 / Budget Allocation',
+          title: 'What is your allocated budget for this project?',
+          subtitle: 'Required · Single selection',
+          helper: 'Digital Architecture engagements start at 15,000 MAD for a bespoke showcase flagship.',
+          type: 'single',
+          required: true,
+          options: [
+            { value: '15,000–24,999 MAD', label: '15,000–24,999 MAD (Essential Bespoke Showcase)' },
+            { value: '25,000–49,999 MAD', label: '25,000–49,999 MAD (Custom Interactive Architecture)' },
+            { value: '50,000–99,999 MAD', label: '50,000–99,999 MAD (E-commerce / Multi-Market Flagship)' },
+            { value: '100,000 MAD or more', label: '100,000 MAD or more (Enterprise Custom Platform)' },
+            { value: 'Flexible / Based on recommendation', label: 'Flexible / Based on recommendation' }
+          ]
+        },
+        {
           id: 'da_examples',
-          eyebrow: '06 / Design Benchmarks',
+          eyebrow: '07 / Design Benchmarks',
           title: 'Share up to three websites you like.',
           subtitle: 'Optional · Long text',
           type: 'textarea',
@@ -198,7 +277,7 @@
         },
         {
           id: 'da_notes',
-          eyebrow: '07 / Technical Context',
+          eyebrow: '08 / Technical Context',
           title: 'Tell us anything else we should know about the project.',
           subtitle: 'Optional · Long text',
           type: 'textarea',
@@ -278,8 +357,24 @@
           ]
         },
         {
+          id: 'cd_budget',
+          eyebrow: '06 / Budget Allocation',
+          title: 'What is your allocated budget for this brand identity?',
+          subtitle: 'Required · Single selection',
+          helper: 'Creative Direction projects start at 8,000 MAD for a core visual identity system.',
+          type: 'single',
+          required: true,
+          options: [
+            { value: '8,000–14,999 MAD', label: '8,000–14,999 MAD (Core Visual Identity)' },
+            { value: '15,000–29,999 MAD', label: '15,000–29,999 MAD (Full Identity System & Collateral)' },
+            { value: '30,000–59,999 MAD', label: '30,000–59,999 MAD (Multi-Touchpoint Brand & Art Direction)' },
+            { value: '60,000 MAD or more', label: '60,000 MAD or more (Complete Brand Universe)' },
+            { value: 'Flexible / Based on recommendation', label: 'Flexible / Based on recommendation' }
+          ]
+        },
+        {
           id: 'cd_references',
-          eyebrow: '06 / Visual References',
+          eyebrow: '07 / Visual References',
           title: 'Share brands or visual references you admire.',
           subtitle: 'Optional · Long text',
           type: 'textarea',
@@ -288,7 +383,7 @@
         },
         {
           id: 'cd_launch_essentials',
-          eyebrow: '07 / Launch Priorities',
+          eyebrow: '08 / Launch Priorities',
           title: 'Which deliverables are essential for launch?',
           subtitle: 'Required · Long text',
           type: 'textarea',
@@ -387,8 +482,24 @@
           placeholder: 'Enter your approximate rate, or leave blank if unknown.'
         },
         {
+          id: 'cs_budget',
+          eyebrow: '07 / Budget Allocation',
+          title: 'What is your allocated budget for conversion optimization?',
+          subtitle: 'Required · Single selection',
+          helper: 'Conversion Strategy audits start at 5,000 MAD for one website or funnel.',
+          type: 'single',
+          required: true,
+          options: [
+            { value: '5,000–9,999 MAD', label: '5,000–9,999 MAD (Diagnostic Funnel Audit)' },
+            { value: '10,000–24,999 MAD', label: '10,000–24,999 MAD (Audit + Implementation)' },
+            { value: '25,000–49,999 MAD', label: '25,000–49,999 MAD (Ongoing CRO Program)' },
+            { value: '50,000 MAD or more', label: '50,000 MAD or more (Enterprise Scale Testing)' },
+            { value: 'Flexible / Based on recommendation', label: 'Flexible / Based on recommendation' }
+          ]
+        },
+        {
           id: 'cs_support',
-          eyebrow: '07 / Scope of Support',
+          eyebrow: '08 / Scope of Support',
           title: 'What kind of support are you looking for?',
           subtitle: 'Required · Single selection',
           type: 'single',
@@ -440,11 +551,11 @@
       id: 'phone',
       eyebrow: 'Your Details · 04',
       title: 'What’s your WhatsApp number?',
-      subtitle: 'Required · Please include your country code',
-      type: 'tel',
+      subtitle: 'Required · Select your country code and enter your number',
+      type: 'phone_split',
       required: true,
-      placeholder: '+212 6... or +34 6...',
-      autocomplete: 'tel'
+      placeholder: '6 12 34 56 78',
+      autocomplete: 'tel-national'
     },
     {
       id: 'location',
@@ -513,7 +624,10 @@
   // 4. Wizard State Store
   const state = {
     selectedService: 'performance-marketing',
-    answers: {},
+    answers: {
+      phoneCountryCode: detectDefaultCountryCode(),
+      phoneNumberRaw: ''
+    },
     currentStepIndex: 0
   };
 
@@ -527,9 +641,8 @@
     }
   } catch (e) {}
 
-  // Build the dynamic question chain based on currently selected service
+  // Build dynamic question chain based on selected service
   function getQuestionsList() {
-    // Step 0: Service Selection
     const serviceQuestion = {
       id: 'selectedService',
       eyebrow: '01 / Scope Foundation',
@@ -626,6 +739,18 @@
       return true;
     }
 
+    // Split Phone Validation
+    if (q.type === 'phone_split') {
+      const rawDigits = (state.answers['phoneNumberRaw'] || '').replace(/\D/g, '');
+      if (rawDigits.length < 6) {
+        showStepError('Please enter your valid phone number in the number box (at least 6 digits).');
+        const phoneBox = document.getElementById('activePhoneNumber');
+        if (phoneBox) phoneBox.classList.add('has-error');
+        return false;
+      }
+      return true;
+    }
+
     const val = state.answers[q.id];
 
     if (q.required) {
@@ -643,10 +768,6 @@
           showStepError('Please enter a valid email address (e.g. name@company.com).');
           return false;
         }
-      }
-      if (q.type === 'tel' && String(val).trim().length < 6) {
-        showStepError('Please enter a valid phone number including country code.');
-        return false;
       }
       if (q.type === 'url') {
         if (!/^https?:\/\/.+/i.test(val)) {
@@ -681,7 +802,7 @@
     inputs.forEach(i => i.classList.remove('has-error'));
   }
 
-  // Render the current question
+  // Render current question
   function renderStep(direction) {
     const list = getQuestionsList();
     const total = list.length;
@@ -729,6 +850,8 @@
         hintEl.innerHTML = `<span>Select an option to proceed · or press <kbd>Enter ↵</kbd></span>`;
       } else if (currentQ.type === 'multi') {
         hintEl.innerHTML = `<span>Select all that apply · then click Continue</span>`;
+      } else if (currentQ.type === 'phone_split') {
+        hintEl.innerHTML = `<span>Select code &amp; enter number · press <kbd>Enter ↵</kbd></span>`;
       } else if (currentQ.type === 'textarea') {
         hintEl.innerHTML = `<span>Shift + Enter for new line · or click Continue</span>`;
       } else {
@@ -757,6 +880,32 @@
               </div>
             `;
           }).join('')}
+        </div>
+      `;
+    } else if (currentQ.type === 'phone_split') {
+      const activeCode = state.answers['phoneCountryCode'] || detectDefaultCountryCode();
+      const activeNumber = state.answers['phoneNumberRaw'] || '';
+      bodyHtml = `
+        <div class="q-phone-split-group">
+          <div>
+            <label for="activeCountryCode" class="q-recap-lbl" style="margin-bottom: 0.35rem; display: block;">Country Code</label>
+            <select class="q-input q-country-code-select" id="activeCountryCode" aria-label="Country Code">
+              ${COUNTRY_CODES.map(c => `
+                <option value="${c.code}" ${c.code === activeCode ? 'selected' : ''}>
+                  ${c.label}
+                </option>
+              `).join('')}
+            </select>
+          </div>
+          <div>
+            <label for="activePhoneNumber" class="q-recap-lbl" style="margin-bottom: 0.35rem; display: block;">Phone Number</label>
+            <input type="tel"
+                   class="q-input q-wizard-input q-phone-number-input"
+                   id="activePhoneNumber"
+                   placeholder="6 12 34 56 78"
+                   value="${escapeHtml(activeNumber)}"
+                   autocomplete="tel-national">
+          </div>
         </div>
       `;
     } else if (currentQ.type === 'single') {
@@ -810,6 +959,12 @@
       const phone = state.answers['phone'] || '—';
       const timeline = state.answers['timeline'] || 'As soon as possible';
 
+      // Check for chosen budget answer if available
+      const budgetKey = (state.selectedService === 'performance-marketing') ? 'pm_budget' :
+                        (state.selectedService === 'digital-architecture') ? 'da_budget' :
+                        (state.selectedService === 'creative-direction') ? 'cd_budget' : 'cs_budget';
+      const budgetVal = state.answers[budgetKey] || svc.price;
+
       bodyHtml = `
         <div class="q-agreement-card">
           <div class="q-agreement-summary-head">
@@ -829,12 +984,12 @@
               <span class="q-recap-val">${escapeHtml(phone)} • ${escapeHtml(email)}</span>
             </div>
             <div class="q-recap-item">
-              <span class="q-recap-lbl">Target Timeline</span>
-              <span class="q-recap-val">${escapeHtml(timeline)}</span>
+              <span class="q-recap-lbl">Allocated Budget</span>
+              <span class="q-recap-val" style="color: var(--brand-gold);">${escapeHtml(budgetVal)}</span>
             </div>
             <div class="q-recap-item">
-              <span class="q-recap-lbl">Commitment</span>
-              <span class="q-recap-val">Submitting this form does not commit you to a purchase.</span>
+              <span class="q-recap-lbl">Target Timeline</span>
+              <span class="q-recap-val">${escapeHtml(timeline)}</span>
             </div>
           </div>
 
@@ -877,7 +1032,43 @@
       </section>
     `;
 
-    // Focus input if available
+    // Split Phone Listeners
+    if (currentQ.type === 'phone_split') {
+      const codeSelect = document.getElementById('activeCountryCode');
+      const numberInput = document.getElementById('activePhoneNumber');
+
+      const syncPhoneState = () => {
+        const code = codeSelect ? codeSelect.value : '+212';
+        let rawNum = (numberInput ? numberInput.value : '').trim();
+        // Remove leading 0 if typed (e.g. 061234 -> 61234)
+        if (rawNum.startsWith('0') && code !== '+other') {
+          rawNum = rawNum.replace(/^0+/, '');
+        }
+        state.answers['phoneCountryCode'] = code;
+        state.answers['phoneNumberRaw'] = rawNum;
+        state.answers['phone'] = `${code} ${rawNum}`.trim();
+        clearStepError();
+      };
+
+      if (codeSelect) {
+        codeSelect.addEventListener('change', syncPhoneState);
+      }
+      if (numberInput) {
+        setTimeout(() => {
+          try { numberInput.focus(); } catch (e) {}
+        }, 50);
+
+        numberInput.addEventListener('input', syncPhoneState);
+        numberInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleNext();
+          }
+        });
+      }
+    }
+
+    // Standard input focus
     const activeInput = document.getElementById('activeInput');
     if (activeInput) {
       setTimeout(() => {
@@ -889,7 +1080,6 @@
         clearStepError();
       });
 
-      // Press Enter in text/email/tel/url triggers Next
       if (currentQ.type !== 'textarea') {
         activeInput.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
@@ -900,7 +1090,7 @@
       }
     }
 
-    // Attach listeners for Service Selector
+    // Service Selector listeners
     if (currentQ.type === 'service_select') {
       const boxes = stageEl.querySelectorAll('.q-service-box');
       boxes.forEach(box => {
@@ -915,7 +1105,6 @@
             b.querySelector('.q-check-circle').textContent = isMatch ? '✓' : '';
           });
           clearStepError();
-          // Auto advance after short tactile delay
           setTimeout(() => {
             handleNext();
           }, 240);
@@ -930,7 +1119,7 @@
       });
     }
 
-    // Attach listeners for Single Choice
+    // Single Choice listeners
     if (currentQ.type === 'single') {
       const rows = stageEl.querySelectorAll('.q-option-row');
       rows.forEach(row => {
@@ -958,7 +1147,7 @@
       });
     }
 
-    // Attach listeners for Multiple Choice
+    // Multiple Choice listeners
     if (currentQ.type === 'multi') {
       const rows = stageEl.querySelectorAll('.q-option-row');
       rows.forEach(row => {
@@ -990,7 +1179,7 @@
       });
     }
 
-    // Attach listener for Privacy modal trigger in agreement step
+    // Privacy modal trigger
     const privLink = document.getElementById('triggerPrivacyModal');
     if (privLink) {
       privLink.addEventListener('click', (e) => {
@@ -1008,7 +1197,6 @@
     const list = getQuestionsList();
     const currentQ = list[state.currentStepIndex];
 
-    // If agreement step, submit inquiry
     if (currentQ.type === 'agreement') {
       submitInquiry();
       return;
@@ -1027,7 +1215,7 @@
     }
   }
 
-  // Handle inquiry submission & storage
+  // Inquiry submission & storage
   function submitInquiry() {
     const svc = SERVICES[state.selectedService] || SERVICES['performance-marketing'];
     const refSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -1051,6 +1239,12 @@
     const timeline = state.answers['timeline'] || 'As soon as possible';
     const additionalNotes = state.answers['additionalNotes'] || '';
 
+    // Extract budget value
+    const budgetKey = (state.selectedService === 'performance-marketing') ? 'pm_budget' :
+                      (state.selectedService === 'digital-architecture') ? 'da_budget' :
+                      (state.selectedService === 'creative-direction') ? 'cd_budget' : 'cs_budget';
+    const budgetVal = state.answers[budgetKey] || svc.price;
+
     // Collect service responses
     const answerNotes = [];
     svc.questions.forEach(q => {
@@ -1065,6 +1259,7 @@
       `BUSINESS CONTEXT: ${bizDesc}`,
       `LOCATION: ${location}`,
       website && website !== '—' ? `WEBSITE: ${website}` : '',
+      `ALLOCATED BUDGET: ${budgetVal}`,
       `TIMELINE: ${timeline}`,
       '--- SERVICE SPECIFIC ---',
       ...answerNotes,
@@ -1082,6 +1277,7 @@
       clientPhone: phone,
       location: location,
       website: website,
+      budget: budgetVal,
       businessDescription: bizDesc,
       serviceKey: state.selectedService,
       services: [`${svc.title} (${svc.price})`],
@@ -1119,7 +1315,6 @@
     if (stepBadgeEl) stepBadgeEl.textContent = 'Inquiry Received';
     if (servicePillEl) servicePillEl.style.display = 'none';
 
-    // Hide bottom wizard footer
     const footer = document.getElementById('wizardFooter');
     if (footer) footer.style.display = 'none';
 
@@ -1143,6 +1338,10 @@
           <div class="q-conf-row">
             <span class="q-conf-lbl">Scope Foundation</span>
             <span class="q-conf-val">${svc.price}</span>
+          </div>
+          <div class="q-conf-row">
+            <span class="q-conf-lbl">Allocated Budget</span>
+            <span class="q-conf-val" style="color: var(--brand-gold);">${escapeHtml(record.budget || svc.price)}</span>
           </div>
           <div class="q-conf-row">
             <span class="q-conf-lbl">Client Contact</span>
@@ -1176,7 +1375,10 @@
     const restartBtn = document.getElementById('restartWizardBtn');
     if (restartBtn) {
       restartBtn.addEventListener('click', () => {
-        state.answers = {};
+        state.answers = {
+          phoneCountryCode: detectDefaultCountryCode(),
+          phoneNumberRaw: ''
+        };
         state.currentStepIndex = 0;
         if (footer) footer.style.display = 'block';
         renderStep('back');
@@ -1186,11 +1388,10 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Keyboard shortcut navigation (Letter keys A, B, C, D, Esc, Enter)
+  // Keyboard shortcut navigation
   window.addEventListener('keydown', (e) => {
-    // If typing in input or textarea, let user type
     const activeEl = document.activeElement;
-    const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+    const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
 
     if (e.key === 'Escape') {
       if (privacyModal && privacyModal.hasAttribute('open')) {
@@ -1204,7 +1405,6 @@
 
     if (isTyping) return;
 
-    // A-Z shortcut for options
     if (/^[a-z]$/i.test(e.key)) {
       const charCode = e.key.toUpperCase().charCodeAt(0);
       const optionIndex = charCode - 65;
@@ -1234,4 +1434,3 @@
   renderStep('init');
 
 })();
-
