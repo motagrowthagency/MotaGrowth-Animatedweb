@@ -3589,7 +3589,49 @@ a:hover .btn-arrow {
   }
 }
 
+@media (max-width: 900px) {
+  .orsap-editorial-body {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .orsap-laptop-col {
+    max-width: 100%;
+  }
+
+  .orsap-mockup-img {
+    max-height: 300px;
+  }
+
+  .orsap-narrative-col {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
+
+  /* Mobile Cinematic Backdrop: dim the background slide text so NO ghost text clashes */
+  .hero-cinematic-overlay {
+    background: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.96) 65%, #000000 100%);
+  }
+
+  .cinematic-slide {
+    filter: brightness(0.22) blur(3px) saturate(0.8);
+    opacity: 0.08 !important;
+  }
+
+  .frame-top-bar {
+    height: 56px;
+    padding: 0;
+  }
+
+  .btn-contact-header {
+    padding: 7px 14px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 4px;
+    box-shadow: none;
+  }
 
   /* Mobile Hero Layout (Unblocked, Pure Background) */
   .hero-section {
@@ -3619,50 +3661,74 @@ a:hover .btn-arrow {
     justify-content: space-between;
   }
 
+  .hero-eyebrow-wrap {
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-eyebrow {
+    justify-content: flex-start;
+    text-align: left;
+    font-size: 0.65rem;
+    gap: 0.35rem;
+    line-height: 1.4;
+  }
+
+  .hero-gold-datum {
+    margin: 0.35rem 0 0 0;
+  }
+
   .hero-headline-desktop {
     display: none;
   }
 
+  /* Unified, impactful 3-line headline on mobile (no zig-zag voids) */
   .hero-headline-mobile {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
     width: 100%;
     margin-bottom: 1.25rem;
+    gap: 0.15rem;
   }
 
   .mobile-stack-right {
     display: flex;
-    flex-direction: column;
-    text-align: right;
-    align-items: flex-end;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.38em;
+    text-align: left;
     font-family: var(--font-sans);
-    font-size: clamp(2.3rem, 11vw, 3.2rem);
+    font-size: clamp(2.4rem, 11vw, 3.4rem);
     font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: 0.02em;
+    line-height: 1.06;
+    letter-spacing: 0.01em;
     color: #FFFFFF;
+    margin: 0;
+  }
+
+  .mobile-stack-right span[data-i18n="hero.m3"] {
+    width: 100%;
   }
 
   .mobile-stack-left {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.38em;
     text-align: left;
-    align-items: flex-start;
     font-family: var(--font-sans);
-    font-size: clamp(2.3rem, 11vw, 3.2rem);
+    font-size: clamp(2.4rem, 11vw, 3.4rem);
     font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: 0.02em;
+    line-height: 1.06;
+    letter-spacing: 0.01em;
     color: #FFFFFF;
-    margin-top: 1.75rem;
+    margin-top: 0.15rem;
   }
 
-  .hero-eyebrow {
-    flex-wrap: wrap;
-    justify-content: center;
-    text-align: center;
-    font-size: 0.68rem;
-    gap: 0.35rem;
+  .mobile-stack-left .growth-word {
+    color: var(--brand-gold);
   }
 
   .hero-sub-split {
@@ -3819,12 +3885,155 @@ a:hover .btn-arrow {
   }
 
   .work-flagship-card {
-    padding: 1.25rem;
-    gap: 1.5rem;
+    padding: clamp(1.25rem, 3.5vw, 1.75rem) clamp(1rem, 3vw, 1.5rem);
+    border-radius: 12px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  .flagship-title {
-    font-size: 1.6rem;
+  .orsap-showcase-tabs {
+    justify-content: flex-start;
+    gap: 0.85rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.75rem;
+  }
+
+  .orsap-showcase-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .orsap-tab-item {
+    flex-shrink: 0;
+    padding: 0.35rem 0.6rem 0.5rem;
+  }
+
+  .orsap-tab-item .tab-label {
+    font-size: 0.72rem;
+  }
+
+  .orsap-editorial-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .orsap-laptop-col {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .orsap-laptop-viewport,
+  .orsap-mockup-frame {
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+  }
+
+  .orsap-mockup-img {
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    max-height: 240px;
+    margin: 0 auto;
+  }
+
+  .orsap-mockup-hover-hint {
+    bottom: 0.75rem;
+    font-size: 0.64rem;
+    padding: 5px 10px;
+  }
+
+  .orsap-narrative-col {
+    width: 100%;
+  }
+
+  .orsap-eyebrow {
+    margin-bottom: 0.35rem;
+  }
+
+  .orsap-eyebrow-link {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+  }
+
+  .orsap-hero-title {
+    font-size: clamp(1.8rem, 6.5vw, 2.4rem);
+    line-height: 1.1;
+  }
+
+  .orsap-hero-desc {
+    font-size: 0.85rem;
+    line-height: 1.55;
+    margin-bottom: 1.25rem;
+    max-width: 100%;
+  }
+
+  .orsap-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 1rem;
+    padding: 1.1rem 0;
+    margin-bottom: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .orsap-metric-col {
+    padding: 0 0.5rem;
+    border-right: none;
+  }
+
+  .orsap-metric-col:nth-child(1),
+  .orsap-metric-col:nth-child(3) {
+    padding-left: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .orsap-metric-col:nth-child(2),
+  .orsap-metric-col:nth-child(4) {
+    padding-right: 0;
+  }
+
+  .orsap-metric-number {
+    font-size: 1.35rem;
+  }
+
+  .orsap-metric-caption {
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+  }
+
+  .orsap-taxonomy-bar {
+    font-size: 0.75rem;
+    gap: 0.45rem;
+    margin-bottom: 1.4rem;
+    line-height: 1.4;
+  }
+
+  .orsap-actions-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.9rem;
+    width: 100%;
+  }
+
+  .orsap-cta-primary,
+  .orsap-cta-secondary {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.74rem;
+    border-bottom: 1px solid rgba(245, 176, 20, 0.35);
   }
 
   .work-secondary-grid {
