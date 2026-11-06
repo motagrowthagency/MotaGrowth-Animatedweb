@@ -332,100 +332,102 @@
 
           <!-- Dominant Flagship Project: ORSAP.MA -->
           <article class="work-flagship-card" id="flagship-orsap">
-            <div class="orsap-showcase-container">
+            
+            <!-- Top Horizontal Architecture Tabs -->
+            <div class="orsap-showcase-tabs" role="tablist" aria-label="ORSAP Architecture Views">
+              <button type="button" class="orsap-tab-item active" data-orsap-tab="home" data-mockup="assets/orsap_mockups/tab1_storefront.webp" data-svg="assets/orsap/orsap_01_home.svg" data-title="Storefront Architecture &amp; Value Proposition" data-desc="Brand hero, video presentation, stats counters &amp; BUTEC client proof">
+                <span class="tab-label">01 / Storefront</span>
+                <span class="tab-underline"></span>
+              </button>
+              <button type="button" class="orsap-tab-item" data-orsap-tab="store" data-mockup="assets/orsap_mockups/tab2_estore.webp" data-svg="assets/orsap/orsap_12_ecommerce_store.svg" data-title="B2B E-Commerce &amp; Client Portal" data-desc="Live MAD pricing, stock availability, express outillage &amp; procurement cart">
+                <span class="tab-label">02 / B2B E-Store</span>
+                <span class="tab-underline"></span>
+              </button>
+              <button type="button" class="orsap-tab-item" data-orsap-tab="catalog" data-mockup="assets/orsap_mockups/tab3_catalog.webp" data-svg="assets/orsap/orsap_05_catalog.svg" data-title="15-Category Industrial Catalog" data-desc="15,000+ reference taxonomy (EPI, Heights, Handling, Fluids, Power Tools)">
+                <span class="tab-label">03 / 15k+ SKU Catalog</span>
+                <span class="tab-underline"></span>
+              </button>
+              <button type="button" class="orsap-tab-item" data-orsap-tab="marques" data-mockup="assets/orsap_mockups/tab4_brands.webp" data-svg="assets/orsap/orsap_07_marques.svg" data-title="300+ Brand Directory" data-desc="International partnerships with 3M, Makita, Bosch, DeWalt, ABB, Honeywell">
+                <span class="tab-label">04 / 300+ Brands</span>
+                <span class="tab-underline"></span>
+              </button>
+              <button type="button" class="orsap-tab-item" data-orsap-tab="proof" data-mockup="assets/orsap_mockups/tab5_proof.webp" data-svg="assets/orsap/orsap_06_temoignages.svg" data-title="Enterprise Client Proof" data-desc="Institutional validation (BUTEC 1,200 workers, Dislog Group, SNEP, Ventec)">
+                <span class="tab-label">05 / Enterprise Proof</span>
+                <span class="tab-underline"></span>
+              </button>
+            </div>
+
+            <!-- Two-Column Editorial Composition -->
+            <div class="orsap-editorial-body">
               
-              <!-- Interactive Architecture Tabs -->
-              <div class="orsap-tabs-strip" role="tablist" aria-label="ORSAP Architecture Views">
-                <button type="button" class="orsap-tab-btn active" data-orsap-tab="home" data-img="assets/orsap/orsap_01_home.svg" data-title="Storefront &amp; Value Proposition" data-desc="Brand hero, video presentation, stats counters &amp; BUTEC client proof">01 / Storefront</button>
-                <button type="button" class="orsap-tab-btn" data-orsap-tab="store" data-img="assets/orsap/orsap_12_ecommerce_store.svg" data-title="B2B E-Commerce &amp; Client Portal" data-desc="Live MAD pricing, stock availability, express outillage &amp; procurement cart">02 / B2B E-Store</button>
-                <button type="button" class="orsap-tab-btn" data-orsap-tab="catalog" data-img="assets/orsap/orsap_05_catalog.svg" data-title="15-Category Industrial Catalog" data-desc="15,000+ reference taxonomy (EPI, Heights, Handling, Fluids, Power Tools)">03 / 15k+ SKU Catalog</button>
-                <button type="button" class="orsap-tab-btn" data-orsap-tab="marques" data-img="assets/orsap/orsap_07_marques.svg" data-title="300+ Brand Directory" data-desc="International partnerships with 3M, Makita, Bosch, DeWalt, ABB, Honeywell">04 / 300+ Brands</button>
-                <button type="button" class="orsap-tab-btn" data-orsap-tab="proof" data-img="assets/orsap/orsap_06_temoignages.svg" data-title="Enterprise Client Proof" data-desc="Institutional validation (BUTEC 1,200 workers, Dislog Group, SNEP, Ventec)">05 / Enterprise Proof</button>
-              </div>
-
-              <!-- Branded Browser Frame -->
-              <div class="orsap-browser-frame">
-                <div class="orsap-browser-chrome">
-                  <div class="browser-dots">
-                    <span class="browser-dot dot-red"></span>
-                    <span class="browser-dot dot-amber"></span>
-                    <span class="browser-dot dot-green"></span>
-                  </div>
-                  <div class="browser-address-bar">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <span>https://orsap.ma</span>
-                  </div>
-                  <button type="button" class="browser-inspect-action" id="orsapInspectBtn" aria-label="Inspect Full Screen">
-                    <span>Inspect Full View ↗</span>
-                  </button>
-                </div>
-
-                <div class="orsap-screen-viewport" id="orsapScreenViewport">
-                  <div class="orsap-screen-inner">
-                    <img src="assets/orsap/orsap_01_home.svg" alt="ORSAP.ma B2B Industrial Distribution Platform" class="orsap-screen-img" id="orsapActiveImg" loading="lazy">
-                  </div>
-                  <div class="orsap-viewport-hint" id="orsapViewportHint">
-                    <span>Scroll to explore full page ↓</span>
-                  </div>
-                  <div class="orsap-overlay-action">
-                    <span class="flagship-featured-badge">FLAGSHIP CASE STUDY</span>
-                    <button type="button" class="btn-inspect-pill" id="orsapInspectPill">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7-7M3 21l7-7"/></svg>
-                      <span>Click to Inspect Full Capture</span>
-                    </button>
+              <!-- Left Column: 3D Angled MacBook Mockup -->
+              <div class="orsap-laptop-col">
+                <div class="orsap-laptop-viewport" id="orsapLaptopViewport" role="button" tabindex="0" aria-label="Inspect Full High-Resolution Capture">
+                  <div class="orsap-mockup-frame">
+                    <img src="assets/orsap_mockups/tab1_storefront.webp" alt="ORSAP.MA 3D Interactive MacBook Mockup" class="orsap-mockup-img" id="orsapMockupImg" loading="lazy">
+                    <div class="orsap-mockup-hover-hint">
+                      <span class="hover-hint-icon">↗</span>
+                      <span>Click to Inspect Full Capture (2358px SVG)</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
+              <!-- Right Column: Editorial Narrative, Metrics & CTAs -->
+              <div class="orsap-narrative-col">
+                <div class="orsap-eyebrow">CASE STUDY —</div>
+                <h3 class="orsap-hero-title">ORSAP MA</h3>
+                <p class="orsap-hero-desc">
+                  From traditional physical supplier to Morocco's leading digital industrial distribution platform. MotaGrowth designed and built a synchronized commercial engine with e-commerce, quotation automation, and enterprise-grade client proof.
+                </p>
+
+                <!-- 4-Stat Metrics Grid with Vertical Divider Borders -->
+                <div class="orsap-metrics-grid">
+                  <div class="orsap-metric-col">
+                    <span class="orsap-metric-number">15,000+</span>
+                    <span class="orsap-metric-caption">INDUSTRIAL SKUS</span>
+                  </div>
+                  <div class="orsap-metric-col">
+                    <span class="orsap-metric-number">300+</span>
+                    <span class="orsap-metric-caption">GLOBAL BRANDS</span>
+                  </div>
+                  <div class="orsap-metric-col">
+                    <span class="orsap-metric-number">24h</span>
+                    <span class="orsap-metric-caption">DELIVERY IN MOROCCO</span>
+                  </div>
+                  <div class="orsap-metric-col">
+                    <span class="orsap-metric-number">Tier-1</span>
+                    <span class="orsap-metric-caption">CLIENTS EQUIPPED</span>
+                  </div>
+                </div>
+
+                <!-- Disciplines / Taxonomy Bar -->
+                <div class="orsap-taxonomy-bar">
+                  <span>B2B E-Commerce</span>
+                  <span class="sep">/</span>
+                  <span>RFQ Funnel</span>
+                  <span class="sep">/</span>
+                  <span>SKU Taxonomy</span>
+                  <span class="sep">/</span>
+                  <span>Brand Authority</span>
+                </div>
+
+                <!-- Action CTAs -->
+                <div class="orsap-actions-row">
+                  <a href="cases.html#orsap" class="orsap-cta-primary">
+                    <span class="cta-label">EXPLORE FULL CASE STUDY</span>
+                    <span class="cta-arrow">↗</span>
+                    <span class="cta-underline"></span>
+                  </a>
+                  <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20saw%20the%20Orsap.ma%20case%20study%20and%20want%20to%20build%20a%20similar%20high-converting%20platform" target="_blank" rel="noopener" class="orsap-cta-secondary">
+                    <span>DISCUSS YOUR BRIEF</span>
+                    <span class="cta-arrow">↗</span>
+                  </a>
+                </div>
+
+              </div>
             </div>
 
-            <div class="flagship-content">
-              <div class="work-meta-top">
-                <span class="work-industry">B2B E-COMMERCE &amp; INDUSTRIAL COMMERCE</span>
-                <span class="work-discipline">FLAGSHIP PLATFORM • 15,000+ REFERENCES • INBOUND RFQ ENGINE</span>
-              </div>
-              <h3 class="flagship-title">ORSAP.MA</h3>
-              <p class="flagship-desc">
-                From traditional physical supplier to Morocco’s leading digital industrial distribution platform: MotaGrowth architected and engineered a synchronized commercial engine managing 15,000+ industrial references and 300+ international brands, equipped with live MAD e-commerce ordering, automated quote generation, and validated client proof for enterprise leaders like BUTEC, Dislog Group, and SNEP.
-              </p>
-
-              <!-- Strategic Verified Proof Metrics -->
-              <div class="flagship-metrics-grid">
-                <div class="flagship-metric-item">
-                  <span class="flagship-metric-val">15,000+</span>
-                  <span class="flagship-metric-label">Industrial SKUs</span>
-                </div>
-                <div class="flagship-metric-item">
-                  <span class="flagship-metric-val">300+</span>
-                  <span class="flagship-metric-label">Global Brands</span>
-                </div>
-                <div class="flagship-metric-item">
-                  <span class="flagship-metric-val">48h SLA</span>
-                  <span class="flagship-metric-label">Delivery Guarantee</span>
-                </div>
-                <div class="flagship-metric-item">
-                  <span class="flagship-metric-val">Tier-1</span>
-                  <span class="flagship-metric-label">Clients Equipped</span>
-                </div>
-              </div>
-
-              <div class="work-deliverables">
-                <span class="deliverable-tag">B2B E-Commerce Architecture</span>
-                <span class="deliverable-tag">15k+ SKU Taxonomy</span>
-                <span class="deliverable-tag">RFQ Conversion Funnel</span>
-                <span class="deliverable-tag">Brand Partner Authority</span>
-                <span class="deliverable-tag">HSE Knowledge Hub</span>
-              </div>
-
-              <div class="work-actions">
-                <a href="cases.html#orsap" class="btn-ref btn-ref-solid" style="margin-right: 0.75rem;">
-                  <span class="btn-text">EXPLORE FULL CASE STUDY ↗</span>
-                </a>
-                <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20saw%20the%20Orsap.ma%20case%20study%20and%20want%20to%20build%20a%20similar%20high-converting%20platform" target="_blank" rel="noopener" class="btn-work-explore">
-                  <span>DISCUSS YOUR BRIEF ↗</span>
-                </a>
-              </div>
-            </div>
           </article>
 
           <!-- Secondary Curated Pair -->

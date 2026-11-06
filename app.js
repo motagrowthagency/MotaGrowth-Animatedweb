@@ -872,7 +872,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!target) return;
 
       const textInput = target.closest('input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="search"], textarea, [contenteditable="true"]');
-      const interactive = target.closest('a, button, [role="button"], input[type="submit"], input[type="button"], select, label, summary, [data-case-inspect], .case-screen-card, .btn-ref, .btn-inspect-pill, .browser-inspect-action, .orsap-tab-btn, .lightbox-nav-btn, .lightbox-size-btn, .lightbox-close-btn, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .portal-nav-btn, .tab-btn, .portal-btn, .action-btn, .document-card, .deliverable-card');
+      const interactive = target.closest('a, button, [role="button"], input[type="submit"], input[type="button"], select, label, summary, [data-case-inspect], .case-screen-card, .btn-ref, .btn-inspect-pill, .browser-inspect-action, .orsap-tab-btn, .orsap-tab-item, .orsap-laptop-viewport, .orsap-cta-primary, .orsap-cta-secondary, .lightbox-nav-btn, .lightbox-size-btn, .lightbox-close-btn, .comma-card, .frame-brand, .frame-menu-dots, .lang-btn, .case-flow-card, .cases-nav-btn, .cases-dot, .portal-nav-btn, .tab-btn, .portal-btn, .action-btn, .document-card, .deliverable-card');
 
       if (textInput) {
         document.body.classList.remove('cursor-hover');
@@ -1067,32 +1067,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Homepage flagship tabs & buttons
-  const orsapTabs = document.querySelectorAll('.orsap-tab-btn');
-  const orsapActiveImg = document.getElementById('orsapActiveImg');
+  // Homepage flagship tabs & 3D laptop mockup interactions
+  const orsapTabs = document.querySelectorAll('.orsap-tab-item, .orsap-tab-btn');
+  const orsapMockupImg = document.getElementById('orsapMockupImg') || document.getElementById('orsapActiveImg');
+  const orsapLaptopViewport = document.getElementById('orsapLaptopViewport');
   const inspectBtns = [document.getElementById('orsapInspectBtn'), document.getElementById('orsapInspectPill')];
 
-  if (orsapTabs.length > 0 && orsapActiveImg) {
+  if (orsapTabs.length > 0) {
     orsapTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         orsapTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
-        const imgSrc = tab.getAttribute('data-img');
-        const foundIdx = orsapCatalog.findIndex(item => item.src === imgSrc);
-        if (foundIdx !== -1) {
-          currentOrsapIndex = foundIdx;
+        const svgSrc = tab.getAttribute('data-svg') || tab.getAttribute('data-img');
+        const mockupSrc = tab.getAttribute('data-mockup') || tab.getAttribute('data-img');
+
+        if (svgSrc) {
+          const foundIdx = orsapCatalog.findIndex(item => item.src === svgSrc);
+          if (foundIdx !== -1) {
+            currentOrsapIndex = foundIdx;
+          }
         }
 
-        if (imgSrc) {
-          orsapActiveImg.style.opacity = '0.3';
+        if (orsapMockupImg && mockupSrc) {
+          orsapMockupImg.style.opacity = '0.35';
           setTimeout(() => {
-            orsapActiveImg.src = imgSrc;
-            orsapActiveImg.style.opacity = '1';
+            orsapMockupImg.src = mockupSrc;
+            orsapMockupImg.style.opacity = '1';
           }, 120);
         }
       });
     });
+
+    if (orsapLaptopViewport) {
+      orsapLaptopViewport.addEventListener('click', () => {
+        openOrsapLightbox(currentOrsapIndex);
+      });
+      orsapLaptopViewport.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openOrsapLightbox(currentOrsapIndex);
+        }
+      });
+    }
 
     inspectBtns.forEach(btn => {
       if (btn) btn.addEventListener('click', () => openOrsapLightbox(currentOrsapIndex));
