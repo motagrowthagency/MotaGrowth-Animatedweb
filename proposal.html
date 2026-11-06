@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Inquiry &amp; Scope Builder | MotaGrowth Digital Growth Studio</title>
+  <meta name="description"
+    content="Build your project inquiry with MotaGrowth Studio. Interactive scope builder with clear starting prices for Performance Marketing, Digital Architecture, Creative Direction, and Conversion Strategy.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/mota-icon.png">
+
+  <!-- Editorial Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Studio Design System -->
+  <link rel="stylesheet" href="styles.css?v=4.8">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="wizard-body">
+
+  <!-- Accessible Skip Link -->
+  <a href="#wizardMain" class="skip-link">Skip to proposal wizard</a>
+
+  <!-- Top Studio Floating Progress Bar & Header -->
+  <header class="wizard-header" id="wizardHeader">
+    <div class="wizard-header-inner">
+
+      <!-- Brand Identity -->
+      <a href="index.html" class="wizard-brand" aria-label="Return to MotaGrowth Home">
+        <span class="mota-word">Mota</span><span class="growth-word">Growth</span>
+        <span class="wizard-brand-tag">Project Inquiry</span>
+      </a>
+
+      <!-- Center Step Badge & Live Counter -->
+      <div class="wizard-counter-wrap">
+        <span class="wizard-step-badge" id="wizardStepBadge">Question 1 of 17</span>
+        <span class="wizard-service-pill" id="wizardServicePill" style="display:none;"></span>
+      </div>
+
+      <!-- Exit Button -->
+      <a href="index.html" class="wizard-exit-btn" title="Exit to Studio Home" aria-label="Exit to Studio Home">
+        <span>✕ Exit</span>
+      </a>
+
+    </div>
+
+    <!-- Progress Track (Glides from 0% to 100%) -->
+    <div class="wizard-progress-track" aria-hidden="true">
+      <div class="wizard-progress-fill" id="wizardProgressFill" style="width: 6%;"></div>
+    </div>
+  </header>
+
+  <!-- Main Wizard Viewport (One Question At A Time Stage) -->
+  <main class="wizard-main" id="wizardMain" tabindex="-1">
+    <div class="wizard-shell">
+
+      <!-- Dynamic Question Container (Injected & Animated by proposal.js) -->
+      <div class="wizard-stage" id="wizardStage" aria-live="polite">
+        <!-- Step DOM injected dynamically -->
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Sticky Bottom Controls Bar -->
+  <footer class="wizard-footer" id="wizardFooter">
+    <div class="wizard-footer-inner">
+      <button type="button" class="btn-wizard-nav btn-wizard-back" id="wizardBackBtn" disabled aria-label="Previous Question">
+        <span class="btn-arrow">←</span>
+        <span>Back</span>
+      </button>
+
+      <div class="wizard-shortcut-hint" id="wizardHint">
+        <span>Press <kbd>Enter ↵</kbd> or click Continue</span>
+      </div>
+
+      <button type="button" class="btn-wizard-nav btn-wizard-next" id="wizardNextBtn" aria-label="Continue to next question">
+        <span>Continue</span>
+        <span class="btn-arrow">→</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       LEGAL DIALOG: PRIVACY STATEMENT (Accessible WCAG 2.2 Modal)
+       ========================================================================= -->
+  <dialog class="legal-modal-backdrop" id="privacyModal" aria-labelledby="privacyTitle" aria-modal="true">
+    <div class="legal-modal-card">
+      <header class="legal-modal-header">
+        <div class="legal-header-meta">
+          <span class="legal-tag">Legal Architecture</span>
+          <h2 class="legal-modal-title" id="privacyTitle">Privacy Statement &amp; Data Ethics</h2>
+          <span class="legal-date">Last Revised: January 2026 · Compliant with GDPR &amp; Law 09-08</span>
+        </div>
+        <button type="button" class="btn-close-modal" id="closePrivacyBtn" aria-label="Close Privacy Modal">✕</button>
+      </header>
+
+      <div class="legal-modal-body">
+        <section class="legal-section">
+          <h3>01 / Core Commitment</h3>
+          <p>
+            MotaGrowth operates on an explicit principle of data minimalism. We do not sell, rent, monetize, or broker
+            client or visitor data. Any information transmitted through our inquiry forms, client portal, or direct
+            communications is treated as strictly proprietary and confidential.
+          </p>
+        </section>
+
+        <section class="legal-section">
+          <h3>02 / Information Collected</h3>
+          <p>
+            When you submit a project inquiry or communicate with our studio, we collect strictly necessary details to
+            evaluate your brief: your name, organization, direct email, WhatsApp number, and submitted scope details.
+          </p>
+        </section>
+
+        <section class="legal-section">
+          <h3>03 / Storage &amp; Retention</h3>
+          <p>
+            Inquiry data is processed directly by studio directors and retained only for the duration required to
+            prepare, deliver, and manage client engagements.
+          </p>
+        </section>
+
+        <section class="legal-section">
+          <h3>04 / Direct Contact</h3>
+          <p>
+            For data privacy inquiries or immediate deletion requests, contact our privacy officer directly at
+            <a href="mailto:privacy@motagrowth.com" class="legal-link">privacy@motagrowth.com</a>.
+          </p>
+        </section>
+      </div>
+
+      <footer class="legal-modal-footer">
+        <button type="button" class="btn-ref btn-ref-solid" id="ackPrivacyBtn">
+          <span class="btn-text">ACKNOWLEDGE &amp; CLOSE</span>
+        </button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- Studio Custom Precision Cursor (Pointer-Fine Devices) -->
+  <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- Scripts -->
+  <script src="app.js?v=4.8"></script>
+  <script src="proposal.js?v=4.8"></script>
+</body>
+
+</html>
+
