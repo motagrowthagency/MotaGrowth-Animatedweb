@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MotaGrowth Studio — CRM Administrateur</title>
+  <title>MotaGrowth Studio — Agency Admin CRM</title>
   <link rel="icon" type="image/png" href="assets/mota-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,86 +13,156 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="is-admin-route">
-<div class="admin-portal-view" id="adminPortalView" style="display: block;">
+
+  <!-- =========================================================================
+       1. MASTER PASSWORD SECURITY LOCK SCREEN
+       ========================================================================= -->
+  <div class="admin-lock-screen" id="adminLockScreen" style="display: flex;">
+    <div class="admin-lock-card">
+      <div class="admin-lock-icon-box">
+        <i data-lucide="shield-check"></i>
+      </div>
+      <h2 class="admin-lock-title">Agency Master Lock</h2>
+      <p class="admin-lock-subtitle">Authorized Executive Access Only.<br>Enter master password to access MotaGrowth CRM & Client Workspaces.</p>
+      
+      <form id="adminLockForm" class="admin-lock-form" autocomplete="off">
+        <div class="admin-pass-wrap">
+          <input 
+            type="password" 
+            id="adminMasterPassInput" 
+            class="admin-pass-input" 
+            placeholder="Enter Master Password..." 
+            required 
+            autocomplete="current-password"
+            autofocus
+          >
+          <button type="button" class="admin-pass-toggle" id="toggleAdminPassBtn" title="Show / Hide Password">
+            <i data-lucide="eye" id="passToggleIcon"></i>
+          </button>
+        </div>
+
+        <div class="admin-lock-error" id="adminLockError">
+          Incorrect master password. Please verify and try again.
+        </div>
+
+        <button type="submit" class="admin-lock-btn" id="adminUnlockSubmitBtn">
+          <span>Unlock Agency CRM</span>
+          <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+        </button>
+      </form>
+
+      <div class="admin-lock-footer">
+        <a href="index.html" class="admin-lock-back-link">
+          <i data-lucide="arrow-left" style="width:14px;height:14px;"></i>
+          <span>Return to Site</span>
+        </a>
+        <span class="admin-lock-secure-tag">
+          <i data-lucide="lock" style="width:12px;height:12px;"></i>
+          <span>256-Bit Encrypted</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. ADMIN MAIN PORTAL VIEW
+       ========================================================================= -->
+  <div class="admin-portal-view" id="adminPortalView" style="display: none;">
     
     <!-- Admin Top Header -->
     <header class="admin-top-bar">
       <div class="admin-bar-left">
-        <a href="#" class="admin-logo-link" id="adminLogoHomeLink" title="Retour au site">
+        <a href="index.html" class="admin-logo-link" id="adminLogoHomeLink" title="Return to Website">
           <img src="logo.png" alt="MotaGrowth Agency" class="admin-brand-logo-img">
         </a>
         <div class="admin-branding">
-          <h2>MotaGrowth <span class="admin-brand-tag">Agency Admin</span></h2>
-          <span class="admin-subheading">Private Agency Control Panel • Lead CRM & Client Workspaces</span>
+          <h2>MotaGrowth <span class="admin-brand-tag">Agency CRM</span></h2>
+          <span class="admin-subheading">Private Agency Control Center • Inbound Pipeline & Client Workspaces</span>
         </div>
       </div>
 
       <div class="admin-bar-right">
         <div class="storage-status-pill">
           <span class="status-pulse-dot"></span>
-          <span>Base Données JSON Active</span>
+          <span>Live Database Sync</span>
         </div>
-        <a href="#" class="btn-logout-pill" id="adminHomeLink">
-          <i data-lucide="log-out"></i>
-          <span>Retour au Site</span>
-        </a>
+
+        <button class="btn-blue-pill btn-small" id="btnOpenManualLeadModal" title="Add a lead manually">
+          <i data-lucide="user-plus" style="width:14px;height:14px;"></i>
+          <span>+ New Lead</span>
+        </button>
+
+        <button class="btn-ghost-minimal" id="btnOpenDataToolsModal" title="Database Backup, Restore & Demo Tools">
+          <i data-lucide="database" style="width:14px;height:14px;"></i>
+          <span>Backup & Tools</span>
+        </button>
+
+        <button class="btn-logout-pill" id="adminLockoutBtn" title="Lock CRM and sign out">
+          <i data-lucide="lock" style="width:14px;height:14px;"></i>
+          <span>Lock CRM</span>
+        </button>
       </div>
     </header>
 
-    <!-- Admin Top Stats & KPI Metrics Row -->
+    <!-- Admin Top Stats & KPI Financial Metrics Row -->
     <div class="admin-kpi-row">
+      <!-- KPI 1: Pipeline Value (MAD) -->
+      <div class="admin-kpi-card">
+        <div class="kpi-icon-box kpi-amber">
+          <i data-lucide="coins"></i>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Estimated Pipeline</span>
+          <h3 class="kpi-value" id="kpiPipelineValue">0 MAD</h3>
+          <span class="kpi-subtext">Sum of open proposal budgets</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: Total Inbound Inquiries -->
       <div class="admin-kpi-card">
         <div class="kpi-icon-box kpi-blue">
           <i data-lucide="inbox"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Demandes de Devis</span>
+          <span class="kpi-label">Total Inbound Leads</span>
           <h3 class="kpi-value" id="kpiTotalInquiries">0</h3>
-          <span class="kpi-subtext">Briefs entrants reçus</span>
+          <span class="kpi-subtext">All questionnaires received</span>
         </div>
       </div>
 
+      <!-- KPI 3: In Active Negotiation / Meeting -->
       <div class="admin-kpi-card">
         <div class="kpi-icon-box kpi-sky">
-          <i data-lucide="video"></i>
+          <i data-lucide="phone-call"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Rendez-vous Clients</span>
-          <h3 class="kpi-value" id="kpiTotalMeetings">0</h3>
-          <span class="kpi-subtext">Sessions stratégiques</span>
+          <span class="kpi-label">Active Negotiations</span>
+          <h3 class="kpi-value" id="kpiActiveNegotiations">0</h3>
+          <span class="kpi-subtext">Leads in meeting or proposal</span>
         </div>
       </div>
 
-      <div class="admin-kpi-card">
-        <div class="kpi-icon-box kpi-purple">
-          <i data-lucide="users"></i>
-        </div>
-        <div class="kpi-info">
-          <span class="kpi-label">Workspaces Clients</span>
-          <h3 class="kpi-value" id="kpiTotalClients">2</h3>
-          <span class="kpi-subtext">Comptes configurés</span>
-        </div>
-      </div>
-
+      <!-- KPI 4: Won Clients & MRR -->
       <div class="admin-kpi-card">
         <div class="kpi-icon-box kpi-emerald">
-          <i data-lucide="check-circle-2"></i>
+          <i data-lucide="award"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Validations en Cours</span>
-          <h3 class="kpi-value" id="kpiTotalApprovals">4</h3>
-          <span class="kpi-subtext">Items soumis aux clients</span>
+          <span class="kpi-label">Won Retainers & MRR</span>
+          <h3 class="kpi-value" id="kpiWonMRR">0 MAD</h3>
+          <span class="kpi-subtext" id="kpiWonCount">0 Active Client Accounts</span>
         </div>
       </div>
 
+      <!-- KPI 5: Conversion Win Rate -->
       <div class="admin-kpi-card">
-        <div class="kpi-icon-box kpi-amber">
-          <i data-lucide="lightbulb"></i>
+        <div class="kpi-icon-box kpi-purple">
+          <i data-lucide="trending-up"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Propositions Stratégiques</span>
-          <h3 class="kpi-value" id="kpiTotalIdeas">3</h3>
-          <span class="kpi-subtext">Concepts & Idées de croissance</span>
+          <span class="kpi-label">Conversion Win Rate</span>
+          <h3 class="kpi-value" id="kpiWinRate">0%</h3>
+          <span class="kpi-subtext">Proposals won / Closed deals</span>
         </div>
       </div>
     </div>
@@ -100,41 +170,61 @@
     <!-- Admin Navigation Tabs Row -->
     <div class="admin-nav-bar-row">
       <button class="admin-nav-btn active" id="tabInquiriesBtn">
-        <i data-lucide="file-text"></i>
-        <span>Demandes de devis</span>
+        <i data-lucide="kanban"></i>
+        <span>Pipeline & Inbound Leads</span>
         <span class="nav-count-badge" id="tabLeadCountBadge">0</span>
-      </button>
-
-      <button class="admin-nav-btn" id="tabMeetingsBtn">
-        <i data-lucide="video"></i>
-        <span>Rendez-vous & Meetings</span>
-        <span class="nav-count-badge" id="tabMeetingsCountBadge">0</span>
       </button>
 
       <button class="admin-nav-btn" id="tabClientsBtn">
         <i data-lucide="layout-grid"></i>
-        <span>Workspaces Clients</span>
-        <span class="nav-count-badge" id="tabClientCountBadge">2</span>
+        <span>Client Workspaces</span>
+        <span class="nav-count-badge" id="tabClientCountBadge">0</span>
+      </button>
+
+      <button class="admin-nav-btn" id="tabAnalyticsBtn">
+        <i data-lucide="pie-chart"></i>
+        <span>Financials & Analytics</span>
       </button>
     </div>
 
-    <!-- SECTION A: INQUIRIES & SUBMISSIONS (TABLE VIEW) -->
-    <div class="admin-section" id="adminInquiriesSection">
-      
+    <!-- =========================================================================
+         SECTION 1: PIPELINE & INBOUND LEADS (CRM TABLE & FILTERS)
+         ========================================================================= -->
+    <div class="admin-section" id="adminInquiriesSection" style="display: block;">
       <div class="orsap-table-card">
         <div class="orsap-card-header">
           <div>
-            <h2 id="inquiriesCardTitle">Demandes de Devis Reçues (0)</h2>
-            <p class="section-subtitle-text">Consultez et gérez les prospects et formulaires de contact soumis via le site</p>
+            <h2 id="inquiriesCardTitle">Lead Pipeline & Inquiries (0)</h2>
+            <p class="section-subtitle-text">Inspect questionnaire responses, initiate direct WhatsApp outreach, and convert prospects to active clients.</p>
           </div>
 
           <div class="orsap-table-tools">
             <div class="search-input-wrap">
               <i data-lucide="search"></i>
-              <input type="text" id="inquirySearchInput" placeholder="Rechercher par nom, email, entreprise, téléphone, secteur...">
+              <input type="text" id="inquirySearchInput" placeholder="Search by name, company, email, phone, location, answers...">
             </div>
+
+            <!-- Status Filter -->
+            <select id="inquiryStatusFilter" class="table-filter-select">
+              <option value="ALL">All Stages</option>
+              <option value="New Lead">New Lead</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Proposal Sent">Proposal Sent</option>
+              <option value="Negotiation / Meeting">Negotiation / Meeting</option>
+              <option value="Won / Active Client">Won / Active Client</option>
+              <option value="Archived / Lost">Archived / Lost</option>
+            </select>
+
+            <!-- Service Filter -->
+            <select id="inquiryServiceFilter" class="table-filter-select">
+              <option value="ALL">All Services</option>
+              <option value="Website Design & Development">Website Design & Dev</option>
+              <option value="Social Media Management">Social Media Management</option>
+              <option value="Paid Performance Marketing">Paid Performance Ads</option>
+              <option value="Full-Service Growth Package">Full-Service Growth</option>
+            </select>
             
-            <button class="btn-export-csv" id="exportCsvBtn" title="Exporter en CSV">
+            <button class="btn-export-csv" id="exportCsvBtn" title="Export current leads to CSV file">
               <i data-lucide="download"></i>
               <span>Export CSV</span>
             </button>
@@ -146,144 +236,257 @@
             <thead>
               <tr>
                 <th>DATE</th>
-                <th>PROFIL</th>
-                <th>CLIENT & ENTREPRISE</th>
-                <th>COORDONNÉES</th>
-                <th>SERVICES SOUHAITÉS</th>
-                <th>SECTEUR D'ACTIVITÉ</th>
-                <th>MESSAGE DU PROSPECT</th>
+                <th>STAGE</th>
+                <th>PROSPECT & COMPANY</th>
+                <th>CONTACT & LOCATION</th>
+                <th>SERVICE PACKAGE</th>
+                <th>EST. BUDGET (MAD)</th>
                 <th>ACTIONS</th>
               </tr>
             </thead>
             <tbody id="inquiriesTableBody">
-              <!-- Injected dynamically via JS -->
+              <!-- Dynamically populated by portal.js -->
             </tbody>
           </table>
         </div>
 
-        <div class="table-empty" id="inquiriesEmptyState" style="display: block;">
+        <div class="table-empty" id="inquiriesEmptyState" style="display: none;">
           <div class="empty-icon-circle"><i data-lucide="inbox"></i></div>
-          <p class="empty-title">Aucune demande trouvée</p>
-          <span class="empty-sub">Les nouvelles demandes soumises via le formulaire apparaîtront ici automatiquement.</span>
+          <p class="empty-title">No inquiries found</p>
+          <span class="empty-sub">Inbound briefs submitted through proposal.html will automatically appear here.</span>
         </div>
       </div>
-
     </div>
 
-    <!-- SECTION B: MEETINGS & STRATEGY SYNCS (TABLE VIEW) -->
-    <div class="admin-section" id="adminMeetingsSection" style="display: block;">
-      
+    <!-- =========================================================================
+         SECTION 2: CLIENT WORKSPACES
+         ========================================================================= -->
+    <div class="admin-section" id="adminClientsSection" style="display: none;">
       <div class="orsap-table-card">
         <div class="orsap-card-header">
           <div>
-            <h2 id="meetingsCardTitle">Rendez-vous & Sessions Stratégiques (0)</h2>
-            <p class="section-subtitle-text">Consultez, rejoignez et gérez tous les rendez-vous pris par vos clients</p>
+            <h2>Active Client Workspaces</h2>
+            <p class="section-subtitle-text">Manage client access codes, deliverables, uploaded documents, meetings, and strategic ideas.</p>
           </div>
-
-          <div class="orsap-table-tools">
+          <div style="display: flex; gap: 0.8rem; align-items: center;">
             <div class="search-input-wrap">
               <i data-lucide="search"></i>
-              <input type="text" id="meetingSearchInput" placeholder="Rechercher par client, type, date, statut...">
+              <input type="text" id="clientSearchInput" placeholder="Search clients...">
             </div>
-            
-            <button class="btn-export-csv" id="exportMeetingsCsvBtn" title="Exporter en CSV">
-              <i data-lucide="download"></i>
-              <span>Export CSV</span>
+            <button class="btn-blue-pill" id="openNewClientModalBtn">
+              <i data-lucide="user-plus"></i>
+              <span>+ Create Client Account</span>
             </button>
           </div>
         </div>
 
-        <div class="table-responsive-wrapper">
-          <table class="orsap-data-table">
-            <thead>
-              <tr>
-                <th>DATE & CRÉNEAU</th>
-                <th>CLIENT & WORKSPACE</th>
-                <th>COORDONNÉES</th>
-                <th>FORMAT SESSION</th>
-                <th>STATUT</th>
-                <th>ORDRE DU JOUR / NOTES</th>
-                <th>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody id="meetingsTableBody">
-              <!-- Injected dynamically via JS -->
-            </tbody>
-          </table>
-        </div>
-
-        <div class="table-empty" id="meetingsEmptyState" style="display: block;">
-          <div class="empty-icon-circle"><i data-lucide="video-off"></i></div>
-          <p class="empty-title">Aucun rendez-vous client trouvé</p>
-          <span class="empty-sub">Les sessions réservées depuis l'espace client ou planifiées par vous apparaîtront ici.</span>
+        <div class="clients-cards-grid" id="adminClientsGrid">
+          <!-- Dynamically populated by portal.js -->
         </div>
       </div>
-
     </div>
 
-    <!-- SECTION B: CLIENT WORKSPACES MANAGER -->
-    <div class="admin-section" id="adminClientsSection" style="display: block;">
-      
-      <div class="orsap-table-card">
-        <div class="orsap-card-header">
-          <div>
-            <h2>Workspaces & Comptes Clients</h2>
-            <p class="section-subtitle-text">Gérez les accès, mots de passe et modules personnalisés de chaque client</p>
+    <!-- =========================================================================
+         SECTION 3: FINANCIALS & ANALYTICS
+         ========================================================================= -->
+    <div class="admin-section" id="adminAnalyticsSection" style="display: none;">
+      <div class="analytics-grid-row">
+        <!-- Service Revenue Breakdown -->
+        <div class="analytics-card">
+          <div class="analytics-card-header">
+            <div>
+              <h3 class="analytics-card-title">Pipeline Breakdown by Service</h3>
+              <span class="analytics-card-sub">Estimated MAD value distribution across solutions</span>
+            </div>
           </div>
-          <button class="btn-blue-pill" id="openNewClientModalBtn">
-            <i data-lucide="user-plus"></i>
-            <span>+ Créer un compte client</span>
-          </button>
+          <div id="serviceBreakdownList">
+            <!-- Dynamically populated -->
+          </div>
         </div>
 
-        <div class="clients-cards-grid" id="adminClientsGrid">
-          <!-- Injected via JS -->
+        <!-- Deal Conversion Funnel -->
+        <div class="analytics-card">
+          <div class="analytics-card-header">
+            <div>
+              <h3 class="analytics-card-title">Pipeline Stage Funnel</h3>
+              <span class="analytics-card-sub">Progression from inbound lead to won retainer</span>
+            </div>
+          </div>
+          <div class="funnel-list" id="pipelineFunnelList">
+            <!-- Dynamically populated -->
+          </div>
         </div>
       </div>
-
     </div>
 
   </div>
 
   <!-- =========================================================================
-       5. MODAL: CREATE CLIENT ACCOUNT
+       3. SLIDE-OUT LEAD DOSSIER INSPECTION DRAWER
        ========================================================================= -->
-  <div class="modal-backdrop" id="createClientModal" style="display: block;">
+  <div class="dossier-backdrop" id="dossierBackdrop"></div>
+  
+  <aside class="lead-dossier-drawer" id="leadDossierDrawer" aria-label="Lead Dossier Details">
+    <div class="dossier-header">
+      <div>
+        <span class="dossier-ref-tag" id="drawerRefId">INQ-REF</span>
+        <h3 class="dossier-title" id="drawerClientName">Prospect Name</h3>
+        <p class="dossier-subtitle" id="drawerCompanyName">Company Name</p>
+      </div>
+      <button class="dossier-close-btn" id="closeDossierBtn" title="Close Drawer">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <!-- Quick Action Toolbar -->
+    <div class="dossier-quick-bar">
+      <!-- WhatsApp Direct -->
+      <a href="#" target="_blank" class="btn-whatsapp-pill" id="drawerWhatsappBtn">
+        <i data-lucide="message-circle" style="width:15px;height:15px;"></i>
+        <span>WhatsApp Direct</span>
+      </a>
+
+      <!-- Direct Email -->
+      <a href="#" class="btn-email-pill" id="drawerEmailBtn">
+        <i data-lucide="mail" style="width:15px;height:15px;"></i>
+        <span>Send Email</span>
+      </a>
+
+      <!-- Stage Selector Dropdown -->
+      <select id="drawerStageSelect" class="stage-select-pill" title="Update Pipeline Stage">
+        <option value="New Lead">New Lead</option>
+        <option value="Contacted">Contacted</option>
+        <option value="Proposal Sent">Proposal Sent</option>
+        <option value="Negotiation / Meeting">Negotiation / Meeting</option>
+        <option value="Won / Active Client">Won / Active Client</option>
+        <option value="Archived / Lost">Archived / Lost</option>
+      </select>
+
+      <!-- Convert to Client Account -->
+      <button type="button" class="btn-blue-pill btn-small" id="drawerConvertBtn" title="Create active client workspace">
+        <i data-lucide="user-check" style="width:14px;height:14px;"></i>
+        <span>Convert to Client</span>
+      </button>
+    </div>
+
+    <!-- Drawer Body -->
+    <div class="dossier-body">
+      <!-- Key Specs Card -->
+      <div class="dossier-card">
+        <div class="dossier-card-title">
+          <i data-lucide="info"></i>
+          <span>Lead Overview & Financials</span>
+        </div>
+        <div class="dossier-grid-2">
+          <div class="dossier-meta-item">
+            <span class="dossier-meta-lbl">Allocated Budget</span>
+            <span class="dossier-meta-val" id="drawerBudget" style="color: #f3c644;">—</span>
+          </div>
+          <div class="dossier-meta-item">
+            <span class="dossier-meta-lbl">Target Timeline</span>
+            <span class="dossier-meta-val" id="drawerTimeline">—</span>
+          </div>
+          <div class="dossier-meta-item">
+            <span class="dossier-meta-lbl">Phone Number</span>
+            <span class="dossier-meta-val" id="drawerPhone">—</span>
+          </div>
+          <div class="dossier-meta-item">
+            <span class="dossier-meta-lbl">Email Address</span>
+            <span class="dossier-meta-val" id="drawerEmail">—</span>
+          </div>
+          <div class="dossier-meta-item">
+            <span class="dossier-meta-lbl">Location / Market</span>
+            <span class="dossier-meta-val" id="drawerLocation">—</span>
+          </div>
+          <div class="dossier-meta-item">
+            <span class="dossier-meta-lbl">Current Website</span>
+            <span class="dossier-meta-val" id="drawerWebsite">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Description -->
+      <div class="dossier-card">
+        <div class="dossier-card-title">
+          <i data-lucide="briefcase"></i>
+          <span>Business & Objectives</span>
+        </div>
+        <p id="drawerBusinessDesc" style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.5;">—</p>
+      </div>
+
+      <!-- Full Questionnaire Answers -->
+      <div class="dossier-card">
+        <div class="dossier-card-title">
+          <i data-lucide="file-question"></i>
+          <span>Questionnaire Responses</span>
+        </div>
+        <div class="dossier-answers-list" id="drawerAnswersList">
+          <!-- Dynamically generated question and answer rows -->
+        </div>
+      </div>
+
+      <!-- Internal Agency Notes -->
+      <div class="dossier-card">
+        <div class="dossier-card-title">
+          <i data-lucide="edit-3"></i>
+          <span>Internal Agency Notes</span>
+        </div>
+        <textarea id="drawerNotesInput" class="dossier-notes-area" placeholder="Add confidential notes on negotiations, strategy, or next steps..."></textarea>
+        <button type="button" class="btn-blue-pill btn-small" id="saveDrawerNotesBtn" style="margin-top: 0.75rem;">
+          <i data-lucide="check" style="width:13px;height:13px;"></i>
+          <span>Save Notes</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- =========================================================================
+       4. MODAL: CREATE / ONBOARD CLIENT WORKSPACE
+       ========================================================================= -->
+  <div class="modal-backdrop" id="createClientModal" style="display: none;">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Créer un Nouveau Compte Client</h3>
+        <div>
+          <h3>Create Client Workspace</h3>
+          <p class="section-subtitle-text" style="margin: 0;">Set up credentials and project scope for client portal</p>
+        </div>
         <button class="modal-close" id="closeCreateClientBtn"><i data-lucide="x"></i></button>
       </div>
 
       <form id="createClientForm" class="modal-form">
         <div class="form-row-grid">
           <div class="field-wrap">
-            <label for="newClientName">Nom Complet du Client *</label>
-            <input type="text" id="newClientName" placeholder="ex: Liam Thorne" required>
+            <label for="newClientName">Client Full Name *</label>
+            <input type="text" id="newClientName" placeholder="e.g. Liam Thorne" required>
           </div>
 
           <div class="field-wrap">
-            <label for="newClientCompany">Nom de l'Entreprise / Marque *</label>
-            <input type="text" id="newClientCompany" placeholder="ex: Lumina Health" required>
+            <label for="newClientCompany">Company / Brand Name *</label>
+            <input type="text" id="newClientCompany" placeholder="e.g. Lumina Health" required>
           </div>
 
           <div class="field-wrap">
-            <label for="newClientUsername">Identifiant de Connexion</label>
-            <input type="text" id="newClientUsername" placeholder="ex: velour ou lumina (défaut: email)">
+            <label for="newClientEmail">Login Email / Identifier *</label>
+            <input type="email" id="newClientEmail" placeholder="e.g. liam@luminahealth.com" required>
           </div>
 
           <div class="field-wrap">
-            <label for="newClientEmail">Email de Connexion *</label>
-            <input type="email" id="newClientEmail" placeholder="ex: liam@luminahealth.com" required>
+            <label for="newClientPassword">Client Access Passcode *</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="text" id="newClientPassword" required>
+              <button type="button" class="btn-ghost-minimal" id="btnGenPasscode" title="Generate Random Passcode">
+                <i data-lucide="refresh-cw" style="width:14px;height:14px;"></i>
+              </button>
+            </div>
           </div>
 
           <div class="field-wrap">
-            <label for="newClientPassword">Mot de Passe d'Accès *</label>
-            <input type="text" id="newClientPassword" value="growth2026" required>
+            <label for="newClientPhone">Client Phone (WhatsApp)</label>
+            <input type="text" id="newClientPhone" placeholder="e.g. +212 612345678">
           </div>
 
           <div class="field-wrap">
-            <label for="newClientServices">Forfait / Service Assigné</label>
+            <label for="newClientServices">Assigned Service Package</label>
             <select id="newClientServices">
               <option value="Full-Service Growth Package">Full-Service Growth Package</option>
               <option value="Website Design & Development">Website Design & Development</option>
@@ -293,58 +496,196 @@
           </div>
 
           <div class="field-wrap">
-            <label for="newClientStatus">Statut du Compte</label>
+            <label for="newClientStatus">Workspace Status</label>
             <select id="newClientStatus">
-              <option value="Active">Workspace Actif</option>
+              <option value="Active">Active Workspace</option>
               <option value="Onboarding">Onboarding</option>
-              <option value="Completed">Complété / Archivé</option>
+              <option value="Completed">Completed / Archived</option>
             </select>
           </div>
 
-          <div class="field-wrap full-span">
-            <label for="newClientSummary">Périmètre / Description du Projet</label>
-            <textarea id="newClientSummary" rows="2" placeholder="ex: Refonte complète du site web, production de contenus TikTok viraux et acquisition Meta Ads."></textarea>
+          <div class="field-wrap">
+            <label for="newClientRetainerMRR">Estimated Monthly Retainer (MAD)</label>
+            <input type="number" id="newClientRetainerMRR" placeholder="e.g. 25000" min="0" step="500">
           </div>
 
           <div class="field-wrap full-span">
-            <label>Logo / Photo de Profil du Client (Optionnel)</label>
-            <div class="client-logo-upload-box">
-              <div class="client-logo-preview" id="newClientLogoPreview">
-                <i data-lucide="image" id="newClientLogoDefaultIcon"></i>
-                <img id="newClientLogoImg" style="display: block;" alt="Preview">
-              </div>
-              <div class="client-logo-controls">
-                <label for="newClientLogoInput" class="btn-logo-upload">
-                  <i data-lucide="upload-cloud"></i>
-                  <span>Téléverser un logo</span>
-                </label>
-                <input type="file" id="newClientLogoInput" accept="image/*" style="display: block;">
-                <button type="button" class="btn-logo-remove" id="removeNewClientLogoBtn" style="display: block;">
-                  <i data-lucide="trash-2"></i>
-                  <span>Supprimer</span>
-                </button>
-                <span class="logo-help-text">PNG, JPG, SVG ou WEBP (Optionnel)</span>
-              </div>
-            </div>
+            <label for="newClientSummary">Project Scope & Deliverables Overview</label>
+            <textarea id="newClientSummary" rows="2" placeholder="e.g. Full website redesign, TikTok viral production, Meta Ads scaling..."></textarea>
           </div>
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn-ghost" id="cancelCreateClientBtn">Annuler</button>
-          <button type="submit" class="btn-blue-pill">Créer le Compte Client</button>
+          <button type="button" class="btn-ghost" id="cancelCreateClientBtn">Cancel</button>
+          <button type="submit" class="btn-blue-pill">Launch Client Workspace</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- =========================================================================
-       6. MODAL / DRAWER: MANAGE CLIENT DETAILS
+       5. MODAL: ADD MANUAL INBOUND LEAD
        ========================================================================= -->
-  <div class="modal-backdrop" id="manageClientModal" style="display: block;">
+  <div class="modal-backdrop" id="manualLeadModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Add Manual Lead</h3>
+          <p class="section-subtitle-text" style="margin: 0;">Record a lead received via phone, WhatsApp, referral, or network</p>
+        </div>
+        <button class="modal-close" id="closeManualLeadBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <form id="manualLeadForm" class="modal-form">
+        <div class="form-row-grid">
+          <div class="field-wrap">
+            <label for="manLeadName">Contact Full Name *</label>
+            <input type="text" id="manLeadName" placeholder="e.g. Sophia Alami" required>
+          </div>
+
+          <div class="field-wrap">
+            <label for="manLeadCompany">Company / Brand Name *</label>
+            <input type="text" id="manLeadCompany" placeholder="e.g. Atlas Luxury Group" required>
+          </div>
+
+          <div class="field-wrap">
+            <label for="manLeadEmail">Email Address</label>
+            <input type="email" id="manLeadEmail" placeholder="e.g. sophia@atlasluxury.ma">
+          </div>
+
+          <div class="field-wrap">
+            <label for="manLeadPhone">Phone / WhatsApp Number</label>
+            <input type="text" id="manLeadPhone" placeholder="e.g. +212 600000000">
+          </div>
+
+          <div class="field-wrap">
+            <label for="manLeadService">Requested Service Package *</label>
+            <select id="manLeadService" required>
+              <option value="Website Design & Development">Website Design & Development</option>
+              <option value="Social Media Management">Social Media Management</option>
+              <option value="Paid Performance Marketing">Paid Performance Marketing</option>
+              <option value="Full-Service Growth Package">Full-Service Growth Package</option>
+            </select>
+          </div>
+
+          <div class="field-wrap">
+            <label for="manLeadBudget">Allocated Budget (MAD) *</label>
+            <select id="manLeadBudget" required>
+              <option value="15,000–24,999 MAD">15,000–24,999 MAD</option>
+              <option value="25,000–49,999 MAD">25,000–49,999 MAD</option>
+              <option value="50,000+ MAD">50,000+ MAD</option>
+              <option value="7,000–11,999 MAD">7,000–11,999 MAD</option>
+              <option value="10,000–19,999 MAD">10,000–19,999 MAD</option>
+            </select>
+          </div>
+
+          <div class="field-wrap">
+            <label for="manLeadStage">Initial Stage</label>
+            <select id="manLeadStage">
+              <option value="New Lead">New Lead</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Proposal Sent">Proposal Sent</option>
+              <option value="Negotiation / Meeting">Negotiation / Meeting</option>
+            </select>
+          </div>
+
+          <div class="field-wrap">
+            <label for="manLeadTimeline">Target Timeline</label>
+            <input type="text" id="manLeadTimeline" placeholder="e.g. 2–4 Weeks">
+          </div>
+
+          <div class="field-wrap full-span">
+            <label for="manLeadNotes">Project Brief & Details</label>
+            <textarea id="manLeadNotes" rows="3" placeholder="Enter notes from discovery call, requirements, deliverables..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelManualLeadBtn">Cancel</button>
+          <button type="submit" class="btn-blue-pill">Save Lead to CRM</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       6. MODAL: DATABASE BACKUP, RESTORE & TESTING TOOLS
+       ========================================================================= -->
+  <div class="modal-backdrop" id="backupToolsModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Database Backup & Management</h3>
+          <p class="section-subtitle-text" style="margin: 0;">Export, restore, or manage your agency CRM database</p>
+        </div>
+        <button class="modal-close" id="closeBackupToolsBtn"><i data-lucide="x"></i></button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1.25rem; padding: 1.5rem 0;">
+        <!-- Download Full Backup -->
+        <div style="background: rgba(22, 28, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+          <div>
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin-bottom: 0.2rem;">Full Database Backup (.JSON)</h4>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">Download all inbound leads, client workspaces, and approval items into a single portable backup file.</p>
+          </div>
+          <button type="button" class="btn-blue-pill btn-small" id="btnDownloadJsonBackup" style="flex-shrink: 0;">
+            <i data-lucide="download" style="width:14px;height:14px;"></i>
+            <span>Export JSON</span>
+          </button>
+        </div>
+
+        <!-- Restore Database -->
+        <div style="background: rgba(22, 28, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+          <div>
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin-bottom: 0.2rem;">Restore Database from Backup</h4>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">Select a previously saved .JSON backup file to restore records.</p>
+          </div>
+          <label for="restoreFileInput" class="btn-ghost-minimal" style="cursor: pointer; flex-shrink: 0; padding: 0.55rem 1rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15);">
+            <i data-lucide="upload" style="width:14px;height:14px;"></i>
+            <span>Upload JSON</span>
+          </label>
+          <input type="file" id="restoreFileInput" accept=".json" style="display: none;">
+        </div>
+
+        <!-- Testing Tools -->
+        <div style="background: rgba(22, 28, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+          <div>
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin-bottom: 0.2rem;">Load Sample Production Leads</h4>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">Populate realistic sample leads across all 4 services to test filters, analytics, and CRM views.</p>
+          </div>
+          <button type="button" class="btn-ghost-minimal" id="btnLoadDemoLeads" style="flex-shrink: 0;">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            <span>Load Demo Data</span>
+          </button>
+        </div>
+
+        <!-- Wipe Test Leads -->
+        <div style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 1.2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+          <div>
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #f87171; margin-bottom: 0.2rem;">Clear Test Inquiries</h4>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">Wipe all test leads from the database when ready for live production use.</p>
+          </div>
+          <button type="button" class="btn-ghost-minimal" id="btnClearInquiries" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); flex-shrink: 0;">
+            <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+            <span>Wipe Leads</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-ghost" id="cancelBackupToolsBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       7. MODAL: MANAGE CLIENT WORKSPACE DETAILS (CALENDAR, DELIVERABLES, ASSETS)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="manageClientModal" style="display: none;">
     <div class="modal-card wide-card">
       <div class="modal-header">
         <div>
-          <h3 id="manageClientTitle">Gérer le Workspace Client</h3>
+          <h3 id="manageClientTitle">Manage Client Workspace</h3>
           <span class="blue-subtext" id="manageClientSub" style="font-size: 0.85rem; color: #0088ff; font-weight: 600;"></span>
         </div>
         <button class="modal-close" id="closeManageClientBtn"><i data-lucide="x"></i></button>
@@ -353,77 +694,74 @@
       <div class="client-editor-tabs">
         <button class="editor-tab active" data-tab="calendar">
           <i data-lucide="calendar"></i>
-          <span>Calendrier & Événements</span>
+          <span>Calendar & Roadmap</span>
         </button>
         <button class="editor-tab" data-tab="meetings">
           <i data-lucide="video"></i>
-          <span>Rendez-vous</span>
+          <span>Strategy Meetings</span>
         </button>
         <button class="editor-tab" data-tab="ideas">
           <i data-lucide="lightbulb"></i>
-          <span>Idées & Notes</span>
+          <span>Growth Ideas & Notes</span>
         </button>
         <button class="editor-tab" data-tab="documents">
           <i data-lucide="folder-up"></i>
-          <span>Documents & Fichiers</span>
+          <span>Documents & Files</span>
         </button>
         <button class="editor-tab" data-tab="approvals">
           <i data-lucide="check-square"></i>
-          <span>Validations</span>
+          <span>Approvals & Deliverables</span>
         </button>
         <button class="editor-tab" data-tab="info">
           <i data-lucide="file-text"></i>
-          <span>Cahier des Charges & Liens</span>
+          <span>Scope & Links</span>
         </button>
       </div>
 
       <div class="client-editor-content">
-        
-        <!-- Tab 1: Calendar & Event Scheduler with Interactive Month Grid -->
+        <!-- Tab 1: Calendar & Roadmap -->
         <div class="editor-pane active" id="paneCalendar">
           <div class="admin-calendar-split-layout">
-            <!-- Left Column: Interactive Month Calendar -->
             <div class="admin-cal-picker-box">
               <div class="admin-cal-month-nav">
                 <button type="button" class="btn-cal-nav" id="adminCalPrevMonthBtn"><i data-lucide="chevron-left"></i></button>
-                <h4 id="adminCalMonthTitle">Octobre 2026</h4>
+                <h4 id="adminCalMonthTitle">October 2026</h4>
                 <button type="button" class="btn-cal-nav" id="adminCalNextMonthBtn"><i data-lucide="chevron-right"></i></button>
               </div>
 
               <div class="admin-cal-weekdays">
-                <span>Dim</span><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span>
+                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
               </div>
 
               <div class="admin-cal-grid" id="adminCalGrid">
-                <!-- Day cells dynamically injected via JS -->
+                <!-- Days injected via JS -->
               </div>
 
               <div class="admin-cal-hint">
                 <i data-lucide="mouse-pointer-click" style="width:13px;height:13px;"></i>
-                <span>Cliquez sur un jour du calendrier pour planifier un événement</span>
+                <span>Click any day on the calendar to schedule an event</span>
               </div>
             </div>
 
-            <!-- Right Column: Add Event on Selected Date Form & Events List -->
             <div class="admin-cal-event-manager">
               <div class="admin-quick-add-box">
-                <h4 id="adminSelectedDateHeading">Ajouter un événement pour le 12 Octobre 2026</h4>
+                <h4 id="adminSelectedDateHeading">Schedule Event for Selected Date</h4>
                 <div class="field-wrap" style="margin-top: 0.6rem;">
-                  <label for="adminEventTitle">Titre de l'Événement / Échéance *</label>
-                  <input type="text" id="adminEventTitle" placeholder="ex: Validation Maquettes Figma v2, Tournage TikTok...">
+                  <label for="adminEventTitle">Event Title / Milestone *</label>
+                  <input type="text" id="adminEventTitle" placeholder="e.g. Figma Prototype Review, Viral Content Shoot...">
                 </div>
                 <div class="field-wrap" style="margin-top: 0.5rem;">
-                  <label for="adminEventDesc">Notes ou Description (Optionnel)</label>
-                  <input type="text" id="adminEventDesc" placeholder="ex: Lien Figma partagé, équipe créative mobilisée...">
+                  <label for="adminEventDesc">Notes or Details (Optional)</label>
+                  <input type="text" id="adminEventDesc" placeholder="e.g. Prototype link shared, production team ready...">
                 </div>
                 <button type="button" class="btn-blue-pill btn-small" id="saveAdminCalEventBtn" style="margin-top: 0.8rem;">
                   <i data-lucide="plus"></i>
-                  <span>Ajouter à cette Date</span>
+                  <span>Add to Selected Date</span>
                 </button>
               </div>
 
               <div class="admin-events-list-wrapper">
-                <h5>Événements Planifiés pour ce Client</h5>
+                <h5>Scheduled Events for this Client</h5>
                 <div class="editor-items-list" id="editorCalendarList">
                   <!-- Injected via JS -->
                 </div>
@@ -432,49 +770,49 @@
           </div>
         </div>
 
-        <!-- Tab 2: Meetings & Strategy Syncs -->
+        <!-- Tab 2: Strategy Meetings -->
         <div class="editor-pane" id="paneMeetings">
           <div class="admin-quick-add-box" style="margin-bottom: 1.5rem;">
-            <h4>Planifier ou Confirmer un Rendez-vous avec le Client</h4>
+            <h4>Schedule or Confirm a Meeting with Client</h4>
             <div class="form-row-grid" style="margin-top: 0.8rem;">
               <div class="field-wrap">
-                <label for="adminMeetTitle">Titre de la Session *</label>
-                <input type="text" id="adminMeetTitle" placeholder="ex: Revue Stratégique Q4 & Ads Scaling">
+                <label for="adminMeetTitle">Meeting Title *</label>
+                <input type="text" id="adminMeetTitle" placeholder="e.g. Q4 Growth Review & Scaling Strategy">
               </div>
               <div class="field-wrap">
-                <label for="adminMeetType">Format de Session</label>
+                <label for="adminMeetType">Session Format</label>
                 <select id="adminMeetType">
                   <option value="15-min Sprint Sync">15-Min Sprint Sync</option>
                   <option value="30-min Growth Review" selected>30-Min Growth Review</option>
                   <option value="45-min Creative Strategy">45-Min Creative Strategy</option>
-                  <option value="Stratégie Trimestrielle">Stratégie Trimestrielle</option>
+                  <option value="Quarterly Strategy Deep-Dive">Quarterly Strategy Deep-Dive</option>
                 </select>
               </div>
               <div class="field-wrap">
-                <label for="adminMeetDate">Date du Rendez-vous *</label>
+                <label for="adminMeetDate">Meeting Date *</label>
                 <input type="date" id="adminMeetDate">
               </div>
               <div class="field-wrap">
-                <label for="adminMeetTime">Créneau Horaire</label>
-                <input type="text" id="adminMeetTime" placeholder="ex: 14:30 (Paris / UTC+1)">
+                <label for="adminMeetTime">Time Slot</label>
+                <input type="text" id="adminMeetTime" placeholder="e.g. 14:30 (GMT+1)">
               </div>
               <div class="field-wrap full-span">
-                <label for="adminMeetLink">Lien Google Meet / Vidéo (Optionnel)</label>
-                <input type="url" id="adminMeetLink" placeholder="ex: https://meet.google.com/abc-defg-hij">
+                <label for="adminMeetLink">Google Meet / Video Link (Optional)</label>
+                <input type="url" id="adminMeetLink" placeholder="e.g. https://meet.google.com/abc-defg-hij">
               </div>
               <div class="field-wrap full-span">
-                <label for="adminMeetAgenda">Ordre du jour & Instructions</label>
-                <textarea id="adminMeetAgenda" rows="2" placeholder="Objectifs de la session, livrables à examiner..."></textarea>
+                <label for="adminMeetAgenda">Agenda & Discussion Points</label>
+                <textarea id="adminMeetAgenda" rows="2" placeholder="Key objectives, deliverables to review..."></textarea>
               </div>
             </div>
             <button type="button" class="btn-blue-pill btn-small" id="saveAdminMeetBtn" style="margin-top: 0.8rem;">
               <i data-lucide="plus"></i>
-              <span>Ajouter le Rendez-vous</span>
+              <span>Schedule Meeting</span>
             </button>
           </div>
 
           <div class="pane-action-bar">
-            <h4>Rendez-vous Planifiés pour ce Client</h4>
+            <h4>Scheduled Meetings</h4>
           </div>
           <div class="editor-items-list" id="editorMeetingsList">
             <!-- Injected via JS -->
@@ -484,181 +822,155 @@
         <!-- Tab 3: Ideas & Notes Bank -->
         <div class="editor-pane" id="paneIdeas">
           <div class="admin-quick-add-box" style="margin-bottom: 1.5rem;">
-            <h4>Ajouter une Nouvelle Proposition ou Note Stratégique</h4>
+            <h4>Add New Growth Idea or Strategic Note</h4>
             <div class="form-row-grid" style="margin-top: 0.8rem;">
               <div class="field-wrap">
-                <label for="adminIdeaTitle">Titre du Concept / Note *</label>
-                <input type="text" id="adminIdeaTitle" placeholder="ex: Expérience 3D Interactive Dark-Mode">
+                <label for="adminIdeaTitle">Concept / Title *</label>
+                <input type="text" id="adminIdeaTitle" placeholder="e.g. Interactive 3D Product Configurator">
               </div>
               <div class="field-wrap">
-                <label for="adminIdeaCategory">Catégorie</label>
+                <label for="adminIdeaCategory">Category</label>
                 <select id="adminIdeaCategory">
-                  <option value="Concept Créatif & UX">Concept Créatif & UX</option>
-                  <option value="Stratégie Publicitaire Ads">Stratégie Publicitaire Ads</option>
-                  <option value="Contenu Viral TikTok & Reels">Contenu Viral TikTok & Reels</option>
-                  <option value="Branding & Identité">Branding & Identité</option>
-                  <option value="Note Stratégique Interne">Note Stratégique Interne</option>
+                  <option value="Creative Concept & UX">Creative Concept & UX</option>
+                  <option value="Paid Ads Scaling">Paid Ads Scaling</option>
+                  <option value="Viral TikTok & Reels">Viral TikTok & Reels</option>
+                  <option value="Branding & Identity">Branding & Identity</option>
+                  <option value="Internal Strategic Note">Internal Strategic Note</option>
                 </select>
               </div>
               <div class="field-wrap">
-                <label for="adminIdeaPriority">Niveau de Priorité</label>
+                <label for="adminIdeaPriority">Priority Level</label>
                 <select id="adminIdeaPriority">
-                  <option value="High">Haute (Critique)</option>
-                  <option value="Medium" selected>Moyenne</option>
-                  <option value="Low">Basse</option>
+                  <option value="High">High (Critical)</option>
+                  <option value="Medium" selected>Medium</option>
+                  <option value="Low">Low</option>
                 </select>
               </div>
               <div class="field-wrap">
-                <label for="adminIdeaImpact">Impact Prévisionnel</label>
-                <input type="text" id="adminIdeaImpact" placeholder="ex: +35% Taux de Conversion Mobile">
+                <label for="adminIdeaImpact">Expected Impact</label>
+                <input type="text" id="adminIdeaImpact" placeholder="e.g. +35% Mobile Checkout Rate">
               </div>
             </div>
             <div class="field-wrap full-span" style="margin-top: 0.6rem;">
-              <label for="adminIdeaDesc">Description & Recommandations Stratégiques *</label>
-              <textarea id="adminIdeaDesc" rows="2" placeholder="Détaillez la proposition, les références ou la note..."></textarea>
+              <label for="adminIdeaDesc">Description & Recommendations *</label>
+              <textarea id="adminIdeaDesc" rows="2" placeholder="Detail the concept, references, or strategic rationale..."></textarea>
             </div>
             <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem; align-items: center;">
               <button type="button" class="btn-blue-pill btn-small" id="saveAdminIdeaBtn">
                 <i data-lucide="plus"></i>
-                <span>Ajouter l'Idée / Note</span>
-              </button>
-              <button type="button" class="btn-ghost-minimal" id="clearPremadeIdeasBtn" title="Supprimer toutes les propositions pré-faites pour ce client">
-                <i data-lucide="trash-2"></i>
-                <span>Vider les idées pré-faites</span>
+                <span>Add Idea</span>
               </button>
             </div>
           </div>
 
           <div class="pane-action-bar">
-            <h4>Propositions & Notes Actives</h4>
+            <h4>Active Ideas & Strategy Notes</h4>
           </div>
           <div class="editor-items-list" id="editorIdeasList">
             <!-- Injected via JS -->
           </div>
         </div>
 
-        <!-- Tab 3: Documents & File Uploads -->
+        <!-- Tab 4: Documents & Files -->
         <div class="editor-pane" id="paneDocuments">
           <div class="admin-quick-add-box" style="margin-bottom: 1.5rem;">
-            <h4>Téléverser un Document dans l'Espace Client</h4>
+            <h4>Upload Document to Client Portal</h4>
             <div class="form-row-grid" style="margin-top: 0.8rem;">
               <div class="field-wrap">
-                <label for="adminDocFileInput">Sélectionner un Fichier *</label>
+                <label for="adminDocFileInput">Select File *</label>
                 <input type="file" id="adminDocFileInput" class="admin-file-picker">
               </div>
               <div class="field-wrap">
-                <label for="adminDocTitle">Nom du Document</label>
-                <input type="text" id="adminDocTitle" placeholder="ex: Contrat_Agence_MotaGrowth.pdf">
+                <label for="adminDocTitle">Document Title</label>
+                <input type="text" id="adminDocTitle" placeholder="e.g. MotaGrowth_Agreement_Signed.pdf">
               </div>
               <div class="field-wrap">
-                <label for="adminDocCategory">Catégorie du Document</label>
+                <label for="adminDocCategory">Category</label>
                 <select id="adminDocCategory">
-                  <option value="Contrats & Accords">Contrats & Accords</option>
-                  <option value="Directives de Marque">Directives de Marque</option>
-                  <option value="Présentations & Devis">Présentations & Devis</option>
-                  <option value="Plans de Projet">Plans de Projet</option>
-                  <option value="Rapports de Performance">Rapports de Performance</option>
-                  <option value="Ressources & Créations">Ressources & Créations</option>
+                  <option value="Contracts & Agreements">Contracts & Agreements</option>
+                  <option value="Brand Assets & Guidelines">Brand Assets & Guidelines</option>
+                  <option value="Invoices & Statements">Invoices & Statements</option>
+                  <option value="Project Deliverables">Project Deliverables</option>
+                  <option value="Performance Reports">Performance Reports</option>
                 </select>
               </div>
               <div class="field-wrap">
-                <label for="adminDocSize">Taille (Auto)</label>
-                <input type="text" id="adminDocSize" placeholder="ex: 2.4 MB" readonly>
+                <label for="adminDocSize">File Size (Auto)</label>
+                <input type="text" id="adminDocSize" placeholder="e.g. 2.4 MB" readonly>
               </div>
             </div>
             <button type="button" class="btn-blue-pill btn-small" id="uploadAdminDocBtn" style="margin-top: 0.8rem;">
               <i data-lucide="upload-cloud"></i>
-              <span>Téléverser dans le Coffre Client</span>
+              <span>Upload Document</span>
             </button>
           </div>
 
           <div class="pane-action-bar">
-            <h4>Documents Accessibles par le Client</h4>
+            <h4>Available Client Documents</h4>
           </div>
           <div class="editor-items-list" id="editorDocsList">
             <!-- Injected via JS -->
           </div>
         </div>
 
-        <!-- Tab 4: Approvals -->
+        <!-- Tab 5: Approvals & Deliverables -->
         <div class="editor-pane" id="paneApprovals">
           <div class="admin-quick-add-box" style="margin-bottom: 1.5rem;">
-            <h4>Ajouter un Élément à Faire Valider</h4>
+            <h4>Add Deliverable for Client Approval</h4>
             <div class="form-row-grid" style="margin-top: 0.8rem;">
               <div class="field-wrap">
-                <label for="adminApprovalTitle">Titre de la Validation *</label>
-                <input type="text" id="adminApprovalTitle" placeholder="ex: Maquette Page d'Accueil v2">
+                <label for="adminApprovalTitle">Deliverable Title *</label>
+                <input type="text" id="adminApprovalTitle" placeholder="e.g. Homepage 3D Interactive Mockup v2">
               </div>
               <div class="field-wrap">
-                <label for="adminApprovalDesc">Description</label>
-                <input type="text" id="adminApprovalDesc" placeholder="ex: Validation de la structure 3D et typographie">
+                <label for="adminApprovalDesc">Description & Action Requested</label>
+                <input type="text" id="adminApprovalDesc" placeholder="e.g. Review typography, 3D responsiveness, and copy">
               </div>
             </div>
             <button type="button" class="btn-blue-pill btn-small" id="saveAdminApprovalBtn" style="margin-top: 0.8rem;">
               <i data-lucide="plus"></i>
-              <span>Ajouter la Validation</span>
+              <span>Submit for Approval</span>
             </button>
           </div>
 
           <div class="pane-action-bar">
-            <h4>Éléments Soumis au Client</h4>
+            <h4>Pending Client Approvals</h4>
           </div>
           <div class="editor-items-list" id="editorApprovalsList">
             <!-- Injected via JS -->
           </div>
         </div>
 
-        <!-- Tab 5: Info -->
+        <!-- Tab 6: Scope & Shared Links -->
         <div class="editor-pane" id="paneInfo">
           <div class="pane-action-bar">
-            <h4>Spécifications du Projet & Liens Partagés</h4>
+            <h4>Project Scope & Shared Resources</h4>
           </div>
 
           <div class="field-wrap full-span" style="margin-top: 1rem;">
-            <label>Logo / Image de Marque du Client (Optionnel)</label>
-            <div class="client-logo-upload-box">
-              <div class="client-logo-preview" id="manageClientLogoPreview">
-                <i data-lucide="image" id="manageClientLogoDefaultIcon"></i>
-                <img id="manageClientLogoImg" style="display: block;" alt="Logo Client">
-              </div>
-              <div class="client-logo-controls">
-                <label for="manageClientLogoInput" class="btn-logo-upload">
-                  <i data-lucide="upload-cloud"></i>
-                  <span>Changer le logo</span>
-                </label>
-                <input type="file" id="manageClientLogoInput" accept="image/*" style="display: block;">
-                <button type="button" class="btn-logo-remove" id="removeManageClientLogoBtn" style="display: block;">
-                  <i data-lucide="trash-2"></i>
-                  <span>Supprimer le logo</span>
-                </button>
-                <span class="logo-help-text">PNG, JPG, SVG ou WEBP</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="field-wrap full-span" style="margin-top: 1rem;">
-            <label for="editorProjectSummary">Périmètre du Projet & Directives</label>
-            <textarea id="editorProjectSummary" rows="3" class="editor-textarea"></textarea>
+            <label for="editorProjectSummary">Project Scope & Strategic Directives</label>
+            <textarea id="editorProjectSummary" rows="3" class="editor-textarea" placeholder="Detailed project scope, milestones, and objectives..."></textarea>
           </div>
           <div class="field-wrap full-span" style="margin-top: 1rem;">
-            <label for="editorSharedLinks">Liens Ressources Partagés (Figma, Google Drive...) — Un par ligne</label>
-            <textarea id="editorSharedLinks" rows="3" class="editor-textarea" placeholder="ex: Prototype Figma: https://figma.com/file/...&#10;Google Drive Brand Assets: https://drive.google.com/..."></textarea>
+            <label for="editorSharedLinks">Shared Resource Links (Figma, Drive, Staging) — One per line</label>
+            <textarea id="editorSharedLinks" rows="3" class="editor-textarea" placeholder="e.g. Figma Prototype: https://figma.com/file/...&#10;Google Drive Brand Vault: https://drive.google.com/..."></textarea>
           </div>
           <button class="btn-blue-pill btn-small" id="saveProjectInfoBtn" style="margin-top: 1rem;">
             <i data-lucide="check"></i>
-            <span>Enregistrer les Informations</span>
+            <span>Save Specifications</span>
           </button>
         </div>
 
       </div>
-
     </div>
   </div>
 
+  <!-- Universal Custom Cursor -->
+  <div class="custom-cursor-dot" id="cursorDot"></div>
+  <div class="custom-cursor-ring" id="cursorRing"></div>
+
   <!-- Scripts -->
   <script src="app.js?v=4.5"></script>
-</body>
-</html>
   <script src="portal.js"></script>
 </body>
 </html>

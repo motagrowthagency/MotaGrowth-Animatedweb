@@ -239,8 +239,18 @@ function initMotaGrowthApp() {
     if (landingView) landingView.style.display = 'none';
     if (clientSignInView) clientSignInView.style.display = 'none';
     if (clientPortalView) clientPortalView.style.display = 'none';
-    if (adminPortalView) adminPortalView.style.display = 'block';
-    renderAdminPortal();
+
+    // Master Authentication Check
+    const isMasterAuth = sessionStorage.getItem('motagrowth_admin_auth') === 'true';
+    const adminLockScreen = document.getElementById('adminLockScreen');
+    if (!isMasterAuth) {
+      if (adminLockScreen) adminLockScreen.style.display = 'flex';
+      if (adminPortalView) adminPortalView.style.display = 'none';
+    } else {
+      if (adminLockScreen) adminLockScreen.style.display = 'none';
+      if (adminPortalView) adminPortalView.style.display = 'block';
+      renderAdminPortal();
+    }
     if (window.lucide) window.lucide.createIcons();
   }
 
@@ -1331,49 +1341,130 @@ function initMotaGrowthApp() {
     return allMeetings;
   }
 
+  // =========================================================================
+  // 5. PRIVATE AGENCY ADMIN CRM ENGINE (MASTER AUTH, PIPELINE & DOSSIER)
+  // =========================================================================
+
+  // Pipeline Stage Normalizer (Option A)
+  function normalizeLeadStage(rawStatus) {
+    if (!rawStatus) return 'New Lead';
+    const s = String(rawStatus).toLowerCase().trim();
+    if (s === 'new lead' || s === 'nouveau' || s === 'new' || s === 'lead') return 'New Lead';
+    if (s === 'contacted' || s === 'contacté' || s === 'in contact') return 'Contacted';
+    if (s === 'proposal sent' || s === 'devis envoyé' || s === 'proposal') return 'Proposal Sent';
+    if (s.includes('negotiat') || s.includes('meeting') || s.includes('rdv')) return 'Negotiation / Meeting';
+    if (s.includes('won') || s.includes('active') || s.includes('gagné')) return 'Won / Active Client';
+    if (s.includes('archiv') || s.includes('lost') || s.includes('perdu')) return 'Archived / Lost';
+    return 'New Lead';
+  }
+
+  function getLeadStageClass(stage) {
+    switch (stage) {
+      case 'New Lead': return 'status-new-lead';
+      case 'Contacted': return 'status-contacted';
+      case 'Proposal Sent': return 'status-proposal-sent';
+      case 'Negotiation / Meeting': return 'status-negotiation';
+      case 'Won / Active Client': return 'status-won';
+      case 'Archived / Lost': return 'status-archived';
+      default: return 'status-new-lead';
+    }
+  }
+
+  function parseLeadBudgetMAD(budgetStr) {
+    if (!budgetStr) return 20000;
+    const str = String(budgetStr).toLowerCase();
+    if (str.includes('50,000+')) return 55000;
+    if (str.includes('25,000–49,999') || str.includes('25,000-49,999')) return 35000;
+    if (str.includes('15,000–24,999') || str.includes('15,000-24,999')) return 20000;
+    if (str.includes('10,000–19,999') || str.includes('10,000-19,999')) return 15000;
+    if (str.includes('7,000–11,999') || str.includes('7,000-11,999')) return 9500;
+    const nums = String(budgetStr).match(/\d+([.,]\d+)?/g);
+    if (nums && nums.length > 0) {
+      const parsed = parseInt(nums[0].replace(/[.,]/g, ''), 10);
+      if (!isNaN(parsed) && parsed > 500) return parsed;
+    }
+    return 20000;
+  }
+
+  function formatCurrencyMAD(amount) {
+    return (Number(amount) || 0).toLocaleString('en-US') + ' MAD';
+  }
+
+  function cleanPhoneForWhatsApp(rawPhone) {
+    if (!rawPhone) return '';
+    let digits = String(rawPhone).replace(/[^\d]/g, '');
+    if (digits.startsWith('0') && digits.length === 10) {
+      digits = '212' + digits.substring(1);
+    }
+    return digits;
+  }
+
   function renderAdminPortal() {
     updateAdminKPIs();
     renderInquiriesTable();
-    renderMeetingsTable();
     renderClientsGrid();
+    renderAnalyticsSection();
+    if (window.lucide) window.lucide.createIcons();
   }
 
   function updateAdminKPIs() {
     const totalInquiries = inquiries.length;
     const totalClients = clients.length;
-    const totalApprovals = clients.reduce((sum, c) => sum + (c.approvals || []).length, 0);
-    const totalIdeas = clients.reduce((sum, c) => sum + (c.ideas || []).length, 0);
-    const totalMeetings = getAllAdminMeetings().length;
 
-    const countBadge = document.getElementById('tabLeadCountBadge');
-    if (countBadge) countBadge.textContent = totalInquiries;
+    // Calculate Estimated Pipeline Value in MAD (sum of open leads not won or archived)
+    const openLeads = inquiries.filter(i => {
+      const st = normalizeLeadStage(i.status);
+      return st !== 'Archived / Lost' && st !== 'Won / Active Client';
+    });
+    const totalPipelineMAD = openLeads.reduce((sum, i) => sum + parseLeadBudgetMAD(i.budget), 0);
 
-    const inquiriesTitle = document.getElementById('inquiriesCardTitle');
-    if (inquiriesTitle) inquiriesTitle.textContent = `Demandes de Devis Reçues (${totalInquiries})`;
+    // Active Negotiations / Meetings
+    const activeNegotiations = inquiries.filter(i => {
+      const st = normalizeLeadStage(i.status);
+      return st === 'Negotiation / Meeting' || st === 'Proposal Sent';
+    }).length;
 
-    const meetBadge = document.getElementById('tabMeetingsCountBadge');
-    if (meetBadge) meetBadge.textContent = totalMeetings;
+    // Won Retainer MRR
+    const wonMRR = clients.reduce((sum, c) => sum + (Number(c.retainerMRR) || 25000), 0);
 
-    const meetingsTitle = document.getElementById('meetingsCardTitle');
-    if (meetingsTitle) meetingsTitle.textContent = `Rendez-vous & Sessions Stratégiques (${totalMeetings})`;
+    // Conversion Win Rate
+    const wonLeads = inquiries.filter(i => normalizeLeadStage(i.status) === 'Won / Active Client').length;
+    const closedLeads = inquiries.filter(i => {
+      const st = normalizeLeadStage(i.status);
+      return st === 'Won / Active Client' || st === 'Archived / Lost';
+    }).length;
+    const winRate = closedLeads > 0 
+      ? Math.round((wonLeads / closedLeads) * 100) 
+      : (totalInquiries > 0 ? Math.round((wonLeads / totalInquiries) * 100) : 0);
 
-    const clientBadge = document.getElementById('tabClientCountBadge');
-    if (clientBadge) clientBadge.textContent = totalClients;
+    // Update KPI Elements
+    const elPipe = document.getElementById('kpiPipelineValue');
+    if (elPipe) elPipe.textContent = formatCurrencyMAD(totalPipelineMAD);
 
-    const kpiInq = document.getElementById('kpiTotalInquiries');
-    if (kpiInq) kpiInq.textContent = totalInquiries;
+    const elTotalInq = document.getElementById('kpiTotalInquiries');
+    if (elTotalInq) elTotalInq.textContent = totalInquiries;
 
-    const kpiMeet = document.getElementById('kpiTotalMeetings');
-    if (kpiMeet) kpiMeet.textContent = totalMeetings;
+    const elNeg = document.getElementById('kpiActiveNegotiations');
+    if (elNeg) elNeg.textContent = activeNegotiations;
 
-    const kpiCli = document.getElementById('kpiTotalClients');
-    if (kpiCli) kpiCli.textContent = totalClients;
+    const elWonMRR = document.getElementById('kpiWonMRR');
+    if (elWonMRR) elWonMRR.textContent = formatCurrencyMAD(wonMRR);
 
-    const kpiApp = document.getElementById('kpiTotalApprovals');
-    if (kpiApp) kpiApp.textContent = totalApprovals;
+    const elWonCount = document.getElementById('kpiWonCount');
+    if (elWonCount) elWonCount.textContent = `${totalClients} Active Client Accounts`;
 
-    const kpiIde = document.getElementById('kpiTotalIdeas');
-    if (kpiIde) kpiIde.textContent = totalIdeas;
+    const elWinRate = document.getElementById('kpiWinRate');
+    if (elWinRate) elWinRate.textContent = `${winRate}%`;
+
+    // Nav Badges
+    const badgeLeads = document.getElementById('tabLeadCountBadge');
+    if (badgeLeads) badgeLeads.textContent = totalInquiries;
+
+    const badgeClients = document.getElementById('tabClientCountBadge');
+    if (badgeClients) badgeClients.textContent = totalClients;
+
+    const inqTitle = document.getElementById('inquiriesCardTitle');
+    if (inqTitle) inqTitle.textContent = `Lead Pipeline & Inquiries (${totalInquiries})`;
   }
 
   function formatDateTime(isoString) {
@@ -1381,84 +1472,94 @@ function initMotaGrowthApp() {
     try {
       const d = new Date(isoString);
       if (isNaN(d.getTime())) return isoString;
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const m = monthNames[d.getMonth()];
       const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
       const year = d.getFullYear();
       const hours = String(d.getHours()).padStart(2, '0');
       const minutes = String(d.getMinutes()).padStart(2, '0');
-      return `<div class="date-stamp">${day}/${month}/${year}<br><span style="color: #64748b; font-weight: 500;">${hours}:${minutes}</span></div>`;
+      return `<div class="date-stamp">${day} ${m} ${year}<br><span style="color: #64748b; font-weight: 500;">${hours}:${minutes}</span></div>`;
     } catch (e) {
       return isoString;
     }
   }
 
+  // Render Inbound Inquiries Table
   function renderInquiriesTable() {
     const search = (inquirySearchInput ? inquirySearchInput.value : '').toLowerCase().trim();
+    const statusFilter = (document.getElementById('inquiryStatusFilter')?.value || 'ALL');
+    const serviceFilter = (document.getElementById('inquiryServiceFilter')?.value || 'ALL');
 
     const filtered = inquiries.filter(i => {
+      const stage = normalizeLeadStage(i.status);
+      if (statusFilter !== 'ALL' && stage !== statusFilter) return false;
+
+      if (serviceFilter !== 'ALL') {
+        const joinedServices = (i.services || []).join(' ').toLowerCase();
+        if (!joinedServices.includes(serviceFilter.toLowerCase())) return false;
+      }
+
       if (!search) return true;
       const name = (i.clientName || '').toLowerCase();
       const company = (i.companyName || '').toLowerCase();
       const email = (i.clientEmail || '').toLowerCase();
       const phone = (i.clientPhone || '').toLowerCase();
       const notes = (i.notes || '').toLowerCase();
-      const sector = (i.sector || '').toLowerCase();
+      const sector = (i.sector || i.location || '').toLowerCase();
       const services = (i.services || []).join(' ').toLowerCase();
+      const budget = (i.budget || '').toLowerCase();
 
       return name.includes(search) || company.includes(search) || email.includes(search) ||
-             phone.includes(search) || notes.includes(search) || sector.includes(search) || services.includes(search);
+             phone.includes(search) || notes.includes(search) || sector.includes(search) || 
+             services.includes(search) || budget.includes(search);
     });
 
     if (filtered.length === 0) {
-      inquiriesTableBody.innerHTML = '';
+      if (inquiriesTableBody) inquiriesTableBody.innerHTML = '';
       if (inquiriesEmptyState) inquiriesEmptyState.style.display = 'block';
       return;
     }
 
     if (inquiriesEmptyState) inquiriesEmptyState.style.display = 'none';
 
-    inquiriesTableBody.innerHTML = filtered.map(item => {
-      const typeUpper = (item.type || 'PRO').toUpperCase();
-      let typeClass = 'pro';
-      if (typeUpper === 'ENTERPRISE') typeClass = 'enterprise';
-      else if (typeUpper === 'STARTUP') typeClass = 'startup';
-      else if (typeUpper === 'MEETING' || typeUpper === 'RDV') typeClass = 'meeting';
-      else if (typeUpper === 'PARTICULIER') typeClass = 'particulier';
-      const typeLabel = typeUpper;
+    if (!inquiriesTableBody) return;
 
-      const initials = ((item.clientName || item.companyName || 'Lead').substring(0, 2)).toUpperCase();
+    inquiriesTableBody.innerHTML = filtered.map(item => {
+      const stage = normalizeLeadStage(item.status);
+      const stageClass = getLeadStageClass(stage);
+      const initials = ((item.clientName || item.companyName || 'LEAD').substring(0, 2)).toUpperCase();
 
       const servicesHtml = (item.services && item.services.length > 0)
-        ? item.services.map(s => `<span class="solution-tag">${escapeHtml(s.toUpperCase())}</span>`).join('')
-        : '—';
-
-      const sectorHtml = (item.sector && item.sector !== '—')
-        ? `<span class="sector-tag">${escapeHtml(item.sector.toUpperCase())}</span>`
+        ? item.services.map(s => `<span class="solution-tag">${escapeHtml(s)}</span>`).join('')
         : '—';
 
       const emailHtml = (item.clientEmail && item.clientEmail !== '—')
-        ? `<a href="mailto:${escapeHtml(item.clientEmail)}" class="tbl-link" title="Envoyer un email"><i data-lucide="mail" style="width:13px;height:13px;"></i> ${escapeHtml(item.clientEmail)}</a>`
+        ? `<a href="mailto:${escapeHtml(item.clientEmail)}" class="tbl-link" title="Send Direct Email" onclick="event.stopPropagation();"><i data-lucide="mail" style="width:13px;height:13px;"></i> ${escapeHtml(item.clientEmail)}</a>`
         : '—';
 
       const phoneHtml = (item.clientPhone && item.clientPhone !== '—')
-        ? `<a href="tel:${escapeHtml(item.clientPhone)}" class="tbl-link" title="Appeler"><i data-lucide="phone" style="width:13px;height:13px;"></i> ${escapeHtml(item.clientPhone)}</a>`
+        ? `<a href="tel:${escapeHtml(item.clientPhone)}" class="tbl-link" title="Call Prospect" onclick="event.stopPropagation();"><i data-lucide="phone" style="width:13px;height:13px;"></i> ${escapeHtml(item.clientPhone)}</a>`
         : '';
 
-      const messageHtml = (item.notes && item.notes !== '—')
-        ? escapeHtml(item.notes)
-        : '—';
+      const locationHtml = (item.location || item.sector)
+        ? `<span style="font-size: 0.76rem; color: #64748b; display: flex; align-items: center; gap: 0.3rem;"><i data-lucide="map-pin" style="width:11px;height:11px;"></i> ${escapeHtml(item.location || item.sector)}</span>`
+        : '';
 
       const dateHtml = item.dateDisplay ? `<div class="date-stamp">${item.dateDisplay}</div>` : formatDateTime(item.createdAt);
 
+      const cleanPhone = cleanPhoneForWhatsApp(item.clientPhone);
+      const waGreeting = `Hi ${item.clientName || 'there'}, thank you for contacting MotaGrowth Agency regarding your project. When would be a great time for a brief 15-minute discovery call?`;
+      const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waGreeting)}` : '#';
+
       return `
-        <tr>
+        <tr class="clickable-lead-row" data-id="${item.id}" style="cursor: pointer;" title="Click to inspect lead questionnaire">
           <td>${dateHtml}</td>
-          <td><span class="type-chip ${typeClass}">${typeLabel}</span></td>
+          <td><span class="status-pill ${stageClass}">${stage}</span></td>
           <td>
             <div class="client-lead-meta">
               <div class="client-lead-avatar">${initials}</div>
               <div>
-                <span class="tbl-name">${escapeHtml(item.clientName || '—')}</span>
+                <span class="tbl-name">${escapeHtml(item.clientName || 'Prospect')}</span>
                 <span class="tbl-company">${escapeHtml(item.companyName || '—')}</span>
               </div>
             </div>
@@ -1467,18 +1568,25 @@ function initMotaGrowthApp() {
             <div class="contact-links-box">
               ${emailHtml}
               ${phoneHtml}
+              ${locationHtml}
             </div>
           </td>
           <td>${servicesHtml}</td>
-          <td>${sectorHtml}</td>
-          <td><div class="tbl-message" title="${escapeHtml(item.notes || '')}">${messageHtml}</div></td>
+          <td><span class="budget-badge">${escapeHtml(item.budget || '15,000+ MAD')}</span></td>
           <td>
-            <div class="tbl-actions-wrap">
-              <button class="btn-convert-lead convert-lead-btn" data-name="${escapeHtml(item.clientName || '')}" data-company="${escapeHtml(item.companyName || '')}" data-email="${escapeHtml(item.clientEmail || '')}" data-service="${escapeHtml((item.services || [])[0] || 'Full-Service Growth Package')}" title="Créer un compte client à partir de ce devis">
-                <i data-lucide="user-plus" style="width:13px;height:13px;"></i>
-                <span>Créer Compte</span>
+            <div class="tbl-actions-wrap" onclick="event.stopPropagation();">
+              <button class="btn-action-icon inspect inspect-lead-btn" data-id="${item.id}" title="Inspect Dossier">
+                <i data-lucide="eye" style="width:14px;height:14px;"></i>
               </button>
-              <button class="btn-delete-row delete-inquiry-btn" data-id="${item.id}" title="Supprimer la demande">
+              ${cleanPhone ? `
+                <a href="${waUrl}" target="_blank" class="btn-action-icon whatsapp wa-lead-btn" title="Open WhatsApp Chat">
+                  <i data-lucide="message-circle" style="width:14px;height:14px;"></i>
+                </a>
+              ` : ''}
+              <button class="btn-action-icon convert convert-lead-btn" data-id="${item.id}" title="Convert to Client Workspace">
+                <i data-lucide="user-plus" style="width:14px;height:14px;"></i>
+              </button>
+              <button class="btn-action-icon delete delete-inquiry-btn" data-id="${item.id}" title="Delete Lead">
                 <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
               </button>
             </div>
@@ -1487,227 +1595,41 @@ function initMotaGrowthApp() {
       `;
     }).join('');
 
-    inquiriesTableBody.querySelectorAll('.delete-inquiry-btn').forEach(btn => {
+    // Row Click & Inspect Events
+    inquiriesTableBody.querySelectorAll('.clickable-lead-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const id = row.getAttribute('data-id');
+        const item = inquiries.find(i => i.id === id);
+        if (item) openLeadDossier(item);
+      });
+    });
+
+    inquiriesTableBody.querySelectorAll('.inspect-lead-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        e.preventDefault();
         e.stopPropagation();
         const id = btn.getAttribute('data-id');
-        if (!id) return;
-
-        const targetInquiry = inquiries.find(i => i.id === id);
-        if (targetInquiry) {
-          // If it was a meeting request, delete from matching client timeline and calendarEvents
-          if (targetInquiry.type === 'MEETING' || (targetInquiry.notes && targetInquiry.notes.includes('Rendez-vous')) || (targetInquiry.services && targetInquiry.services.some(s => s && s.includes('Rendez-vous')))) {
-            let clientsChanged = false;
-            clients.forEach(c => {
-              const matches = (targetInquiry.clientEmail && c.email && targetInquiry.clientEmail.toLowerCase() === c.email.toLowerCase()) ||
-                              (targetInquiry.companyName && c.companyName && targetInquiry.companyName.toLowerCase() === c.companyName.toLowerCase()) ||
-                              (targetInquiry.clientName && c.clientName && targetInquiry.clientName.toLowerCase() === c.clientName.toLowerCase());
-              if (matches) {
-                if (Array.isArray(c.timeline)) {
-                  c.timeline = c.timeline.filter(t => t.type !== 'Meeting');
-                  clientsChanged = true;
-                }
-                if (c.calendarEvents && typeof c.calendarEvents === 'object') {
-                  Object.keys(c.calendarEvents).forEach(d => {
-                    if (Array.isArray(c.calendarEvents[d])) {
-                      c.calendarEvents[d] = c.calendarEvents[d].filter(ev => ev.type !== 'Sync' && !(ev.title && (ev.title.includes('Strategy Session') || ev.title.includes('Rendez-vous'))));
-                    }
-                  });
-                  clientsChanged = true;
-                }
-              }
-            });
-            if (clientsChanged) {
-              saveClients(clients);
-            }
-          }
-        }
-
-        inquiries = inquiries.filter(i => i.id !== id);
-        saveInquiries(inquiries);
-        renderAdminPortal();
+        const item = inquiries.find(i => i.id === id);
+        if (item) openLeadDossier(item);
       });
     });
 
     inquiriesTableBody.querySelectorAll('.convert-lead-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        e.preventDefault();
         e.stopPropagation();
-        const name = btn.getAttribute('data-name') || '';
-        const company = btn.getAttribute('data-company') || '';
-        const email = btn.getAttribute('data-email') || '';
-        const service = btn.getAttribute('data-service') || '';
-
-        if (document.getElementById('newClientName')) document.getElementById('newClientName').value = name;
-        if (document.getElementById('newClientCompany')) document.getElementById('newClientCompany').value = company;
-        if (document.getElementById('newClientEmail')) document.getElementById('newClientEmail').value = email;
-        if (document.getElementById('newClientUsername')) {
-          document.getElementById('newClientUsername').value = (company || name || 'client').toLowerCase().replace(/[^a-z0-9]/g, '');
-        }
-        if (document.getElementById('newClientServices') && service) {
-          document.getElementById('newClientServices').value = service;
-        }
-        
-        createClientModal.style.display = 'flex';
-        if (window.lucide) window.lucide.createIcons();
+        const id = btn.getAttribute('data-id');
+        const item = inquiries.find(i => i.id === id);
+        if (item) startLeadConversion(item);
       });
     });
 
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  function renderMeetingsTable() {
-    if (!meetingsTableBody) return;
-    const search = (meetingSearchInput ? meetingSearchInput.value : '').toLowerCase().trim();
-    const allMeetings = getAllAdminMeetings();
-
-    const filtered = allMeetings.filter(m => {
-      if (!search) return true;
-      const title = (m.title || '').toLowerCase();
-      const client = (m.clientName || '').toLowerCase();
-      const company = (m.companyName || '').toLowerCase();
-      const email = (m.clientEmail || '').toLowerCase();
-      const phone = (m.clientPhone || '').toLowerCase();
-      const date = (m.date || m.rawDate || '').toLowerCase();
-      const desc = (m.description || '').toLowerCase();
-      const status = (m.status || '').toLowerCase();
-
-      return title.includes(search) || client.includes(search) || company.includes(search) ||
-             email.includes(search) || phone.includes(search) || date.includes(search) ||
-             desc.includes(search) || status.includes(search);
-    });
-
-    if (filtered.length === 0) {
-      meetingsTableBody.innerHTML = '';
-      if (meetingsEmptyState) meetingsEmptyState.style.display = 'block';
-      return;
-    }
-
-    if (meetingsEmptyState) meetingsEmptyState.style.display = 'none';
-
-    meetingsTableBody.innerHTML = filtered.map(m => {
-      const initials = (m.clientName || 'CL').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-      const meetLink = m.link || 'https://meet.google.com/new';
-      const cleanTitle = (m.title || 'Rendez-vous Stratégique').replace('Rendez-vous : ', '').trim();
-      const dateStr = m.date || m.rawDate || '—';
-
-      return `
-        <tr>
-          <td>
-            <div class="date-stamp" style="font-weight: 700; color: #0f172a;">
-              ${escapeHtml(dateStr)}
-            </div>
-          </td>
-          <td>
-            <div class="client-cell">
-              <div class="client-avatar" style="${m.clientLogo ? `background-image: url('${m.clientLogo}'); background-size: cover;` : ''}">
-                ${!m.clientLogo ? initials : ''}
-              </div>
-              <div class="client-names">
-                <strong>${escapeHtml(m.clientName)}</strong>
-                <span>${escapeHtml(m.companyName)}</span>
-              </div>
-            </div>
-          </td>
-          <td>
-            <div class="contact-cell">
-              <a href="mailto:${escapeHtml(m.clientEmail)}" class="contact-link">
-                <i data-lucide="mail"></i>
-                <span>${escapeHtml(m.clientEmail)}</span>
-              </a>
-              ${m.clientPhone && m.clientPhone !== '—' ? `
-                <a href="tel:${escapeHtml(m.clientPhone)}" class="contact-link">
-                  <i data-lucide="phone"></i>
-                  <span>${escapeHtml(m.clientPhone)}</span>
-                </a>
-              ` : ''}
-            </div>
-          </td>
-          <td>
-            <span class="type-chip meeting" style="padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; background: #e0f2fe; color: #0284c7; display: inline-flex; align-items: center; gap: 0.3rem;">
-              <i data-lucide="video" style="width: 12px; height: 12px;"></i>
-              ${escapeHtml(cleanTitle)}
-            </span>
-          </td>
-          <td>
-            <span class="status-tag scheduled" style="font-size: 0.75rem;">${escapeHtml(m.status || 'Planifié')}</span>
-          </td>
-          <td>
-            <div class="inquiry-message" style="max-width: 320px; font-size: 0.82rem; color: #475569;" title="${escapeHtml(m.description || 'Session 1-on-1')}">
-              ${escapeHtml(m.description || 'Session 1-on-1 de stratégie de croissance')}
-            </div>
-          </td>
-          <td>
-            <div class="action-btn-group" style="display: flex; align-items: center; gap: 0.4rem;">
-              <a href="${escapeHtml(meetLink)}" target="_blank" rel="noopener noreferrer" class="btn-table-action" style="background: #0088ff; color: #ffffff; padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;" title="Rejoindre l'appel vidéo">
-                <i data-lucide="video" style="width: 12px; height: 12px;"></i>
-                <span>Rejoindre</span>
-              </a>
-              <button class="btn-table-action manage-meet-client-btn" data-client-id="${m.clientId}" style="background: #f1f5f9; color: #334155; padding: 0.35rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;" title="Ouvrir le Workspace client">
-                <i data-lucide="external-link" style="width: 12px; height: 12px;"></i>
-              </button>
-              <button class="btn-delete-row delete-admin-meeting-btn" data-client-id="${m.clientId}" data-meet-id="${m.id}" title="Supprimer ce rendez-vous">
-                <i data-lucide="trash-2"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-
-    // Bind Manage Workspace button
-    meetingsTableBody.querySelectorAll('.manage-meet-client-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const clientId = btn.getAttribute('data-client-id');
-        if (clientId) {
-          openManageClientModal(clientId);
-          document.querySelectorAll('.client-editor-tabs .editor-tab').forEach(t => t.classList.remove('active'));
-          document.querySelectorAll('.client-editor-content .editor-pane').forEach(p => p.classList.remove('active'));
-          document.querySelector('.client-editor-tabs .editor-tab[data-tab="meetings"]')?.classList.add('active');
-          document.getElementById('paneMeetings')?.classList.add('active');
-          if (window.lucide) window.lucide.createIcons();
-        }
-      });
-    });
-
-    // Bind Delete Meeting button
-    meetingsTableBody.querySelectorAll('.delete-admin-meeting-btn').forEach(btn => {
+    inquiriesTableBody.querySelectorAll('.delete-inquiry-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const clientId = btn.getAttribute('data-client-id');
-        const meetId = btn.getAttribute('data-meet-id');
-        if (!clientId || !meetId) return;
-
-        const client = clients.find(c => c.id === clientId);
-        if (client) {
-          const meetingItem = (client.timeline || []).find(t => t.id === meetId);
-          const meetDate = meetingItem ? (meetingItem.rawDate || meetingItem.date) : '';
-
-          client.timeline = (client.timeline || []).filter(t => t.id !== meetId);
-          if (client.calendarEvents) {
-            Object.keys(client.calendarEvents).forEach(d => {
-              client.calendarEvents[d] = (client.calendarEvents[d] || []).filter(ev => {
-                if (ev.id === meetId) return false;
-                if (meetDate && d === meetDate && (ev.type === 'Sync' || (ev.title && (ev.title.includes('Strategy Session') || ev.title.includes('Rendez-vous'))))) return false;
-                return true;
-              });
-            });
-          }
-
-          // Also clean from inquiries
-          inquiries = inquiries.filter(inq => {
-            if (inq.type === 'MEETING') {
-              const matches = (inq.clientEmail && client.email && inq.clientEmail.toLowerCase() === client.email.toLowerCase()) ||
-                              (inq.companyName && client.companyName && inq.companyName.toLowerCase() === client.companyName.toLowerCase());
-              if (matches && meetDate && inq.notes && inq.notes.includes(meetDate)) return false;
-              if (inq.id === meetId || inq.id.toLowerCase() === meetId.toLowerCase()) return false;
-            }
-            return true;
-          });
+        const id = btn.getAttribute('data-id');
+        if (!id) return;
+        if (confirm('Are you sure you want to delete this inquiry?')) {
+          inquiries = inquiries.filter(i => i.id !== id);
           saveInquiries(inquiries);
-
-          saveClients(clients);
           renderAdminPortal();
         }
       });
@@ -1716,34 +1638,278 @@ function initMotaGrowthApp() {
     if (window.lucide) window.lucide.createIcons();
   }
 
+  // =========================================================================
+  // LEAD DOSSIER DRAWER (INSPECT QUESTIONNAIRE & REAL-TIME STAGE UPDATES)
+  // =========================================================================
+
+  const leadDossierDrawer = document.getElementById('leadDossierDrawer');
+  const dossierBackdrop = document.getElementById('dossierBackdrop');
+  const closeDossierBtn = document.getElementById('closeDossierBtn');
+  let activeDossierLeadId = null;
+
+  function closeLeadDossier() {
+    if (leadDossierDrawer) leadDossierDrawer.classList.remove('open');
+    if (dossierBackdrop) dossierBackdrop.classList.remove('open');
+    activeDossierLeadId = null;
+  }
+
+  if (closeDossierBtn) closeDossierBtn.addEventListener('click', closeLeadDossier);
+  if (dossierBackdrop) dossierBackdrop.addEventListener('click', closeLeadDossier);
+
+  function openLeadDossier(item) {
+    if (!item) return;
+    activeDossierLeadId = item.id;
+
+    // Header info
+    const refTag = document.getElementById('drawerRefId');
+    if (refTag) refTag.textContent = item.id || 'INQ-BRIEF';
+
+    const clientName = document.getElementById('drawerClientName');
+    if (clientName) clientName.textContent = item.clientName || 'Prospect Name';
+
+    const compName = document.getElementById('drawerCompanyName');
+    if (compName) compName.textContent = item.companyName || 'Private Client';
+
+    // Quick Actions
+    const waBtn = document.getElementById('drawerWhatsappBtn');
+    const cleanPhone = cleanPhoneForWhatsApp(item.clientPhone);
+    if (waBtn) {
+      if (cleanPhone) {
+        const greeting = `Hi ${item.clientName || 'there'}, thank you for contacting MotaGrowth Agency regarding your project. When would be a great time for a brief 15-minute discovery call?`;
+        waBtn.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(greeting)}`;
+        waBtn.style.display = 'inline-flex';
+      } else {
+        waBtn.style.display = 'none';
+      }
+    }
+
+    const emailBtn = document.getElementById('drawerEmailBtn');
+    if (emailBtn) {
+      if (item.clientEmail) {
+        emailBtn.href = `mailto:${item.clientEmail}?subject=${encodeURIComponent('MotaGrowth Agency — Proposal & Strategy')}`;
+        emailBtn.style.display = 'inline-flex';
+      } else {
+        emailBtn.style.display = 'none';
+      }
+    }
+
+    // Stage Selector
+    const stageSelect = document.getElementById('drawerStageSelect');
+    if (stageSelect) {
+      stageSelect.value = normalizeLeadStage(item.status);
+      stageSelect.onchange = () => {
+        item.status = stageSelect.value;
+        saveInquiries(inquiries);
+        renderAdminPortal();
+      };
+    }
+
+    // Convert Button
+    const convertBtn = document.getElementById('drawerConvertBtn');
+    if (convertBtn) {
+      convertBtn.onclick = () => {
+        closeLeadDossier();
+        startLeadConversion(item);
+      };
+    }
+
+    // Overview Meta
+    const budgetEl = document.getElementById('drawerBudget');
+    if (budgetEl) budgetEl.textContent = item.budget || '15,000+ MAD';
+
+    const timelineEl = document.getElementById('drawerTimeline');
+    if (timelineEl) timelineEl.textContent = item.timeline || 'Immediate';
+
+    const phoneEl = document.getElementById('drawerPhone');
+    if (phoneEl) {
+      phoneEl.innerHTML = item.clientPhone ? `<a href="tel:${escapeHtml(item.clientPhone)}" style="color:#38bdf8;">${escapeHtml(item.clientPhone)}</a>` : '—';
+    }
+
+    const mailEl = document.getElementById('drawerEmail');
+    if (mailEl) {
+      mailEl.innerHTML = item.clientEmail ? `<a href="mailto:${escapeHtml(item.clientEmail)}" style="color:#38bdf8;">${escapeHtml(item.clientEmail)}</a>` : '—';
+    }
+
+    const locEl = document.getElementById('drawerLocation');
+    if (locEl) locEl.textContent = item.location || item.sector || 'Morocco';
+
+    const siteEl = document.getElementById('drawerWebsite');
+    if (siteEl) {
+      if (item.website && item.website !== '—') {
+        const fullUrl = item.website.startsWith('http') ? item.website : `https://${item.website}`;
+        siteEl.innerHTML = `<a href="${fullUrl}" target="_blank" style="color:#0088ff;text-decoration:underline;">${escapeHtml(item.website)} ↗</a>`;
+      } else {
+        siteEl.textContent = 'None';
+      }
+    }
+
+    const descEl = document.getElementById('drawerBusinessDesc');
+    if (descEl) descEl.textContent = item.businessDescription || item.notes || 'No preliminary notes provided.';
+
+    // Detailed Questionnaire Answers
+    const answersList = document.getElementById('drawerAnswersList');
+    if (answersList) {
+      let answersHtml = '';
+      if (item.answers && Object.keys(item.answers).length > 0) {
+        answersHtml = Object.entries(item.answers).map(([key, val]) => {
+          let formattedVal = Array.isArray(val) ? val.join(', ') : String(val);
+          if (typeof val === 'object' && val !== null) formattedVal = JSON.stringify(val);
+          const prettyKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+          return `
+            <div class="dossier-answer-item">
+              <div class="dossier-q">${escapeHtml(prettyKey)}</div>
+              <div class="dossier-a">${escapeHtml(formattedVal)}</div>
+            </div>
+          `;
+        }).join('');
+      } else if (item.notes) {
+        answersHtml = `
+          <div class="dossier-answer-item">
+            <div class="dossier-q">Brief Submission</div>
+            <div class="dossier-a">${escapeHtml(item.notes)}</div>
+          </div>
+        `;
+      } else {
+        answersHtml = '<div style="color:#64748b;font-size:0.85rem;">No questionnaire answers recorded.</div>';
+      }
+      answersList.innerHTML = answersHtml;
+    }
+
+    // Internal Notes
+    const notesInput = document.getElementById('drawerNotesInput');
+    if (notesInput) notesInput.value = item.internalNotes || '';
+
+    const saveNotesBtn = document.getElementById('saveDrawerNotesBtn');
+    if (saveNotesBtn) {
+      saveNotesBtn.onclick = () => {
+        item.internalNotes = (notesInput ? notesInput.value : '').trim();
+        saveInquiries(inquiries);
+        saveNotesBtn.innerHTML = '<i data-lucide="check" style="width:13px;height:13px;"></i><span>Saved!</span>';
+        if (window.lucide) window.lucide.createIcons();
+        setTimeout(() => {
+          saveNotesBtn.innerHTML = '<i data-lucide="check" style="width:13px;height:13px;"></i><span>Save Notes</span>';
+          if (window.lucide) window.lucide.createIcons();
+        }, 1800);
+      };
+    }
+
+    // Open Drawer
+    if (leadDossierDrawer) leadDossierDrawer.classList.add('open');
+    if (dossierBackdrop) dossierBackdrop.classList.add('open');
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  // =========================================================================
+  // FINANCIALS & ANALYTICS TAB
+  // =========================================================================
+
+  function renderAnalyticsSection() {
+    const serviceListEl = document.getElementById('serviceBreakdownList');
+    const funnelListEl = document.getElementById('pipelineFunnelList');
+
+    // 1. Service Breakdown
+    const serviceCategories = [
+      'Website Design & Development',
+      'Social Media Management',
+      'Paid Performance Marketing',
+      'Full-Service Growth Package'
+    ];
+
+    if (serviceListEl) {
+      serviceListEl.innerHTML = serviceCategories.map(cat => {
+        const matchingLeads = inquiries.filter(i => {
+          const joined = (i.services || []).join(' ').toLowerCase();
+          return joined.includes(cat.toLowerCase());
+        });
+        const totalCatVal = matchingLeads.reduce((sum, i) => sum + parseLeadBudgetMAD(i.budget), 0);
+
+        return `
+          <div class="service-stat-item">
+            <div>
+              <div class="service-stat-name">${cat}</div>
+              <span style="font-size:0.75rem;color:#94a3b8;">${matchingLeads.length} Inbound Leads</span>
+            </div>
+            <div class="service-stat-val">${formatCurrencyMAD(totalCatVal)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 2. Deal Conversion Funnel
+    const stages = [
+      { name: 'New Lead', color: '#38bdf8' },
+      { name: 'Contacted', color: '#fbbf24' },
+      { name: 'Proposal Sent', color: '#c084fc' },
+      { name: 'Negotiation / Meeting', color: '#38bdf8' },
+      { name: 'Won / Active Client', color: '#34d399' }
+    ];
+
+    const totalCount = inquiries.length || 1;
+
+    if (funnelListEl) {
+      funnelListEl.innerHTML = stages.map(st => {
+        const count = inquiries.filter(i => normalizeLeadStage(i.status) === st.name).length;
+        const pct = Math.round((count / totalCount) * 100);
+
+        return `
+          <div class="funnel-stage-item">
+            <div class="funnel-stage-meta">
+              <span style="color:#ffffff;">${st.name}</span>
+              <span style="color:${st.color};">${count} leads (${pct}%)</span>
+            </div>
+            <div class="funnel-bar-wrap">
+              <div class="funnel-bar-fill" style="width: ${Math.max(pct, 4)}%; background: ${st.color};"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // =========================================================================
+  // CLIENT WORKSPACES GRID (ACTIVE CLIENTS & 1-CLICK WHATSAPP ONBOARDING)
+  // =========================================================================
+
   function renderClientsGrid() {
-    if (!clients || clients.length === 0) {
+    const search = (document.getElementById('clientSearchInput')?.value || '').toLowerCase().trim();
+    const filteredClients = clients.filter(c => {
+      if (!search) return true;
+      const comp = (c.companyName || '').toLowerCase();
+      const name = (c.clientName || '').toLowerCase();
+      const email = (c.email || '').toLowerCase();
+      return comp.includes(search) || name.includes(search) || email.includes(search);
+    });
+
+    if (!adminClientsGrid) return;
+
+    if (filteredClients.length === 0) {
       adminClientsGrid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1; color: #64748b;">
-          <i data-lucide="users" style="width: 36px; height: 36px; color: #0088ff; margin-bottom: 0.75rem; opacity: 0.6;"></i>
-          <h4 style="font-size: 1.05rem; color: #0f172a; margin-bottom: 0.35rem;">Aucun compte client</h4>
-          <p style="font-size: 0.85rem; margin-bottom: 1rem;">Créez un nouveau workspace client pour commencer.</p>
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: rgba(14, 18, 28, 0.7); border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.12); color: #64748b;">
+          <i data-lucide="users" style="width: 36px; height: 36px; color: #0088ff; margin-bottom: 0.75rem; opacity: 0.7;"></i>
+          <h4 style="font-size: 1.05rem; color: #ffffff; margin-bottom: 0.35rem;">No Client Workspaces Found</h4>
+          <p style="font-size: 0.85rem; margin-bottom: 1.25rem;">Create a new client account to provision access and deliverables.</p>
           <button type="button" class="btn-blue-pill btn-small" id="emptyStateAddClientBtn">
             <i data-lucide="plus"></i>
-            <span>Créer un Compte Client</span>
+            <span>+ Create Client Account</span>
           </button>
         </div>
       `;
       document.getElementById('emptyStateAddClientBtn')?.addEventListener('click', () => {
-        createClientModal.style.display = 'flex';
-        if (window.lucide) window.lucide.createIcons();
+        openCreateClientModal();
       });
       if (window.lucide) window.lucide.createIcons();
       return;
     }
 
-    adminClientsGrid.innerHTML = clients.map(c => {
+    adminClientsGrid.innerHTML = filteredClients.map(c => {
       const initials = ((c.companyName || c.clientName || 'CL').substring(0, 2)).toUpperCase();
       const statusClass = (c.status || 'Active').toLowerCase();
       const hasLogo = Boolean(c.logo);
       const avatarInner = hasLogo
         ? `<img src="${c.logo}" class="client-card-logo-img" alt="${escapeHtml(c.companyName)}" />`
         : initials;
+
+      const retainerMAD = c.retainerMRR ? formatCurrencyMAD(c.retainerMRR) : '25,000 MAD / mo';
 
       return `
         <div class="admin-client-card" id="clientCard-${c.id}">
@@ -1760,27 +1926,38 @@ function initMotaGrowthApp() {
 
           <div class="client-meta-box">
             <div><strong>Email :</strong> ${escapeHtml(c.email)}</div>
-            <div><strong>Nom d'utilisateur :</strong> <code>${escapeHtml(c.username || c.email)}</code></div>
-            <div><strong>Mot de passe :</strong> <code>${escapeHtml(c.password)}</code></div>
-            <div><span class="client-service-chip">${escapeHtml(c.servicesTier || 'Full-Service Growth')}</span></div>
+            <div><strong>Passcode :</strong> <code style="color: #f3c644; font-weight:700;">${escapeHtml(c.password)}</code></div>
+            <div><strong>Retainer :</strong> <span style="color:#34d399; font-weight:700;">${retainerMAD}</span></div>
+            <div><span class="client-service-chip">${escapeHtml(c.servicesTier || 'Full-Service Growth Package')}</span></div>
           </div>
 
           <div class="client-stats-badges">
-            <span class="stat-chip"><i data-lucide="check-square" style="width:13px;height:13px;color:#0088ff;"></i> ${(c.approvals || []).length} Approbations</span>
-            <span class="stat-chip"><i data-lucide="calendar" style="width:13px;height:13px;color:#7e22ce;"></i> ${(c.timeline || []).length} Échéances</span>
-            <span class="stat-chip"><i data-lucide="lightbulb" style="width:13px;height:13px;color:#d97706;"></i> ${(c.ideas || []).length} Idées</span>
+            <span class="stat-chip"><i data-lucide="check-square" style="width:13px;height:13px;color:#0088ff;"></i> ${(c.approvals || []).length} Deliverables</span>
+            <span class="stat-chip"><i data-lucide="calendar" style="width:13px;height:13px;color:#7e22ce;"></i> ${(c.timeline || []).length} Milestones</span>
+            <span class="stat-chip"><i data-lucide="lightbulb" style="width:13px;height:13px;color:#d97706;"></i> ${(c.ideas || []).length} Ideas</span>
           </div>
 
           <div class="client-card-actions">
+            <!-- 1-Click WhatsApp Onboarding Invite -->
+            <button type="button" class="btn-copy-wa-invite copy-wa-invite-btn" data-id="${c.id}" title="Copy ready-to-send WhatsApp onboarding invite">
+              <i data-lucide="share-2" style="width:13px;height:13px;"></i>
+              <span>WhatsApp Invite</span>
+            </button>
+
+            <!-- Manage Details Modal -->
             <button type="button" class="btn-blue-pill btn-small manage-client-btn" data-id="${c.id}">
               <i data-lucide="sliders" style="width:14px;height:14px;"></i>
-              <span>Gérer Workspace</span>
+              <span>Manage</span>
             </button>
-            <button type="button" class="btn-test-client test-client-login-btn" data-id="${c.id}" title="Se connecter directement dans l'Espace Client pour tester">
+
+            <!-- Preview / Login to Client Space -->
+            <button type="button" class="btn-test-client test-client-login-btn" data-id="${c.id}" title="Login directly into this client's portal">
               <i data-lucide="log-in" style="width:14px;height:14px;"></i>
-              <span>Tester Accès</span>
+              <span>Preview</span>
             </button>
-            <button type="button" class="btn-delete-row delete-client-btn" data-id="${c.id}" title="Supprimer ce client">
+
+            <!-- Delete -->
+            <button type="button" class="btn-delete-row delete-client-btn" data-id="${c.id}" title="Delete Client Account">
               <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
             </button>
           </div>
@@ -1788,9 +1965,32 @@ function initMotaGrowthApp() {
       `;
     }).join('');
 
+    // WhatsApp Invite Copy Handlers
+    adminClientsGrid.querySelectorAll('.copy-wa-invite-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        const client = clients.find(c => c.id === id);
+        if (!client) return;
+
+        const portalUrl = 'https://motagrowthagency.github.io/MotaGrowth-Animatedweb/client-space.html';
+        const msg = `Hello ${client.clientName}, welcome to MotaGrowth Agency!\n\nYour dedicated Client Workspace is active:\n🔗 Portal Link: ${portalUrl}\n👤 Login: ${client.email}\n🔑 Passcode: ${client.password}\n\nYou can review your project roadmap, approvals, and growth ideas anytime. Let's scale together! 🚀`;
+
+        navigator.clipboard.writeText(msg).then(() => {
+          btn.innerHTML = '<i data-lucide="check" style="width:13px;height:13px;"></i><span>Copied!</span>';
+          if (window.lucide) window.lucide.createIcons();
+          setTimeout(() => {
+            btn.innerHTML = '<i data-lucide="share-2" style="width:13px;height:13px;"></i><span>WhatsApp Invite</span>';
+            if (window.lucide) window.lucide.createIcons();
+          }, 2000);
+        }).catch(() => {
+          prompt('Copy Onboarding Invite Message:', msg);
+        });
+      });
+    });
+
     adminClientsGrid.querySelectorAll('.manage-client-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        e.preventDefault();
         e.stopPropagation();
         const id = btn.getAttribute('data-id');
         openManageClientModal(id);
@@ -1799,200 +1999,488 @@ function initMotaGrowthApp() {
 
     adminClientsGrid.querySelectorAll('.test-client-login-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        e.preventDefault();
         e.stopPropagation();
         const id = btn.getAttribute('data-id');
-        const currentClients = loadClients();
-        const client = currentClients.find(c => c.id === id);
+        const client = clients.find(c => c.id === id);
         if (client) {
           loggedInClient = client;
           saveActiveSession(client);
-          showClientSpaceView();
-          window.location.hash = '#client-space';
+          window.location.href = 'client-space.html';
         }
       });
     });
 
     adminClientsGrid.querySelectorAll('.delete-client-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        e.preventDefault();
         e.stopPropagation();
         const id = btn.getAttribute('data-id');
         if (!id) return;
-        clients = loadClients().filter(c => c.id !== id);
-        saveClients(clients);
-        renderAdminPortal();
+        if (confirm('Are you sure you want to delete this client account?')) {
+          clients = clients.filter(c => c.id !== id);
+          saveClients(clients);
+          renderAdminPortal();
+        }
       });
     });
 
     if (window.lucide) window.lucide.createIcons();
   }
 
-  // Admin Tab Switcher
+  // =========================================================================
+  // ADMIN TAB SWITCHER
+  // =========================================================================
+
+  const tabAnalyticsBtn = document.getElementById('tabAnalyticsBtn');
+  const adminAnalyticsSection = document.getElementById('adminAnalyticsSection');
+
   function switchAdminTab(activeTab) {
     if (tabInquiriesBtn) tabInquiriesBtn.classList.toggle('active', activeTab === 'inquiries');
-    if (tabMeetingsBtn) tabMeetingsBtn.classList.toggle('active', activeTab === 'meetings');
     if (tabClientsBtn) tabClientsBtn.classList.toggle('active', activeTab === 'clients');
+    if (tabAnalyticsBtn) tabAnalyticsBtn.classList.toggle('active', activeTab === 'analytics');
 
     if (adminInquiriesSection) adminInquiriesSection.style.display = (activeTab === 'inquiries') ? 'block' : 'none';
-    if (adminMeetingsSection) adminMeetingsSection.style.display = (activeTab === 'meetings') ? 'block' : 'none';
     if (adminClientsSection) adminClientsSection.style.display = (activeTab === 'clients') ? 'block' : 'none';
+    if (adminAnalyticsSection) adminAnalyticsSection.style.display = (activeTab === 'analytics') ? 'block' : 'none';
 
     if (activeTab === 'inquiries') renderInquiriesTable();
-    if (activeTab === 'meetings') renderMeetingsTable();
     if (activeTab === 'clients') renderClientsGrid();
+    if (activeTab === 'analytics') renderAnalyticsSection();
     if (window.lucide) window.lucide.createIcons();
   }
 
-  if (tabInquiriesBtn) {
-    tabInquiriesBtn.addEventListener('click', () => switchAdminTab('inquiries'));
-  }
-  if (tabMeetingsBtn) {
-    tabMeetingsBtn.addEventListener('click', () => switchAdminTab('meetings'));
-  }
-  if (tabClientsBtn) {
-    tabClientsBtn.addEventListener('click', () => switchAdminTab('clients'));
-  }
+  if (tabInquiriesBtn) tabInquiriesBtn.addEventListener('click', () => switchAdminTab('inquiries'));
+  if (tabClientsBtn) tabClientsBtn.addEventListener('click', () => switchAdminTab('clients'));
+  if (tabAnalyticsBtn) tabAnalyticsBtn.addEventListener('click', () => switchAdminTab('analytics'));
 
-  if (inquirySearchInput) {
-    inquirySearchInput.addEventListener('input', renderInquiriesTable);
-  }
+  if (inquirySearchInput) inquirySearchInput.addEventListener('input', renderInquiriesTable);
+  document.getElementById('inquiryStatusFilter')?.addEventListener('change', renderInquiriesTable);
+  document.getElementById('inquiryServiceFilter')?.addEventListener('change', renderInquiriesTable);
+  document.getElementById('clientSearchInput')?.addEventListener('input', renderClientsGrid);
 
-  if (meetingSearchInput) {
-    meetingSearchInput.addEventListener('input', renderMeetingsTable);
-  }
-
-  // Meetings CSV Export
-  if (exportMeetingsCsvBtn) {
-    exportMeetingsCsvBtn.addEventListener('click', () => {
-      const allMeetings = getAllAdminMeetings();
-      if (allMeetings.length === 0) { alert('Aucun rendez-vous à exporter.'); return; }
-      const headers = ['DATE', 'CLIENT', 'ENTREPRISE', 'EMAIL', 'TELEPHONE', 'FORMAT', 'STATUT', 'NOTES', 'LIEN_MEET'];
-      const rows = allMeetings.map(m => [
-        `"${m.date || m.rawDate || '—'}"`,
-        `"${m.clientName || '—'}"`,
-        `"${m.companyName || '—'}"`,
-        `"${m.clientEmail || '—'}"`,
-        `"${m.clientPhone || '—'}"`,
-        `"${(m.title || 'Session').replace('Rendez-vous : ', '')}"`,
-        `"${m.status || 'Planifié'}"`,
-        `"${(m.description || '—').replace(/"/g, '""')}"`,
-        `"${m.link || '—'}"`
-      ]);
-      const csv = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-      downloadBlob(csv, `motagrowth_meetings_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
-    });
-  }
-
-  // CSV Export
+  // CSV Export for Inbound Leads
   if (exportCsvBtn) {
     exportCsvBtn.addEventListener('click', () => {
-      if (inquiries.length === 0) { alert('Aucune demande à exporter.'); return; }
-      const headers = ['DATE', 'TYPE', 'NOM', 'ENTREPRISE', 'EMAIL', 'TELEPHONE', 'SOLUTIONS', 'SECTEURS', 'MESSAGE'];
+      if (inquiries.length === 0) { alert('No leads to export.'); return; }
+      const headers = ['REFERENCE_ID', 'DATE', 'STAGE', 'CLIENT_NAME', 'COMPANY', 'EMAIL', 'PHONE', 'LOCATION', 'SERVICES', 'BUDGET', 'NOTES'];
       const rows = inquiries.map(i => [
+        `"${i.id || 'INQ'}"`,
         `"${(i.dateDisplay || i.createdAt || '').replace(/<br>/g, ' ')}"`,
-        `"${i.type || 'PRO'}"`,
-        `"${i.clientName || '—'}"`,
-        `"${i.companyName || '—'}"`,
-        `"${i.clientEmail || '—'}"`,
-        `"${i.clientPhone || '—'}"`,
+        `"${normalizeLeadStage(i.status)}"`,
+        `"${(i.clientName || '').replace(/"/g, '""')}"`,
+        `"${(i.companyName || '').replace(/"/g, '""')}"`,
+        `"${i.clientEmail || ''}"`,
+        `"${i.clientPhone || ''}"`,
+        `"${i.location || i.sector || ''}"`,
         `"${(i.services || []).join('; ')}"`,
-        `"${i.sector || i.primaryGoal || '—'}"`,
-        `"${(i.notes || '—').replace(/"/g, '""')}"`
+        `"${i.budget || ''}"`,
+        `"${(i.notes || '').replace(/"/g, '""')}"`
       ]);
       const csv = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-      downloadBlob(csv, `motagrowth_inquiries_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
+      downloadBlob(csv, `motagrowth_crm_leads_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
     });
   }
 
-  // Create Client Modal
-  let newClientLogoDataUrl = '';
+  // =========================================================================
+  // MASTER LOCK & LOGOUT CONTROLLER
+  // =========================================================================
 
-  const newClientLogoInput = document.getElementById('newClientLogoInput');
-  const newClientLogoImg = document.getElementById('newClientLogoImg');
-  const newClientLogoDefaultIcon = document.getElementById('newClientLogoDefaultIcon');
-  const removeNewClientLogoBtn = document.getElementById('removeNewClientLogoBtn');
+  const adminLockScreen = document.getElementById('adminLockScreen');
+  const adminLockForm = document.getElementById('adminLockForm');
+  const adminMasterPassInput = document.getElementById('adminMasterPassInput');
+  const adminLockError = document.getElementById('adminLockError');
+  const toggleAdminPassBtn = document.getElementById('toggleAdminPassBtn');
+  const passToggleIcon = document.getElementById('passToggleIcon');
+  const adminLockoutBtn = document.getElementById('adminLockoutBtn');
 
-  function resetNewClientLogoPreview() {
-    newClientLogoDataUrl = '';
-    if (newClientLogoInput) newClientLogoInput.value = '';
-    if (newClientLogoImg) {
-      newClientLogoImg.src = '';
-      newClientLogoImg.style.display = 'none';
-    }
-    if (newClientLogoDefaultIcon) newClientLogoDefaultIcon.style.display = 'block';
-    if (removeNewClientLogoBtn) removeNewClientLogoBtn.style.display = 'none';
+  if (toggleAdminPassBtn && adminMasterPassInput) {
+    toggleAdminPassBtn.addEventListener('click', () => {
+      const isPass = adminMasterPassInput.type === 'password';
+      adminMasterPassInput.type = isPass ? 'text' : 'password';
+      if (passToggleIcon) {
+        passToggleIcon.setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+        if (window.lucide) window.lucide.createIcons();
+      }
+    });
   }
 
-  if (newClientLogoInput) {
-    newClientLogoInput.addEventListener('change', (e) => {
+  if (adminLockForm) {
+    adminLockForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = (adminMasterPassInput ? adminMasterPassInput.value : '').trim();
+      if (val === 'Mogamedtazi223') {
+        sessionStorage.setItem('motagrowth_admin_auth', 'true');
+        if (adminLockError) adminLockError.style.display = 'none';
+        if (adminLockScreen) adminLockScreen.style.display = 'none';
+        if (adminPortalView) adminPortalView.style.display = 'block';
+        renderAdminPortal();
+      } else {
+        if (adminLockError) adminLockError.style.display = 'block';
+        if (adminMasterPassInput) {
+          adminMasterPassInput.focus();
+          adminMasterPassInput.select();
+        }
+      }
+    });
+  }
+
+  if (adminLockoutBtn) {
+    adminLockoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      sessionStorage.removeItem('motagrowth_admin_auth');
+      if (adminPortalView) adminPortalView.style.display = 'none';
+      if (adminLockScreen) adminLockScreen.style.display = 'flex';
+      if (adminMasterPassInput) {
+        adminMasterPassInput.value = '';
+        adminMasterPassInput.focus();
+      }
+      if (adminLockError) adminLockError.style.display = 'none';
+      if (window.lucide) window.lucide.createIcons();
+    });
+  }
+
+  // =========================================================================
+  // MANUAL LEAD MODAL CONTROLLER
+  // =========================================================================
+
+  const btnOpenManualLeadModal = document.getElementById('btnOpenManualLeadModal');
+  const manualLeadModal = document.getElementById('manualLeadModal');
+  const closeManualLeadBtn = document.getElementById('closeManualLeadBtn');
+  const cancelManualLeadBtn = document.getElementById('cancelManualLeadBtn');
+  const manualLeadForm = document.getElementById('manualLeadForm');
+
+  if (btnOpenManualLeadModal && manualLeadModal) {
+    btnOpenManualLeadModal.addEventListener('click', () => {
+      manualLeadModal.style.display = 'flex';
+    });
+  }
+
+  if (closeManualLeadBtn && manualLeadModal) {
+    closeManualLeadBtn.addEventListener('click', () => manualLeadModal.style.display = 'none');
+  }
+  if (cancelManualLeadBtn && manualLeadModal) {
+    cancelManualLeadBtn.addEventListener('click', () => manualLeadModal.style.display = 'none');
+  }
+
+  if (manualLeadForm) {
+    manualLeadForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('manLeadName')?.value.trim();
+      const company = document.getElementById('manLeadCompany')?.value.trim();
+      const email = document.getElementById('manLeadEmail')?.value.trim() || '—';
+      const phone = document.getElementById('manLeadPhone')?.value.trim() || '—';
+      const service = document.getElementById('manLeadService')?.value;
+      const budget = document.getElementById('manLeadBudget')?.value;
+      const stage = document.getElementById('manLeadStage')?.value || 'New Lead';
+      const timeline = document.getElementById('manLeadTimeline')?.value.trim() || 'Immediate';
+      const notes = document.getElementById('manLeadNotes')?.value.trim();
+
+      const newLead = {
+        id: 'INQ-MAN-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+        createdAt: new Date().toISOString(),
+        clientName: name,
+        companyName: company,
+        clientEmail: email,
+        clientPhone: phone,
+        location: 'Morocco',
+        website: '—',
+        budget: budget,
+        timeline: timeline,
+        services: [service],
+        status: stage,
+        notes: notes || 'Manual lead entry from direct contact.',
+        answers: { Service: service, Budget: budget, Timeline: timeline }
+      };
+
+      inquiries.unshift(newLead);
+      saveInquiries(inquiries);
+      manualLeadModal.style.display = 'none';
+      manualLeadForm.reset();
+      renderAdminPortal();
+    });
+  }
+
+  // =========================================================================
+  // BACKUP, RESTORE & DATA TOOLS MODAL
+  // =========================================================================
+
+  const btnOpenDataToolsModal = document.getElementById('btnOpenDataToolsModal');
+  const backupToolsModal = document.getElementById('backupToolsModal');
+  const closeBackupToolsBtn = document.getElementById('closeBackupToolsBtn');
+  const cancelBackupToolsBtn = document.getElementById('cancelBackupToolsBtn');
+  const btnDownloadJsonBackup = document.getElementById('btnDownloadJsonBackup');
+  const restoreFileInput = document.getElementById('restoreFileInput');
+  const btnLoadDemoLeads = document.getElementById('btnLoadDemoLeads');
+  const btnClearInquiries = document.getElementById('btnClearInquiries');
+
+  if (btnOpenDataToolsModal && backupToolsModal) {
+    btnOpenDataToolsModal.addEventListener('click', () => {
+      backupToolsModal.style.display = 'flex';
+    });
+  }
+  if (closeBackupToolsBtn && backupToolsModal) {
+    closeBackupToolsBtn.addEventListener('click', () => backupToolsModal.style.display = 'none');
+  }
+  if (cancelBackupToolsBtn && backupToolsModal) {
+    cancelBackupToolsBtn.addEventListener('click', () => backupToolsModal.style.display = 'none');
+  }
+
+  // Export JSON Backup
+  if (btnDownloadJsonBackup) {
+    btnDownloadJsonBackup.addEventListener('click', () => {
+      const backupData = {
+        version: '7.0',
+        exportedAt: new Date().toISOString(),
+        inquiries: inquiries,
+        clients: clients
+      };
+      const json = JSON.stringify(backupData, null, 2);
+      downloadBlob(json, `motagrowth_crm_backup_${Date.now()}.json`, 'application/json');
+    });
+  }
+
+  // Restore JSON Backup
+  if (restoreFileInput) {
+    restoreFileInput.addEventListener('change', (e) => {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (evt) => {
-        newClientLogoDataUrl = evt.target.result;
-        if (newClientLogoImg) {
-          newClientLogoImg.src = newClientLogoDataUrl;
-          newClientLogoImg.style.display = 'block';
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed && (Array.isArray(parsed.inquiries) || Array.isArray(parsed.clients))) {
+            if (Array.isArray(parsed.inquiries)) {
+              inquiries = parsed.inquiries;
+              saveInquiries(inquiries);
+            }
+            if (Array.isArray(parsed.clients)) {
+              clients = parsed.clients;
+              saveClients(clients);
+            }
+            renderAdminPortal();
+            if (backupToolsModal) backupToolsModal.style.display = 'none';
+            alert('Database successfully restored from backup!');
+          } else {
+            alert('Invalid backup file format.');
+          }
+        } catch (err) {
+          alert('Failed to parse JSON backup file.');
         }
-        if (newClientLogoDefaultIcon) newClientLogoDefaultIcon.style.display = 'none';
-        if (removeNewClientLogoBtn) removeNewClientLogoBtn.style.display = 'inline-flex';
       };
-      reader.readAsDataURL(file);
+      reader.readAsText(file);
     });
   }
 
-  if (removeNewClientLogoBtn) {
-    removeNewClientLogoBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      resetNewClientLogoPreview();
+  // Load Demo Leads
+  if (btnLoadDemoLeads) {
+    btnLoadDemoLeads.addEventListener('click', () => {
+      const demoLeads = [
+        {
+          id: 'INQ-ATLAS-91A',
+          createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+          clientName: 'Yassine Bennani',
+          companyName: 'Atlas Luxury Living',
+          clientEmail: 'yassine@atlasliving.ma',
+          clientPhone: '+212 661 248910',
+          location: 'Casablanca, Morocco',
+          website: 'atlasliving.ma',
+          budget: '50,000+ MAD',
+          timeline: '1–2 Months',
+          services: ['Full-Service Growth Package'],
+          status: 'Negotiation / Meeting',
+          businessDescription: 'High-end interior design and architectural real estate studio expanding across Morocco and the UAE.',
+          notes: 'Wants full rebrand, cinematic 3D web experience, and private client presentation vaults.',
+          answers: { 'Primary Objective': 'Scale High-Ticket Inquiries', 'Target Market': 'Luxury HNWIs in Casablanca & Dubai' }
+        },
+        {
+          id: 'INQ-NOOR-42B',
+          createdAt: new Date(Date.now() - 3600000 * 22).toISOString(),
+          clientName: 'Sofia El Amrani',
+          companyName: 'Noor Botanical Skincare',
+          clientEmail: 'sofia@noorbotanics.com',
+          clientPhone: '+212 662 550192',
+          location: 'Marrakech, Morocco',
+          website: 'noorbotanics.com',
+          budget: '25,000–49,999 MAD',
+          timeline: '2–4 Weeks',
+          services: ['Paid Performance Marketing'],
+          status: 'Proposal Sent',
+          businessDescription: 'Organic argan and prickly pear seed luxury cosmetics brand retailing in high-end hotels and e-commerce.',
+          notes: 'Seeking Meta & TikTok Ads scale to achieve 4x ROAS on direct-to-consumer store.',
+          answers: { 'Current Monthly Spend': '30,000 MAD', 'Ad Objective': 'Scale to 100k MAD/mo profitably' }
+        },
+        {
+          id: 'INQ-CASA-18C',
+          createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
+          clientName: 'Mehdi Tazi',
+          companyName: 'Casa FinTech Solutions',
+          clientEmail: 'mehdi@casafintech.io',
+          clientPhone: '+212 663 881204',
+          location: 'Casablanca Finance City',
+          website: 'casafintech.io',
+          budget: '25,000–49,999 MAD',
+          timeline: 'Immediate',
+          services: ['Website Design & Development'],
+          status: 'Contacted',
+          businessDescription: 'B2B payment infrastructure and embedded financing gateway for North African merchants.',
+          notes: 'Needs enterprise dark-mode interactive website with interactive API docs and fast conversion flow.',
+          answers: { 'Tech Stack': 'Next.js / Tailwind', 'Security Requirements': 'PCI-DSS Compliant' }
+        },
+        {
+          id: 'INQ-SOL-77D',
+          createdAt: new Date(Date.now() - 3600000 * 72).toISOString(),
+          clientName: 'Laila Chraibi',
+          companyName: 'Maison Soliel Hospitality',
+          clientEmail: 'laila@maisonsoliel.com',
+          clientPhone: '+212 665 339011',
+          location: 'Tangier, Morocco',
+          website: 'maisonsoliel.com',
+          budget: '15,000–24,999 MAD',
+          timeline: '2–4 Weeks',
+          services: ['Social Media Management'],
+          status: 'New Lead',
+          businessDescription: 'Boutique riad and culinary retreat overlooking the Strait of Gibraltar.',
+          notes: 'Needs daily organic Instagram reels, influencer partnerships, and direct booking engine growth.',
+          answers: { 'Content Style': 'Cinematic luxury lifestyle', 'Publishing Cadence': '5 Reels / Week' }
+        }
+      ];
+
+      inquiries = [...demoLeads, ...inquiries];
+      saveInquiries(inquiries);
+      renderAdminPortal();
+      if (backupToolsModal) backupToolsModal.style.display = 'none';
+      alert('Sample production leads successfully loaded!');
     });
   }
 
-  openNewClientModalBtn.addEventListener('click', () => {
-    resetNewClientLogoPreview();
-    createClientModal.style.display = 'flex';
-  });
-  closeCreateClientBtn.addEventListener('click', () => createClientModal.style.display = 'none');
-  cancelCreateClientBtn.addEventListener('click', () => createClientModal.style.display = 'none');
+  // Clear Inquiries
+  if (btnClearInquiries) {
+    btnClearInquiries.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear all inquiries? This action cannot be undone.')) {
+        inquiries = [];
+        saveInquiries(inquiries);
+        renderAdminPortal();
+        if (backupToolsModal) backupToolsModal.style.display = 'none';
+      }
+    });
+  }
 
-  createClientForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const rawUsername = (document.getElementById('newClientUsername')?.value || '').trim();
-    const emailVal = document.getElementById('newClientEmail').value.trim();
-    const companyVal = document.getElementById('newClientCompany').value.trim();
-    const usernameVal = rawUsername || emailVal.split('@')[0].toLowerCase() || emailVal.toLowerCase();
+  // =========================================================================
+  // CLIENT ONBOARDING & PASSCODE GENERATOR
+  // =========================================================================
 
-    const newClient = {
-      id: 'CLI-' + Math.random().toString(36).substring(2, 7).toUpperCase(),
-      createdAt: new Date().toISOString(),
-      clientName: document.getElementById('newClientName').value.trim(),
-      companyName: companyVal,
-      email: emailVal,
-      username: usernameVal,
-      password: document.getElementById('newClientPassword').value.trim(),
-      logo: newClientLogoDataUrl || '',
-      servicesTier: document.getElementById('newClientServices').value,
-      status: document.getElementById('newClientStatus').value,
-      summary: document.getElementById('newClientSummary').value.trim(),
-      approvals: [],
-      timeline: [],
-      ideas: [],
-      files: [],
-      tasks: [],
-      calendarEvents: {},
-      links: []
-    };
+  function generateClientPasscode(companyName) {
+    const cleanComp = (companyName || 'MOTA')
+      .replace(/[^a-zA-Z]/g, '')
+      .toUpperCase()
+      .substring(0, 5) || 'CLIENT';
+    const rand = Math.floor(100 + Math.random() * 900);
+    return `MOTA-${cleanComp}-${rand}`;
+  }
 
-    clients = loadClients();
-    clients.unshift(newClient);
-    saveClients(clients);
-    createClientModal.style.display = 'none';
+  const btnGenPasscode = document.getElementById('btnGenPasscode');
+  if (btnGenPasscode) {
+    btnGenPasscode.addEventListener('click', () => {
+      const compInput = document.getElementById('newClientCompany')?.value;
+      const passInput = document.getElementById('newClientPassword');
+      if (passInput) passInput.value = generateClientPasscode(compInput);
+    });
+  }
+
+  function openCreateClientModal() {
     createClientForm.reset();
-    resetNewClientLogoPreview();
-    renderAdminPortal();
-    alert(`Compte client créé avec succès pour ${newClient.companyName} !\n\nIdentifiant / Email: ${newClient.username}\nMot de passe: ${newClient.password}`);
-  });
+    const passInput = document.getElementById('newClientPassword');
+    if (passInput) passInput.value = generateClientPasscode('');
+    createClientModal.style.display = 'flex';
+  }
+
+  function startLeadConversion(lead) {
+    if (!lead) return;
+    openCreateClientModal();
+
+    if (document.getElementById('newClientName')) document.getElementById('newClientName').value = lead.clientName || '';
+    if (document.getElementById('newClientCompany')) document.getElementById('newClientCompany').value = lead.companyName || '';
+    if (document.getElementById('newClientEmail')) document.getElementById('newClientEmail').value = lead.clientEmail || '';
+    if (document.getElementById('newClientPhone')) document.getElementById('newClientPhone').value = lead.clientPhone || '';
+
+    const passInput = document.getElementById('newClientPassword');
+    if (passInput) passInput.value = generateClientPasscode(lead.companyName);
+
+    const mrrInput = document.getElementById('newClientRetainerMRR');
+    if (mrrInput) mrrInput.value = parseLeadBudgetMAD(lead.budget);
+
+    const summaryInput = document.getElementById('newClientSummary');
+    if (summaryInput) summaryInput.value = lead.businessDescription || lead.notes || '';
+
+    // Mark lead stage as Won / Active Client
+    lead.status = 'Won / Active Client';
+    saveInquiries(inquiries);
+  }
+
+  if (openNewClientModalBtn) {
+    openNewClientModalBtn.addEventListener('click', openCreateClientModal);
+  }
+  if (closeCreateClientBtn) closeCreateClientBtn.addEventListener('click', () => createClientModal.style.display = 'none');
+  if (cancelCreateClientBtn) cancelCreateClientBtn.addEventListener('click', () => createClientModal.style.display = 'none');
+
+  if (createClientForm) {
+    createClientForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const emailVal = document.getElementById('newClientEmail').value.trim();
+      const companyVal = document.getElementById('newClientCompany').value.trim();
+      const clientNameVal = document.getElementById('newClientName').value.trim();
+      const passwordVal = document.getElementById('newClientPassword').value.trim();
+      const phoneVal = document.getElementById('newClientPhone')?.value.trim() || '';
+      const retainerVal = Number(document.getElementById('newClientRetainerMRR')?.value) || 25000;
+
+      const newClient = {
+        id: 'CLI-' + Math.random().toString(36).substring(2, 7).toUpperCase(),
+        createdAt: new Date().toISOString(),
+        clientName: clientNameVal,
+        companyName: companyVal,
+        email: emailVal,
+        username: emailVal,
+        password: passwordVal,
+        phone: phoneVal,
+        retainerMRR: retainerVal,
+        logo: '',
+        servicesTier: document.getElementById('newClientServices').value,
+        status: document.getElementById('newClientStatus').value,
+        summary: document.getElementById('newClientSummary').value.trim(),
+        approvals: [
+          {
+            id: 'APP-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+            title: 'Onboarding & Strategic Brief Approval',
+            description: 'Confirmation of project scope, timelines, and communications channels.',
+            status: 'Pending',
+            createdAt: new Date().toISOString()
+          }
+        ],
+        timeline: [
+          {
+            id: 'TL-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+            title: 'Kickoff Discovery & Assets Handover',
+            date: 'Phase 1',
+            status: 'In Progress'
+          }
+        ],
+        ideas: [],
+        files: [],
+        tasks: [],
+        calendarEvents: {},
+        links: []
+      };
+
+      clients = loadClients();
+      clients.unshift(newClient);
+      saveClients(clients);
+      createClientModal.style.display = 'none';
+      createClientForm.reset();
+      renderAdminPortal();
+
+      // Show alert with 1-click details
+      alert(`Client Workspace Created Successfully!\n\nCompany: ${newClient.companyName}\nClient: ${newClient.clientName}\nEmail: ${newClient.email}\nPasscode: ${newClient.password}\n\nYou can now share the WhatsApp onboarding invite with them in 1 click!`);
+    });
+  }
 
   // =========================================================================
   // ADMIN WORKSPACE MANAGER (CALENDAR, IDEAS/NOTES, DOCUMENTS, VALIDATIONS)
@@ -2001,9 +2489,9 @@ function initMotaGrowthApp() {
   let adminCalYear = 2026;
   let adminCalMonth = 9; // October (0-indexed)
   let selectedAdminDate = '2026-10-12';
-  const frenchMonthNames = [
-    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+  const englishMonthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
   function formatDisplayDate(dateStr) {
@@ -2014,7 +2502,7 @@ function initMotaGrowthApp() {
         const y = parseInt(parts[0], 10);
         const m = parseInt(parts[1], 10) - 1;
         const d = parseInt(parts[2], 10);
-        return `${d} ${frenchMonthNames[m]} ${y}`;
+        return `${englishMonthNames[m]} ${d}, ${y}`;
       }
     } catch (e) {}
     return dateStr;
@@ -2079,11 +2567,11 @@ function initMotaGrowthApp() {
     const headingEl = document.getElementById('adminSelectedDateHeading');
 
     if (monthTitleEl) {
-      monthTitleEl.textContent = `${frenchMonthNames[adminCalMonth]} ${adminCalYear}`;
+      monthTitleEl.textContent = `${englishMonthNames[adminCalMonth]} ${adminCalYear}`;
     }
 
     if (headingEl) {
-      headingEl.textContent = `Ajouter un événement pour le ${formatDisplayDate(selectedAdminDate)}`;
+      headingEl.textContent = `Schedule Event for ${formatDisplayDate(selectedAdminDate)}`;
     }
 
     if (gridEl) {
@@ -2114,9 +2602,8 @@ function initMotaGrowthApp() {
           if (ev.rawDate === dayStr) return true;
           if (ev.date) {
             const evUpper = ev.date.toUpperCase();
-            const mNameUpper = frenchMonthNames[adminCalMonth].toUpperCase();
-            const engMonthUpper = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'][adminCalMonth];
-            if ((evUpper.includes(mNameUpper) || evUpper.includes(engMonthUpper) || evUpper.includes(String(adminCalMonth + 1))) && evUpper.includes(String(day))) {
+            const engMonthUpper = englishMonthNames[adminCalMonth].toUpperCase();
+            if ((evUpper.includes(engMonthUpper) || evUpper.includes(String(adminCalMonth + 1))) && evUpper.includes(String(day))) {
               return true;
             }
           }
