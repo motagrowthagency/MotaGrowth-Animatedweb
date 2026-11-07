@@ -1444,6 +1444,9 @@ function initMotaGrowthApp() {
     const elTotalInq = document.getElementById('kpiTotalInquiries');
     if (elTotalInq) elTotalInq.textContent = totalInquiries;
 
+    const elWorkspaces = document.getElementById('kpiWorkspacesCount');
+    if (elWorkspaces) elWorkspaces.textContent = totalClients;
+
     const elNeg = document.getElementById('kpiActiveNegotiations');
     if (elNeg) elNeg.textContent = activeNegotiations;
 
@@ -1465,6 +1468,53 @@ function initMotaGrowthApp() {
 
     const inqTitle = document.getElementById('inquiriesCardTitle');
     if (inqTitle) inqTitle.textContent = `Lead Pipeline & Inquiries (${totalInquiries})`;
+
+    // Donut Chart Calculations (Circumference = 2 * PI * 38 = ~238.76)
+    const countWeb = inquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('web'))).length;
+    const countSocial = inquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('social'))).length;
+    const countAds = inquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('paid') || s.toLowerCase().includes('performance'))).length;
+    const countFull = inquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('full'))).length;
+
+    const elCountWeb = document.getElementById('countWeb');
+    if (elCountWeb) elCountWeb.textContent = countWeb;
+    const elCountSocial = document.getElementById('countSocial');
+    if (elCountSocial) elCountSocial.textContent = countSocial;
+    const elCountAds = document.getElementById('countAds');
+    if (elCountAds) elCountAds.textContent = countAds;
+    const elCountFull = document.getElementById('countFull');
+    if (elCountFull) elCountFull.textContent = countFull;
+
+    const elDonutTotal = document.getElementById('donutTotalCount');
+    if (elDonutTotal) elDonutTotal.textContent = totalInquiries;
+
+    const circ = 238.76;
+    const sumServices = (countWeb + countSocial + countAds + countFull) || 1;
+    const pWeb = (countWeb / sumServices) * circ;
+    const pSocial = (countSocial / sumServices) * circ;
+    const pAds = (countAds / sumServices) * circ;
+    const pFull = (countFull / sumServices) * circ;
+
+    const segWeb = document.getElementById('donutSegWeb');
+    const segSocial = document.getElementById('donutSegSocial');
+    const segAds = document.getElementById('donutSegAds');
+    const segFull = document.getElementById('donutSegFull');
+
+    if (segWeb) {
+      segWeb.setAttribute('stroke-dasharray', `${pWeb} ${circ}`);
+      segWeb.setAttribute('stroke-dashoffset', '0');
+    }
+    if (segSocial) {
+      segSocial.setAttribute('stroke-dasharray', `${pSocial} ${circ}`);
+      segSocial.setAttribute('stroke-dashoffset', `-${pWeb}`);
+    }
+    if (segAds) {
+      segAds.setAttribute('stroke-dasharray', `${pAds} ${circ}`);
+      segAds.setAttribute('stroke-dashoffset', `-${pWeb + pSocial}`);
+    }
+    if (segFull) {
+      segFull.setAttribute('stroke-dasharray', `${pFull} ${circ}`);
+      segFull.setAttribute('stroke-dashoffset', `-${pWeb + pSocial + pAds}`);
+    }
   }
 
   function formatDateTime(isoString) {
@@ -1600,7 +1650,9 @@ function initMotaGrowthApp() {
       row.addEventListener('click', () => {
         const id = row.getAttribute('data-id');
         const item = inquiries.find(i => i.id === id);
-        if (item) openLeadDossier(item);
+        if (item) {
+          selectLeadForRightPanel(item);
+        }
       });
     });
 
@@ -1609,7 +1661,10 @@ function initMotaGrowthApp() {
         e.stopPropagation();
         const id = btn.getAttribute('data-id');
         const item = inquiries.find(i => i.id === id);
-        if (item) openLeadDossier(item);
+        if (item) {
+          selectLeadForRightPanel(item);
+          openLeadDossier(item);
+        }
       });
     });
 
@@ -1796,6 +1851,155 @@ function initMotaGrowthApp() {
     // Open Drawer
     if (leadDossierDrawer) leadDossierDrawer.classList.add('open');
     if (dossierBackdrop) dossierBackdrop.classList.add('open');
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  // =========================================================================
+  // LEAD DETAILS RIGHT PANEL CONTROLLER
+  // =========================================================================
+
+  function selectLeadForRightPanel(item) {
+    if (!item) return;
+    activeDossierLeadId = item.id;
+
+    // Highlight row in leads table
+    const tableBody = document.getElementById('inquiriesTableBody');
+    if (tableBody) {
+      tableBody.querySelectorAll('.clickable-lead-row').forEach(r => {
+        r.classList.toggle('is-selected-row', r.getAttribute('data-id') === item.id);
+      });
+    }
+
+    const emptyPanel = document.getElementById('leadPanelEmpty');
+    const dossierPanel = document.getElementById('leadPanelDossier');
+    if (emptyPanel) emptyPanel.style.display = 'none';
+    if (dossierPanel) dossierPanel.style.display = 'flex';
+
+    const pRef = document.getElementById('panelRefId');
+    if (pRef) pRef.textContent = item.id || 'INQ-LEAD';
+
+    const pName = document.getElementById('panelClientName');
+    if (pName) pName.textContent = item.clientName || 'Prospect Name';
+
+    const pComp = document.getElementById('panelCompanyName');
+    if (pComp) pComp.textContent = item.companyName || 'Private Client';
+
+    const pStage = document.getElementById('panelStageSelect');
+    if (pStage) {
+      pStage.value = normalizeLeadStage(item.status);
+      pStage.onchange = () => {
+        item.status = pStage.value;
+        saveInquiries(inquiries);
+        renderAdminPortal();
+      };
+    }
+
+    const cleanPhone = cleanPhoneForWhatsApp(item.clientPhone);
+    const pWa = document.getElementById('panelWhatsappBtn');
+    if (pWa) {
+      if (cleanPhone) {
+        const greeting = `Hi ${item.clientName || 'there'}, thank you for contacting MotaGrowth Agency regarding your project. When would be a great time for a brief 15-minute discovery call?`;
+        pWa.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(greeting)}`;
+        pWa.style.display = 'inline-flex';
+      } else {
+        pWa.style.display = 'none';
+      }
+    }
+
+    const pEmail = document.getElementById('panelEmailBtn');
+    if (pEmail) {
+      if (item.clientEmail) {
+        pEmail.href = `mailto:${item.clientEmail}?subject=${encodeURIComponent('MotaGrowth Agency — Proposal & Strategy')}`;
+        pEmail.style.display = 'inline-flex';
+      } else {
+        pEmail.style.display = 'none';
+      }
+    }
+
+    const pConvert = document.getElementById('panelConvertBtn');
+    if (pConvert) {
+      pConvert.onclick = () => {
+        startLeadConversion(item);
+      };
+    }
+
+    const pBudget = document.getElementById('panelBudget');
+    if (pBudget) pBudget.textContent = item.budget || '15,000+ MAD';
+
+    const pTime = document.getElementById('panelTimeline');
+    if (pTime) pTime.textContent = item.timeline || 'Immediate';
+
+    const pPhone = document.getElementById('panelPhone');
+    if (pPhone) {
+      pPhone.innerHTML = item.clientPhone ? `<a href="tel:${escapeHtml(item.clientPhone)}" style="color:#38bdf8;">${escapeHtml(item.clientPhone)}</a>` : '—';
+    }
+
+    const pMail = document.getElementById('panelEmail');
+    if (pMail) {
+      pMail.innerHTML = item.clientEmail ? `<a href="mailto:${escapeHtml(item.clientEmail)}" style="color:#38bdf8;">${escapeHtml(item.clientEmail)}</a>` : '—';
+    }
+
+    const pLoc = document.getElementById('panelLocation');
+    if (pLoc) pLoc.textContent = item.location || item.sector || 'Morocco';
+
+    const pWeb = document.getElementById('panelWebsite');
+    if (pWeb) {
+      if (item.website && item.website !== '—') {
+        const fullUrl = item.website.startsWith('http') ? item.website : `https://${item.website}`;
+        pWeb.innerHTML = `<a href="${fullUrl}" target="_blank" style="color:#f59e0b;text-decoration:underline;">${escapeHtml(item.website)} ↗</a>`;
+      } else {
+        pWeb.textContent = 'None';
+      }
+    }
+
+    const pDesc = document.getElementById('panelBusinessDesc');
+    if (pDesc) pDesc.textContent = item.businessDescription || item.notes || 'No preliminary notes provided.';
+
+    const pAnswers = document.getElementById('panelAnswersList');
+    if (pAnswers) {
+      let answersHtml = '';
+      if (item.answers && Object.keys(item.answers).length > 0) {
+        answersHtml = Object.entries(item.answers).map(([key, val]) => {
+          let formattedVal = Array.isArray(val) ? val.join(', ') : String(val);
+          if (typeof val === 'object' && val !== null) formattedVal = JSON.stringify(val);
+          const prettyKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+          return `
+            <div class="dossier-answer-item">
+              <div class="dossier-q">${escapeHtml(prettyKey)}</div>
+              <div class="dossier-a">${escapeHtml(formattedVal)}</div>
+            </div>
+          `;
+        }).join('');
+      } else if (item.notes) {
+        answersHtml = `
+          <div class="dossier-answer-item">
+            <div class="dossier-q">Brief Submission</div>
+            <div class="dossier-a">${escapeHtml(item.notes)}</div>
+          </div>
+        `;
+      } else {
+        answersHtml = '<div style="color:#64748b;font-size:0.82rem;">No questionnaire answers recorded.</div>';
+      }
+      pAnswers.innerHTML = answersHtml;
+    }
+
+    const pNotes = document.getElementById('panelNotesInput');
+    if (pNotes) pNotes.value = item.internalNotes || '';
+
+    const pSaveNotes = document.getElementById('savePanelNotesBtn');
+    if (pSaveNotes) {
+      pSaveNotes.onclick = () => {
+        item.internalNotes = (pNotes ? pNotes.value : '').trim();
+        saveInquiries(inquiries);
+        pSaveNotes.innerHTML = '<i data-lucide="check" style="width:13px;height:13px;"></i><span>Saved!</span>';
+        if (window.lucide) window.lucide.createIcons();
+        setTimeout(() => {
+          pSaveNotes.innerHTML = '<i data-lucide="check" style="width:13px;height:13px;"></i><span>Save Notes</span>';
+          if (window.lucide) window.lucide.createIcons();
+        }, 1800);
+      };
+    }
+
     if (window.lucide) window.lucide.createIcons();
   }
 
@@ -2042,10 +2246,122 @@ function initMotaGrowthApp() {
     if (adminClientsSection) adminClientsSection.style.display = (activeTab === 'clients') ? 'block' : 'none';
     if (adminAnalyticsSection) adminAnalyticsSection.style.display = (activeTab === 'analytics') ? 'block' : 'none';
 
+    // Synchronize left sidebar nav items
+    if (typeof updateSidebarNavState === 'function') {
+      if (activeTab === 'inquiries') updateSidebarNavState('dashboard');
+      else if (activeTab === 'clients') updateSidebarNavState('clients');
+      else if (activeTab === 'analytics') updateSidebarNavState('analytics');
+    }
+
     if (activeTab === 'inquiries') renderInquiriesTable();
     if (activeTab === 'clients') renderClientsGrid();
     if (activeTab === 'analytics') renderAnalyticsSection();
     if (window.lucide) window.lucide.createIcons();
+  }
+
+  // Sidebar navigation handlers
+  const navItemDashboard = document.getElementById('navItemDashboard');
+  const navItemPipeline = document.getElementById('navItemPipeline');
+  const navItemClients = document.getElementById('navItemClients');
+  const navItemAnalytics = document.getElementById('navItemAnalytics');
+
+  function updateSidebarNavState(view) {
+    if (navItemDashboard) navItemDashboard.classList.toggle('active', view === 'dashboard');
+    if (navItemPipeline) navItemPipeline.classList.toggle('active', view === 'pipeline');
+    if (navItemClients) navItemClients.classList.toggle('active', view === 'clients');
+    if (navItemAnalytics) navItemAnalytics.classList.toggle('active', view === 'analytics');
+  }
+
+  if (navItemDashboard) {
+    navItemDashboard.addEventListener('click', () => {
+      updateSidebarNavState('dashboard');
+      switchAdminTab('inquiries');
+    });
+  }
+  if (navItemPipeline) {
+    navItemPipeline.addEventListener('click', () => {
+      updateSidebarNavState('pipeline');
+      switchAdminTab('inquiries');
+    });
+  }
+  if (navItemClients) {
+    navItemClients.addEventListener('click', () => {
+      updateSidebarNavState('clients');
+      switchAdminTab('clients');
+    });
+  }
+  if (navItemAnalytics) {
+    navItemAnalytics.addEventListener('click', () => {
+      updateSidebarNavState('analytics');
+      switchAdminTab('analytics');
+    });
+  }
+
+  // Right Panel Lead Details Buttons
+  const closeLeadDetailsBtn = document.getElementById('closeLeadDetailsBtn');
+  if (closeLeadDetailsBtn) {
+    closeLeadDetailsBtn.addEventListener('click', () => {
+      const emptyPanel = document.getElementById('leadPanelEmpty');
+      const dossierPanel = document.getElementById('leadPanelDossier');
+      if (emptyPanel) emptyPanel.style.display = 'flex';
+      if (dossierPanel) dossierPanel.style.display = 'none';
+      document.querySelectorAll('.clickable-lead-row').forEach(r => r.classList.remove('is-selected-row'));
+      activeDossierLeadId = null;
+    });
+  }
+
+  const expandLeadDetailsBtn = document.getElementById('expandLeadDetailsBtn');
+  if (expandLeadDetailsBtn) {
+    expandLeadDetailsBtn.addEventListener('click', () => {
+      const activeLead = inquiries.find(i => i.id === activeDossierLeadId);
+      if (activeLead) {
+        openLeadDossier(activeLead);
+      } else if (inquiries.length > 0) {
+        openLeadDossier(inquiries[0]);
+      }
+    });
+  }
+
+  // Global Search Controller & Cmd+K Shortcut
+  const adminGlobalSearchInput = document.getElementById('adminGlobalSearchInput');
+  if (adminGlobalSearchInput) {
+    adminGlobalSearchInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (inquirySearchInput) inquirySearchInput.value = val;
+      if (clientSearchInput) clientSearchInput.value = val;
+      renderInquiriesTable();
+      renderClientsGrid();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        adminGlobalSearchInput.focus();
+        adminGlobalSearchInput.select();
+      }
+    });
+  }
+
+  // Date Range Selector
+  const adminDateRangeBtn = document.getElementById('adminDateRangeBtn');
+  const dateRangeSelectedText = document.getElementById('dateRangeSelectedText');
+  if (adminDateRangeBtn) {
+    adminDateRangeBtn.addEventListener('click', () => {
+      const ranges = ['All Time', 'Last 30 Days', 'Last 90 Days', 'Year to Date (2026)'];
+      const current = dateRangeSelectedText ? dateRangeSelectedText.textContent : 'All Time';
+      const nextIdx = (ranges.indexOf(current) + 1) % ranges.length;
+      const nextRange = ranges[nextIdx >= 0 ? nextIdx : 0];
+      if (dateRangeSelectedText) dateRangeSelectedText.textContent = nextRange;
+      renderAdminPortal();
+    });
+  }
+
+  // Notifications Bell
+  const adminNotifBellBtn = document.getElementById('adminNotifBellBtn');
+  if (adminNotifBellBtn) {
+    adminNotifBellBtn.addEventListener('click', () => {
+      alert(`MotaGrowth Operations Hub:\n• ${inquiries.length} Inbound Leads active.\n• ${clients.length} Active Client Workspaces.\n• Live Database Sync operational.\n• Administrator: Fouad Tazi.`);
+    });
   }
 
   if (tabInquiriesBtn) tabInquiriesBtn.addEventListener('click', () => switchAdminTab('inquiries'));

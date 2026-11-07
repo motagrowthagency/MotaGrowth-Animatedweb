@@ -65,148 +65,435 @@
   </div>
 
   <!-- =========================================================================
-       2. ADMIN MAIN PORTAL VIEW
+       2. ADMIN MAIN PORTAL VIEW (LUXURY OPERATIONS HUB - 3 COLUMNS)
        ========================================================================= -->
   <div class="admin-portal-view" id="adminPortalView" style="display: none;">
-    
-    <!-- Admin Top Header -->
-    <header class="admin-top-bar">
-      <div class="admin-bar-left">
-        <a href="index.html" class="admin-logo-link" id="adminLogoHomeLink" title="Return to Website">
-          <img src="logo.png" alt="MotaGrowth Agency" class="admin-brand-logo-img">
-        </a>
-        <div class="admin-branding">
-          <h2>MotaGrowth <span class="admin-brand-tag">Agency CRM</span></h2>
-          <span class="admin-subheading">Private Agency Control Center • Inbound Pipeline & Client Workspaces</span>
-        </div>
-      </div>
+    <!-- Radiant Golden Light Arc in Top Right Background -->
+    <div class="admin-golden-arc" aria-hidden="true"></div>
 
-      <div class="admin-bar-right">
-        <div class="storage-status-pill">
-          <span class="status-pulse-dot"></span>
-          <span>Live Database Sync</span>
-        </div>
-
-        <button class="btn-blue-pill btn-small" id="btnOpenManualLeadModal" title="Add a lead manually">
-          <i data-lucide="user-plus" style="width:14px;height:14px;"></i>
-          <span>+ New Lead</span>
-        </button>
-
-        <button class="btn-ghost-minimal" id="btnOpenDataToolsModal" title="Database Backup, Restore & Demo Tools">
-          <i data-lucide="database" style="width:14px;height:14px;"></i>
-          <span>Backup & Tools</span>
-        </button>
-
-        <button class="btn-logout-pill" id="adminLockoutBtn" title="Lock CRM and sign out">
-          <i data-lucide="lock" style="width:14px;height:14px;"></i>
-          <span>Lock CRM</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Admin Top Stats & KPI Financial Metrics Row -->
-    <div class="admin-kpi-row">
-      <!-- KPI 1: Pipeline Value (MAD) -->
-      <div class="admin-kpi-card">
-        <div class="kpi-icon-box kpi-amber">
-          <i data-lucide="coins"></i>
-        </div>
-        <div class="kpi-info">
-          <span class="kpi-label">Estimated Pipeline</span>
-          <h3 class="kpi-value" id="kpiPipelineValue">0 MAD</h3>
-          <span class="kpi-subtext">Sum of open proposal budgets</span>
-        </div>
-      </div>
-
-      <!-- KPI 2: Total Inbound Inquiries -->
-      <div class="admin-kpi-card">
-        <div class="kpi-icon-box kpi-blue">
-          <i data-lucide="inbox"></i>
-        </div>
-        <div class="kpi-info">
-          <span class="kpi-label">Total Inbound Leads</span>
-          <h3 class="kpi-value" id="kpiTotalInquiries">0</h3>
-          <span class="kpi-subtext">All questionnaires received</span>
-        </div>
-      </div>
-
-      <!-- KPI 3: In Active Negotiation / Meeting -->
-      <div class="admin-kpi-card">
-        <div class="kpi-icon-box kpi-sky">
-          <i data-lucide="phone-call"></i>
-        </div>
-        <div class="kpi-info">
-          <span class="kpi-label">Active Negotiations</span>
-          <h3 class="kpi-value" id="kpiActiveNegotiations">0</h3>
-          <span class="kpi-subtext">Leads in meeting or proposal</span>
-        </div>
-      </div>
-
-      <!-- KPI 4: Won Clients & MRR -->
-      <div class="admin-kpi-card">
-        <div class="kpi-icon-box kpi-emerald">
-          <i data-lucide="award"></i>
-        </div>
-        <div class="kpi-info">
-          <span class="kpi-label">Won Retainers & MRR</span>
-          <h3 class="kpi-value" id="kpiWonMRR">0 MAD</h3>
-          <span class="kpi-subtext" id="kpiWonCount">0 Active Client Accounts</span>
-        </div>
-      </div>
-
-      <!-- KPI 5: Conversion Win Rate -->
-      <div class="admin-kpi-card">
-        <div class="kpi-icon-box kpi-purple">
-          <i data-lucide="trending-up"></i>
-        </div>
-        <div class="kpi-info">
-          <span class="kpi-label">Conversion Win Rate</span>
-          <h3 class="kpi-value" id="kpiWinRate">0%</h3>
-          <span class="kpi-subtext">Proposals won / Closed deals</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Admin Navigation Tabs Row -->
-    <div class="admin-nav-bar-row">
-      <button class="admin-nav-btn active" id="tabInquiriesBtn">
-        <i data-lucide="kanban"></i>
-        <span>Pipeline & Inbound Leads</span>
-        <span class="nav-count-badge" id="tabLeadCountBadge">0</span>
-      </button>
-
-      <button class="admin-nav-btn" id="tabClientsBtn">
-        <i data-lucide="layout-grid"></i>
-        <span>Client Workspaces</span>
-        <span class="nav-count-badge" id="tabClientCountBadge">0</span>
-      </button>
-
-      <button class="admin-nav-btn" id="tabAnalyticsBtn">
-        <i data-lucide="pie-chart"></i>
-        <span>Financials & Analytics</span>
-      </button>
-    </div>
-
-    <!-- =========================================================================
-         SECTION 1: PIPELINE & INBOUND LEADS (CRM TABLE & FILTERS)
-         ========================================================================= -->
-    <div class="admin-section" id="adminInquiriesSection" style="display: block;">
-      <div class="orsap-table-card">
-        <div class="orsap-card-header">
-          <div>
-            <h2 id="inquiriesCardTitle">Lead Pipeline & Inquiries (0)</h2>
-            <p class="section-subtitle-text">Inspect questionnaire responses, initiate direct WhatsApp outreach, and convert prospects to active clients.</p>
+    <div class="admin-app-layout">
+      <!-- =======================================================================
+           COLUMN 1: LEFT SIDEBAR
+           ======================================================================= -->
+      <aside class="admin-sidebar" aria-label="Agency Navigation">
+        <div>
+          <!-- Brand Header -->
+          <div class="admin-brand-block">
+            <a href="index.html" class="admin-brand-title" title="Return to Website">MOTAGROWTH</a>
+            <span class="admin-brand-subtitle">Admin Portal</span>
           </div>
 
-          <div class="orsap-table-tools">
-            <div class="search-input-wrap">
-              <i data-lucide="search"></i>
-              <input type="text" id="inquirySearchInput" placeholder="Search by name, company, email, phone, location, answers...">
+          <!-- Primary Navigation -->
+          <nav class="admin-nav-group">
+            <button type="button" class="admin-nav-item active" id="navItemDashboard" data-view="dashboard">
+              <i data-lucide="home"></i>
+              <span>Dashboard</span>
+            </button>
+            <button type="button" class="admin-nav-item" id="navItemPipeline" data-view="pipeline">
+              <i data-lucide="layers"></i>
+              <span>Pipeline & Leads</span>
+            </button>
+            <button type="button" class="admin-nav-item" id="navItemClients" data-view="clients">
+              <i data-lucide="users"></i>
+              <span>Client Workspaces</span>
+            </button>
+            <button type="button" class="admin-nav-item" id="navItemAnalytics" data-view="analytics">
+              <i data-lucide="bar-chart-2"></i>
+              <span>Financials & Analytics</span>
+            </button>
+          </nav>
+
+          <!-- Quick Actions -->
+          <div class="admin-sidebar-section-label">Quick Actions</div>
+          <button type="button" class="btn-sidebar-gold-outline" id="btnOpenManualLeadModal" title="Add a manual inbound lead">
+            <i data-lucide="plus" style="width:14px;height:14px;"></i>
+            <span>Add Manual Lead</span>
+          </button>
+          <button type="button" class="btn-sidebar-glass" id="btnOpenDataToolsModal" title="Export database or load test data">
+            <i data-lucide="download" style="width:14px;height:14px;"></i>
+            <span>Export (CSV / JSON)</span>
+          </button>
+        </div>
+
+        <!-- Bottom Profile Widget -->
+        <div class="admin-user-profile-card" id="adminProfileWidget" title="Executive Account: Fouad Tazi">
+          <div class="profile-avatar-box">FT</div>
+          <div class="profile-info">
+            <span class="profile-name">Fouad Tazi</span>
+            <span class="profile-role">Administrator</span>
+          </div>
+          <i data-lucide="chevron-right" class="profile-chevron"></i>
+        </div>
+      </aside>
+
+      <!-- =======================================================================
+           COLUMN 2: CENTER MAIN CONTENT
+           ======================================================================= -->
+      <main class="admin-main-center" id="adminMainCenter">
+        <!-- Top Navigation Bar -->
+        <div class="admin-top-nav-bar">
+          <div class="admin-search-wrapper">
+            <i data-lucide="search" class="admin-search-icon"></i>
+            <input 
+              type="text" 
+              id="adminGlobalSearchInput" 
+              class="admin-global-search-input" 
+              placeholder="Search leads, clients, projects..."
+              autocomplete="off"
+            >
+            <span class="admin-search-shortcut-badge">⌘ K</span>
+          </div>
+
+          <div class="admin-top-nav-actions">
+            <!-- Notification Bell -->
+            <button type="button" class="admin-notif-btn" id="adminNotifBellBtn" title="System Notifications">
+              <i data-lucide="bell" style="width:16px;height:16px;"></i>
+              <span class="admin-notif-dot"></span>
+            </button>
+
+            <!-- Log Out Button -->
+            <button type="button" class="admin-logout-btn" id="adminLockoutBtn" title="Lock CRM and sign out">
+              <i data-lucide="log-out" style="width:14px;height:14px;"></i>
+              <span>Log Out</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Welcome Hub Header -->
+        <div class="admin-hub-header">
+          <div>
+            <div class="hub-category-tag">AGENCY OPERATIONS HUB</div>
+            <h1 class="hub-welcome-title">Welcome back, Fouad</h1>
+            <p class="hub-welcome-subtitle">Manage leads, clients, projects and business performance — all in one place.</p>
+          </div>
+          <div>
+            <button type="button" class="date-range-dropdown-btn" id="adminDateRangeBtn" title="Filter by date range">
+              <i data-lucide="calendar" style="width:14px;height:14px; color:#f59e0b;"></i>
+              <span id="dateRangeSelectedText">Select date range</span>
+              <i data-lucide="chevron-down" style="width:13px;height:13px; color:#64748b;"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 KPI Summary Cards (Grid) -->
+        <div class="admin-kpi-quad-grid">
+          <!-- KPI 1: Active Leads (Gold Border / Highlighted) -->
+          <div class="kpi-quad-card is-active-kpi" id="kpiCardLeads">
+            <div class="kpi-quad-icon-box">
+              <i data-lucide="users" style="width:18px;height:18px;"></i>
+            </div>
+            <div class="kpi-quad-title">Active Leads</div>
+            <div class="kpi-quad-number" id="kpiTotalInquiries">0</div>
+            <div class="kpi-quad-sub" id="kpiTotalInquiriesSub">All inbound inquiries</div>
+          </div>
+
+          <!-- KPI 2: Workspaces & Projects -->
+          <div class="kpi-quad-card" id="kpiCardWorkspaces">
+            <div class="kpi-quad-icon-box">
+              <i data-lucide="folder" style="width:18px;height:18px;"></i>
+            </div>
+            <div class="kpi-quad-title">Workspaces & Projects</div>
+            <div class="kpi-quad-number" id="kpiWorkspacesCount">0</div>
+            <div class="kpi-quad-sub" id="kpiWonCount">0 Active Client Accounts</div>
+          </div>
+
+          <!-- KPI 3: Deals & Retainers -->
+          <div class="kpi-quad-card" id="kpiCardDeals">
+            <div class="kpi-quad-icon-box">
+              <i data-lucide="layers" style="width:18px;height:18px;"></i>
+            </div>
+            <div class="kpi-quad-title">Deals & Retainers</div>
+            <div class="kpi-quad-number" id="kpiActiveNegotiations">0</div>
+            <div class="kpi-quad-sub">In negotiation & meeting</div>
+          </div>
+
+          <!-- KPI 4: Financial Value (MAD) -->
+          <div class="kpi-quad-card" id="kpiCardFinance">
+            <div class="kpi-quad-icon-box">
+              <i data-lucide="bar-chart-2" style="width:18px;height:18px;"></i>
+            </div>
+            <div class="kpi-quad-title">Pipeline Value (MAD)</div>
+            <div class="kpi-quad-number" id="kpiPipelineValue">0 MAD</div>
+            <div class="kpi-quad-sub">Estimated proposal value</div>
+          </div>
+        </div>
+
+        <!-- Charts Split Row (Spline Wave Chart + Donut Chart) -->
+        <div class="admin-charts-split-row">
+          <!-- Wave Spline Chart Card -->
+          <div class="chart-module-card">
+            <div class="chart-module-header">
+              <div>
+                <div class="chart-module-title">Pipeline Trend & Velocity</div>
+                <div class="chart-module-subtitle">Inbound brief progression over time</div>
+              </div>
+              <span style="font-size: 0.72rem; color: #10b981; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981;"></span> Live Inbound
+              </span>
+            </div>
+            <div class="wave-spline-wrap">
+              <svg class="wave-spline-svg" viewBox="0 0 540 140" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="waveGoldFill" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.32" />
+                    <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.08" />
+                    <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.0" />
+                  </linearGradient>
+                  <linearGradient id="waveGoldStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#b45309" />
+                    <stop offset="40%" stop-color="#f59e0b" />
+                    <stop offset="100%" stop-color="#fbbf24" />
+                  </linearGradient>
+                </defs>
+                <!-- Grid lines -->
+                <line x1="0" y1="35" x2="540" y2="35" stroke="rgba(255,255,255,0.03)" stroke-dasharray="3,3" />
+                <line x1="0" y1="70" x2="540" y2="70" stroke="rgba(255,255,255,0.03)" stroke-dasharray="3,3" />
+                <line x1="0" y1="105" x2="540" y2="105" stroke="rgba(255,255,255,0.03)" stroke-dasharray="3,3" />
+                <!-- Area Fill -->
+                <path id="waveSplineArea" d="M 0,118 Q 70,125 130,95 T 260,92 T 370,62 T 460,70 T 540,55 L 540,140 L 0,140 Z" fill="url(#waveGoldFill)" />
+                <!-- Spline Curve -->
+                <path id="waveSplinePath" d="M 0,118 Q 70,125 130,95 T 260,92 T 370,62 T 460,70 T 540,55" fill="none" stroke="url(#waveGoldStroke)" stroke-width="2.5" stroke-dasharray="6,4" />
+                <!-- Nodes -->
+                <circle cx="130" cy="95" r="3.5" fill="#fbbf24" />
+                <circle cx="260" cy="92" r="3.5" fill="#fbbf24" />
+                <circle cx="370" cy="62" r="4" fill="#fbbf24" />
+                <circle cx="540" cy="55" r="3.5" fill="#fbbf24" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Donut Chart Card -->
+          <div class="chart-module-card">
+            <div class="chart-module-header">
+              <div>
+                <div class="chart-module-title">Services Distribution</div>
+                <div class="chart-module-subtitle">Share of client demand by package</div>
+              </div>
+            </div>
+            <div class="donut-split-container">
+              <div class="donut-graphic-box">
+                <svg class="donut-graphic-svg" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="12" />
+                  <circle id="donutSegWeb" cx="50" cy="50" r="38" fill="none" stroke="#f59e0b" stroke-width="12" stroke-dasharray="80 240" stroke-dashoffset="0" />
+                  <circle id="donutSegSocial" cx="50" cy="50" r="38" fill="none" stroke="#38bdf8" stroke-width="12" stroke-dasharray="60 240" stroke-dashoffset="-80" />
+                  <circle id="donutSegAds" cx="50" cy="50" r="38" fill="none" stroke="#fbbf24" stroke-width="12" stroke-dasharray="50 240" stroke-dashoffset="-140" />
+                  <circle id="donutSegFull" cx="50" cy="50" r="38" fill="none" stroke="#a855f7" stroke-width="12" stroke-dasharray="50 240" stroke-dashoffset="-190" />
+                </svg>
+                <div class="donut-inner-data">
+                  <span class="donut-center-num" id="donutTotalCount">0</span>
+                  <span class="donut-center-lbl">Leads</span>
+                </div>
+              </div>
+              <div class="donut-legend-col">
+                <div class="donut-legend-item">
+                  <div class="donut-legend-label">
+                    <span class="donut-legend-pip" style="background: #f59e0b;"></span>
+                    <span>Web Design</span>
+                  </div>
+                  <span class="donut-legend-qty" id="countWeb">0</span>
+                </div>
+                <div class="donut-legend-item">
+                  <div class="donut-legend-label">
+                    <span class="donut-legend-pip" style="background: #38bdf8;"></span>
+                    <span>Social Media</span>
+                  </div>
+                  <span class="donut-legend-qty" id="countSocial">0</span>
+                </div>
+                <div class="donut-legend-item">
+                  <div class="donut-legend-label">
+                    <span class="donut-legend-pip" style="background: #fbbf24;"></span>
+                    <span>Performance Ads</span>
+                  </div>
+                  <span class="donut-legend-qty" id="countAds">0</span>
+                </div>
+                <div class="donut-legend-item">
+                  <div class="donut-legend-label">
+                    <span class="donut-legend-pip" style="background: #a855f7;"></span>
+                    <span>Full Growth</span>
+                  </div>
+                  <span class="donut-legend-qty" id="countFull">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subnav Tabs -->
+        <div class="admin-hub-subnav">
+          <button type="button" class="hub-subnav-btn active" id="tabInquiriesBtn">
+            <i data-lucide="layers" style="width:16px;height:16px;"></i>
+            <span>Pipeline & Leads</span>
+            <span class="hub-subnav-badge" id="tabLeadCountBadge">0</span>
+          </button>
+          <button type="button" class="hub-subnav-btn" id="tabClientsBtn">
+            <i data-lucide="users" style="width:16px;height:16px;"></i>
+            <span>Client Workspaces</span>
+            <span class="hub-subnav-badge" id="tabClientCountBadge">0</span>
+          </button>
+          <button type="button" class="hub-subnav-btn" id="tabAnalyticsBtn">
+            <i data-lucide="bar-chart-2" style="width:16px;height:16px;"></i>
+            <span>Financials & Analytics</span>
+          </button>
+        </div>
+
+        <!-- Hub Content Box -->
+        <div class="admin-hub-content-box">
+          <!-- ===================================================================
+               SUB-SECTION 1: PIPELINE & INBOUND LEADS
+               =================================================================== -->
+          <div class="admin-section" id="adminInquiriesSection" style="display: block;">
+            <div class="orsap-table-tools" style="margin-bottom: 1.25rem;">
+              <div class="search-input-wrap">
+                <i data-lucide="search"></i>
+                <input type="text" id="inquirySearchInput" placeholder="Filter current view...">
+              </div>
+
+              <!-- Status Filter -->
+              <select id="inquiryStatusFilter" class="table-filter-select">
+                <option value="ALL">All Stages</option>
+                <option value="New Lead">New Lead</option>
+                <option value="Contacted">Contacted</option>
+                <option value="Proposal Sent">Proposal Sent</option>
+                <option value="Negotiation / Meeting">Negotiation / Meeting</option>
+                <option value="Won / Active Client">Won / Active Client</option>
+                <option value="Archived / Lost">Archived / Lost</option>
+              </select>
+
+              <!-- Service Filter -->
+              <select id="inquiryServiceFilter" class="table-filter-select">
+                <option value="ALL">All Services</option>
+                <option value="Website Design & Development">Website Design & Dev</option>
+                <option value="Social Media Management">Social Media Management</option>
+                <option value="Paid Performance Marketing">Paid Performance Ads</option>
+                <option value="Full-Service Growth Package">Full-Service Growth</option>
+              </select>
+              
+              <button class="btn-export-csv" id="exportCsvBtn" title="Export current leads to CSV file">
+                <i data-lucide="download"></i>
+                <span>Export CSV</span>
+              </button>
             </div>
 
-            <!-- Status Filter -->
-            <select id="inquiryStatusFilter" class="table-filter-select">
-              <option value="ALL">All Stages</option>
+            <div class="table-responsive-wrapper" id="inquiriesTableWrapper">
+              <table class="orsap-data-table">
+                <thead>
+                  <tr>
+                    <th>DATE</th>
+                    <th>STAGE</th>
+                    <th>PROSPECT & COMPANY</th>
+                    <th>CONTACT & LOCATION</th>
+                    <th>SERVICE PACKAGE</th>
+                    <th>EST. BUDGET (MAD)</th>
+                    <th>ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody id="inquiriesTableBody">
+                  <!-- Dynamically populated by portal.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Empty State (Matches image) -->
+            <div class="hub-empty-state-view" id="inquiriesEmptyState" style="display: none;">
+              <div class="hub-empty-tray-icon">
+                <i data-lucide="inbox"></i>
+              </div>
+              <div class="hub-empty-title">No data yet</div>
+              <p class="hub-empty-subtext">Your leads and pipeline will appear here once you start receiving inquiries.</p>
+            </div>
+          </div>
+
+          <!-- ===================================================================
+               SUB-SECTION 2: CLIENT WORKSPACES
+               =================================================================== -->
+          <div class="admin-section" id="adminClientsSection" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.8rem;">
+              <div>
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.2rem;">Active Client Workspaces</h3>
+                <p style="font-size: 0.82rem; color: #94a3b8; margin: 0;">Manage client access codes, deliverables, uploaded documents, and milestones.</p>
+              </div>
+              <div style="display: flex; gap: 0.8rem; align-items: center;">
+                <div class="search-input-wrap">
+                  <i data-lucide="search"></i>
+                  <input type="text" id="clientSearchInput" placeholder="Search clients...">
+                </div>
+                <button class="btn-blue-pill" id="openNewClientModalBtn">
+                  <i data-lucide="user-plus"></i>
+                  <span>+ Create Client Account</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="clients-cards-grid" id="adminClientsGrid">
+              <!-- Dynamically populated by portal.js -->
+            </div>
+          </div>
+
+          <!-- ===================================================================
+               SUB-SECTION 3: FINANCIALS & ANALYTICS
+               =================================================================== -->
+          <div class="admin-section" id="adminAnalyticsSection" style="display: none;">
+            <div class="analytics-grid-row">
+              <!-- Service Revenue Breakdown -->
+              <div class="analytics-card">
+                <div class="analytics-card-header">
+                  <div>
+                    <h3 class="analytics-card-title">Pipeline Breakdown by Service</h3>
+                    <span class="analytics-card-sub">Estimated MAD value distribution across solutions</span>
+                  </div>
+                </div>
+                <div id="serviceBreakdownList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <!-- Deal Conversion Funnel -->
+              <div class="analytics-card">
+                <div class="analytics-card-header">
+                  <div>
+                    <h3 class="analytics-card-title">Pipeline Stage Funnel</h3>
+                    <span class="analytics-card-sub">Progression from inbound lead to won retainer</span>
+                  </div>
+                </div>
+                <div class="funnel-list" id="pipelineFunnelList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- =======================================================================
+           COLUMN 3: RIGHT PANEL (LEAD DETAILS)
+           ======================================================================= -->
+      <aside class="admin-right-panel" id="adminRightPanel" aria-label="Lead Details Panel">
+        <div class="right-panel-header">
+          <h3 class="right-panel-title">Lead Details</h3>
+          <div class="right-panel-actions">
+            <button type="button" class="right-panel-icon-btn" id="expandLeadDetailsBtn" title="Expand Details">
+              <i data-lucide="external-link" style="width:14px;height:14px;"></i>
+            </button>
+            <button type="button" class="right-panel-icon-btn" id="closeLeadDetailsBtn" title="Clear Selection">
+              <i data-lucide="x" style="width:14px;height:14px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State (Matches Reference Image) -->
+        <div class="right-panel-empty-state" id="leadPanelEmpty">
+          <div class="right-panel-empty-icon">
+            <i data-lucide="file-text"></i>
+          </div>
+          <h4 class="right-panel-empty-title">No lead selected</h4>
+          <p class="right-panel-empty-desc">Select a lead from the pipeline to view its details.</p>
+        </div>
+
+        <!-- Selected Lead Dossier View (Shown when row is clicked) -->
+        <div class="right-panel-dossier-view" id="leadPanelDossier" style="display: none;">
+          <div class="lead-dossier-badge-row">
+            <span class="dossier-ref-tag" id="panelRefId">INQ-REF</span>
+            <select id="panelStageSelect" class="stage-select-pill" title="Update Pipeline Stage">
               <option value="New Lead">New Lead</option>
               <option value="Contacted">Contacted</option>
               <option value="Proposal Sent">Proposal Sent</option>
@@ -214,111 +501,94 @@
               <option value="Won / Active Client">Won / Active Client</option>
               <option value="Archived / Lost">Archived / Lost</option>
             </select>
-
-            <!-- Service Filter -->
-            <select id="inquiryServiceFilter" class="table-filter-select">
-              <option value="ALL">All Services</option>
-              <option value="Website Design & Development">Website Design & Dev</option>
-              <option value="Social Media Management">Social Media Management</option>
-              <option value="Paid Performance Marketing">Paid Performance Ads</option>
-              <option value="Full-Service Growth Package">Full-Service Growth</option>
-            </select>
-            
-            <button class="btn-export-csv" id="exportCsvBtn" title="Export current leads to CSV file">
-              <i data-lucide="download"></i>
-              <span>Export CSV</span>
-            </button>
           </div>
-        </div>
 
-        <div class="table-responsive-wrapper">
-          <table class="orsap-data-table">
-            <thead>
-              <tr>
-                <th>DATE</th>
-                <th>STAGE</th>
-                <th>PROSPECT & COMPANY</th>
-                <th>CONTACT & LOCATION</th>
-                <th>SERVICE PACKAGE</th>
-                <th>EST. BUDGET (MAD)</th>
-                <th>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody id="inquiriesTableBody">
-              <!-- Dynamically populated by portal.js -->
-            </tbody>
-          </table>
-        </div>
-
-        <div class="table-empty" id="inquiriesEmptyState" style="display: none;">
-          <div class="empty-icon-circle"><i data-lucide="inbox"></i></div>
-          <p class="empty-title">No inquiries found</p>
-          <span class="empty-sub">Inbound briefs submitted through proposal.html will automatically appear here.</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- =========================================================================
-         SECTION 2: CLIENT WORKSPACES
-         ========================================================================= -->
-    <div class="admin-section" id="adminClientsSection" style="display: none;">
-      <div class="orsap-table-card">
-        <div class="orsap-card-header">
           <div>
-            <h2>Active Client Workspaces</h2>
-            <p class="section-subtitle-text">Manage client access codes, deliverables, uploaded documents, meetings, and strategic ideas.</p>
+            <h3 class="lead-dossier-name" id="panelClientName">Prospect Name</h3>
+            <p class="lead-dossier-comp" id="panelCompanyName">Company Name</p>
           </div>
-          <div style="display: flex; gap: 0.8rem; align-items: center;">
-            <div class="search-input-wrap">
-              <i data-lucide="search"></i>
-              <input type="text" id="clientSearchInput" placeholder="Search clients...">
+
+          <div class="lead-dossier-btn-group">
+            <a href="#" target="_blank" class="btn-dossier-wa" id="panelWhatsappBtn">
+              <i data-lucide="message-circle" style="width:14px;height:14px;"></i>
+              <span>WhatsApp Direct</span>
+            </a>
+            <a href="#" class="btn-dossier-email" id="panelEmailBtn">
+              <i data-lucide="mail" style="width:14px;height:14px;"></i>
+              <span>Send Email</span>
+            </a>
+          </div>
+
+          <button type="button" class="btn-blue-pill btn-small" id="panelConvertBtn" style="width:100%; justify-content:center;">
+            <i data-lucide="user-plus" style="width:14px;height:14px;"></i>
+            <span>Convert to Client Workspace</span>
+          </button>
+
+          <div class="lead-dossier-card">
+            <div class="lead-dossier-card-title">
+              <i data-lucide="info" style="width:14px;height:14px;"></i>
+              <span>Lead Financials & Overview</span>
             </div>
-            <button class="btn-blue-pill" id="openNewClientModalBtn">
-              <i data-lucide="user-plus"></i>
-              <span>+ Create Client Account</span>
+            <div class="lead-dossier-specs-grid">
+              <div class="lead-spec-item">
+                <span class="lead-spec-label">Allocated Budget</span>
+                <span class="lead-spec-value is-gold" id="panelBudget">—</span>
+              </div>
+              <div class="lead-spec-item">
+                <span class="lead-spec-label">Target Timeline</span>
+                <span class="lead-spec-value" id="panelTimeline">—</span>
+              </div>
+              <div class="lead-spec-item">
+                <span class="lead-spec-label">Phone / WhatsApp</span>
+                <span class="lead-spec-value" id="panelPhone">—</span>
+              </div>
+              <div class="lead-spec-item">
+                <span class="lead-spec-label">Email Address</span>
+                <span class="lead-spec-value" id="panelEmail">—</span>
+              </div>
+              <div class="lead-spec-item">
+                <span class="lead-spec-label">Market Location</span>
+                <span class="lead-spec-value" id="panelLocation">—</span>
+              </div>
+              <div class="lead-spec-item">
+                <span class="lead-spec-label">Current Website</span>
+                <span class="lead-spec-value" id="panelWebsite">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lead-dossier-card">
+            <div class="lead-dossier-card-title">
+              <i data-lucide="briefcase" style="width:14px;height:14px;"></i>
+              <span>Business & Objectives</span>
+            </div>
+            <p id="panelBusinessDesc" style="color: #cbd5e1; font-size: 0.82rem; line-height: 1.5; margin: 0;">—</p>
+          </div>
+
+          <div class="lead-dossier-card">
+            <div class="lead-dossier-card-title">
+              <i data-lucide="file-question" style="width:14px;height:14px;"></i>
+              <span>Questionnaire Responses</span>
+            </div>
+            <div class="dossier-answers-list" id="panelAnswersList" style="max-height: 220px; overflow-y: auto;">
+              <!-- Dynamically injected questionnaire Q&As -->
+            </div>
+          </div>
+
+          <div class="lead-dossier-card">
+            <div class="lead-dossier-card-title">
+              <i data-lucide="edit-3" style="width:14px;height:14px;"></i>
+              <span>Internal Agency Notes</span>
+            </div>
+            <textarea id="panelNotesInput" class="dossier-notes-area" rows="3" placeholder="Add confidential notes on negotiations, strategy, or next steps..."></textarea>
+            <button type="button" class="btn-blue-pill btn-small" id="savePanelNotesBtn" style="margin-top: 0.6rem; width:100%; justify-content:center;">
+              <i data-lucide="check" style="width:13px;height:13px;"></i>
+              <span>Save Notes</span>
             </button>
           </div>
         </div>
-
-        <div class="clients-cards-grid" id="adminClientsGrid">
-          <!-- Dynamically populated by portal.js -->
-        </div>
-      </div>
+      </aside>
     </div>
-
-    <!-- =========================================================================
-         SECTION 3: FINANCIALS & ANALYTICS
-         ========================================================================= -->
-    <div class="admin-section" id="adminAnalyticsSection" style="display: none;">
-      <div class="analytics-grid-row">
-        <!-- Service Revenue Breakdown -->
-        <div class="analytics-card">
-          <div class="analytics-card-header">
-            <div>
-              <h3 class="analytics-card-title">Pipeline Breakdown by Service</h3>
-              <span class="analytics-card-sub">Estimated MAD value distribution across solutions</span>
-            </div>
-          </div>
-          <div id="serviceBreakdownList">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-
-        <!-- Deal Conversion Funnel -->
-        <div class="analytics-card">
-          <div class="analytics-card-header">
-            <div>
-              <h3 class="analytics-card-title">Pipeline Stage Funnel</h3>
-              <span class="analytics-card-sub">Progression from inbound lead to won retainer</span>
-            </div>
-          </div>
-          <div class="funnel-list" id="pipelineFunnelList">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <!-- =========================================================================
