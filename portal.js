@@ -1345,6 +1345,26 @@ function initMotaGrowthApp() {
   // 5. PRIVATE AGENCY ADMIN CRM ENGINE (MASTER AUTH, PIPELINE & DOSSIER)
   // =========================================================================
 
+  let activeDateRange = 'All Time';
+
+  function getFilteredInquiriesByDate() {
+    if (activeDateRange === 'All Time') return inquiries;
+    const now = Date.now();
+    if (activeDateRange === 'Last 30 Days') {
+      const cut = now - 30 * 86400000;
+      return inquiries.filter(i => new Date(i.createdAt || now).getTime() >= cut);
+    }
+    if (activeDateRange === 'Last 90 Days') {
+      const cut = now - 90 * 86400000;
+      return inquiries.filter(i => new Date(i.createdAt || now).getTime() >= cut);
+    }
+    if (activeDateRange === 'Year to Date (2026)') {
+      const start2026 = new Date('2026-01-01T00:00:00Z').getTime();
+      return inquiries.filter(i => new Date(i.createdAt || now).getTime() >= start2026);
+    }
+    return inquiries;
+  }
+
   // Pipeline Stage Normalizer (Option A)
   function normalizeLeadStage(rawStatus) {
     if (!rawStatus) return 'New Lead';
@@ -1413,6 +1433,7 @@ function initMotaGrowthApp() {
 
     if (!waveStroke || !waveArea) return;
 
+    const currentInquiries = getFilteredInquiriesByDate();
     const now = Date.now();
     let numBuckets = 6;
     let rangeDurationMs = 30 * 86400000;
@@ -1429,8 +1450,8 @@ function initMotaGrowthApp() {
     } else if (activeVelocityRange === 'all') {
       numBuckets = 7;
       let oldest = now - 180 * 86400000;
-      if (inquiries.length > 0) {
-        const times = inquiries.map(i => new Date(i.createdAt || Date.now()).getTime()).filter(t => !isNaN(t));
+      if (currentInquiries.length > 0) {
+        const times = currentInquiries.map(i => new Date(i.createdAt || Date.now()).getTime()).filter(t => !isNaN(t));
         if (times.length > 0) oldest = Math.min(...times);
       }
       rangeDurationMs = Math.max(30 * 86400000, now - oldest);
@@ -1459,7 +1480,7 @@ function initMotaGrowthApp() {
       }
 
       // Filter inquiries falling into this interval
-      const bucketLeads = inquiries.filter(i => {
+      const bucketLeads = currentInquiries.filter(i => {
         const t = new Date(i.createdAt || now).getTime();
         return !isNaN(t) && t >= bStart && t < bEnd;
       });
@@ -1623,18 +1644,19 @@ function initMotaGrowthApp() {
   }
 
   function updateAdminKPIs() {
-    const totalInquiries = inquiries.length;
+    const currentInquiries = getFilteredInquiriesByDate();
+    const totalInquiries = currentInquiries.length;
     const totalClients = clients.length;
 
     // Calculate Estimated Pipeline Value in MAD (sum of open leads not won or archived)
-    const openLeads = inquiries.filter(i => {
+    const openLeads = currentInquiries.filter(i => {
       const st = normalizeLeadStage(i.status);
       return st !== 'Archived / Lost' && st !== 'Won / Active Client';
     });
     const totalPipelineMAD = openLeads.reduce((sum, i) => sum + parseLeadBudgetMAD(i.budget), 0);
 
     // Active Negotiations / Meetings
-    const activeNegotiations = inquiries.filter(i => {
+    const activeNegotiations = currentInquiries.filter(i => {
       const st = normalizeLeadStage(i.status);
       return st === 'Negotiation / Meeting' || st === 'Proposal Sent';
     }).length;
@@ -1643,8 +1665,8 @@ function initMotaGrowthApp() {
     const wonMRR = clients.reduce((sum, c) => sum + (Number(c.retainerMRR) || 25000), 0);
 
     // Conversion Win Rate
-    const wonLeads = inquiries.filter(i => normalizeLeadStage(i.status) === 'Won / Active Client').length;
-    const closedLeads = inquiries.filter(i => {
+    const wonLeads = currentInquiries.filter(i => normalizeLeadStage(i.status) === 'Won / Active Client').length;
+    const closedLeads = currentInquiries.filter(i => {
       const st = normalizeLeadStage(i.status);
       return st === 'Won / Active Client' || st === 'Archived / Lost';
     }).length;
@@ -1685,10 +1707,10 @@ function initMotaGrowthApp() {
     if (inqTitle) inqTitle.textContent = `Lead Pipeline & Inquiries (${totalInquiries})`;
 
     // Donut Chart Calculations (Circumference = 2 * PI * 38 = ~238.76)
-    const countWeb = inquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('web'))).length;
-    const countSocial = inquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('social'))).length;
-    const countAds = inquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('paid') || s.toLowerCase().includes('performance'))).length;
-    const countFull = inquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('full'))).length;
+    const countWeb = currentInquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('web'))).length;
+    const countSocial = currentInquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('social'))).length;
+    const countAds = currentInquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('paid') || s.toLowerCase().includes('performance'))).length;
+    const countFull = currentInquiries.filter(i => (i.services || []).some(s => s.toLowerCase().includes('full'))).length;
 
     const elCountWeb = document.getElementById('countWeb');
     if (elCountWeb) elCountWeb.textContent = countWeb;
@@ -1751,11 +1773,12 @@ function initMotaGrowthApp() {
 
   // Render Inbound Inquiries Table
   function renderInquiriesTable() {
+    const currentInquiries = getFilteredInquiriesByDate();
     const search = (inquirySearchInput ? inquirySearchInput.value : '').toLowerCase().trim();
     const statusFilter = (document.getElementById('inquiryStatusFilter')?.value || 'ALL');
     const serviceFilter = (document.getElementById('inquiryServiceFilter')?.value || 'ALL');
 
-    const filtered = inquiries.filter(i => {
+    const filtered = currentInquiries.filter(i => {
       const stage = normalizeLeadStage(i.status);
       if (statusFilter !== 'ALL' && stage !== statusFilter) return false;
 
@@ -1793,6 +1816,7 @@ function initMotaGrowthApp() {
       const stage = normalizeLeadStage(item.status);
       const stageClass = getLeadStageClass(stage);
       const initials = ((item.clientName || item.companyName || 'LEAD').substring(0, 2)).toUpperCase();
+      const isSelected = item.id === activeDossierLeadId;
 
       const servicesHtml = (item.services && item.services.length > 0)
         ? item.services.map(s => `<span class="solution-tag">${escapeHtml(s)}</span>`).join('')
@@ -1817,7 +1841,7 @@ function initMotaGrowthApp() {
       const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waGreeting)}` : '#';
 
       return `
-        <tr class="clickable-lead-row" data-id="${item.id}" style="cursor: pointer;" title="Click to inspect lead questionnaire">
+        <tr class="clickable-lead-row ${isSelected ? 'is-selected-row' : ''}" data-id="${item.id}" style="cursor: pointer;" title="Click to inspect lead questionnaire">
           <td>${dateHtml}</td>
           <td><span class="status-pill ${stageClass}">${stage}</span></td>
           <td>
@@ -2446,13 +2470,13 @@ function initMotaGrowthApp() {
   }
 
   // =========================================================================
-  // ADMIN TAB SWITCHER
+  // ADMIN TAB SWITCHER & NAVIGATION
   // =========================================================================
 
   const tabAnalyticsBtn = document.getElementById('tabAnalyticsBtn');
   const adminAnalyticsSection = document.getElementById('adminAnalyticsSection');
 
-  function switchAdminTab(activeTab) {
+  function switchAdminTab(activeTab, originView) {
     if (tabInquiriesBtn) tabInquiriesBtn.classList.toggle('active', activeTab === 'inquiries');
     if (tabClientsBtn) tabClientsBtn.classList.toggle('active', activeTab === 'clients');
     if (tabAnalyticsBtn) tabAnalyticsBtn.classList.toggle('active', activeTab === 'analytics');
@@ -2463,9 +2487,15 @@ function initMotaGrowthApp() {
 
     // Synchronize left sidebar nav items
     if (typeof updateSidebarNavState === 'function') {
-      if (activeTab === 'inquiries') updateSidebarNavState('dashboard');
-      else if (activeTab === 'clients') updateSidebarNavState('clients');
-      else if (activeTab === 'analytics') updateSidebarNavState('analytics');
+      if (originView) {
+        updateSidebarNavState(originView);
+      } else if (activeTab === 'inquiries') {
+        updateSidebarNavState('pipeline');
+      } else if (activeTab === 'clients') {
+        updateSidebarNavState('clients');
+      } else if (activeTab === 'analytics') {
+        updateSidebarNavState('analytics');
+      }
     }
 
     if (activeTab === 'inquiries') renderInquiriesTable();
@@ -2489,26 +2519,109 @@ function initMotaGrowthApp() {
 
   if (navItemDashboard) {
     navItemDashboard.addEventListener('click', () => {
-      updateSidebarNavState('dashboard');
-      switchAdminTab('inquiries');
+      switchAdminTab('inquiries', 'dashboard');
     });
   }
   if (navItemPipeline) {
     navItemPipeline.addEventListener('click', () => {
-      updateSidebarNavState('pipeline');
-      switchAdminTab('inquiries');
+      switchAdminTab('inquiries', 'pipeline');
     });
   }
   if (navItemClients) {
     navItemClients.addEventListener('click', () => {
-      updateSidebarNavState('clients');
-      switchAdminTab('clients');
+      switchAdminTab('clients', 'clients');
     });
   }
   if (navItemAnalytics) {
     navItemAnalytics.addEventListener('click', () => {
-      updateSidebarNavState('analytics');
-      switchAdminTab('analytics');
+      switchAdminTab('analytics', 'analytics');
+    });
+  }
+
+  // 4 Interactive KPI Summary Cards
+  const kpiCardLeads = document.getElementById('kpiCardLeads');
+  if (kpiCardLeads) {
+    kpiCardLeads.addEventListener('click', () => {
+      switchAdminTab('inquiries', 'pipeline');
+      const sf = document.getElementById('inquiryStatusFilter');
+      if (sf) sf.value = 'ALL';
+      renderInquiriesTable();
+    });
+  }
+
+  const kpiCardWorkspaces = document.getElementById('kpiCardWorkspaces');
+  if (kpiCardWorkspaces) {
+    kpiCardWorkspaces.addEventListener('click', () => {
+      switchAdminTab('clients', 'clients');
+    });
+  }
+
+  const kpiCardDeals = document.getElementById('kpiCardDeals');
+  if (kpiCardDeals) {
+    kpiCardDeals.addEventListener('click', () => {
+      switchAdminTab('inquiries', 'pipeline');
+      const sf = document.getElementById('inquiryStatusFilter');
+      if (sf) sf.value = 'Negotiation / Meeting';
+      renderInquiriesTable();
+    });
+  }
+
+  const kpiCardFinance = document.getElementById('kpiCardFinance');
+  if (kpiCardFinance) {
+    kpiCardFinance.addEventListener('click', () => {
+      switchAdminTab('analytics', 'analytics');
+    });
+  }
+
+  // Interactive Donut Chart Legend Filter
+  const countWebEl = document.getElementById('countWeb')?.closest('.donut-legend-item');
+  if (countWebEl) {
+    countWebEl.addEventListener('click', () => {
+      switchAdminTab('inquiries', 'pipeline');
+      const svcFilter = document.getElementById('inquiryServiceFilter');
+      if (svcFilter) svcFilter.value = 'Website Design & Development';
+      renderInquiriesTable();
+    });
+  }
+
+  const countSocialEl = document.getElementById('countSocial')?.closest('.donut-legend-item');
+  if (countSocialEl) {
+    countSocialEl.addEventListener('click', () => {
+      switchAdminTab('inquiries', 'pipeline');
+      const svcFilter = document.getElementById('inquiryServiceFilter');
+      if (svcFilter) svcFilter.value = 'Social Media Management';
+      renderInquiriesTable();
+    });
+  }
+
+  const countAdsEl = document.getElementById('countAds')?.closest('.donut-legend-item');
+  if (countAdsEl) {
+    countAdsEl.addEventListener('click', () => {
+      switchAdminTab('inquiries', 'pipeline');
+      const svcFilter = document.getElementById('inquiryServiceFilter');
+      if (svcFilter) svcFilter.value = 'Paid Performance Marketing';
+      renderInquiriesTable();
+    });
+  }
+
+  const countFullEl = document.getElementById('countFull')?.closest('.donut-legend-item');
+  if (countFullEl) {
+    countFullEl.addEventListener('click', () => {
+      switchAdminTab('inquiries', 'pipeline');
+      const svcFilter = document.getElementById('inquiryServiceFilter');
+      if (svcFilter) svcFilter.value = 'Full-Service Growth Package';
+      renderInquiriesTable();
+    });
+  }
+
+  const donutTotalCountEl = document.getElementById('donutTotalCount')?.parentElement;
+  if (donutTotalCountEl) {
+    donutTotalCountEl.style.cursor = 'pointer';
+    donutTotalCountEl.title = 'Reset service filter';
+    donutTotalCountEl.addEventListener('click', () => {
+      const svcFilter = document.getElementById('inquiryServiceFilter');
+      if (svcFilter) svcFilter.value = 'ALL';
+      renderInquiriesTable();
     });
   }
 
@@ -2557,27 +2670,149 @@ function initMotaGrowthApp() {
     });
   }
 
-  // Date Range Selector
+  // Date Range Selector & Dropdown Menu
   const adminDateRangeBtn = document.getElementById('adminDateRangeBtn');
+  const adminDateRangeMenu = document.getElementById('adminDateRangeMenu');
   const dateRangeSelectedText = document.getElementById('dateRangeSelectedText');
-  if (adminDateRangeBtn) {
-    adminDateRangeBtn.addEventListener('click', () => {
-      const ranges = ['All Time', 'Last 30 Days', 'Last 90 Days', 'Year to Date (2026)'];
-      const current = dateRangeSelectedText ? dateRangeSelectedText.textContent : 'All Time';
-      const nextIdx = (ranges.indexOf(current) + 1) % ranges.length;
-      const nextRange = ranges[nextIdx >= 0 ? nextIdx : 0];
-      if (dateRangeSelectedText) dateRangeSelectedText.textContent = nextRange;
-      renderAdminPortal();
+
+  if (adminDateRangeBtn && adminDateRangeMenu) {
+    adminDateRangeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = adminDateRangeMenu.style.display === 'flex';
+      adminDateRangeMenu.style.display = isVisible ? 'none' : 'flex';
+      if (adminNotifDropdown) adminNotifDropdown.style.display = 'none';
+      if (adminProfileMenu) adminProfileMenu.style.display = 'none';
+    });
+
+    adminDateRangeMenu.querySelectorAll('.date-menu-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const range = btn.getAttribute('data-range') || 'All Time';
+        activeDateRange = range;
+        if (dateRangeSelectedText) dateRangeSelectedText.textContent = range;
+        adminDateRangeMenu.querySelectorAll('.date-menu-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        adminDateRangeMenu.style.display = 'none';
+        renderAdminPortal();
+      });
     });
   }
 
-  // Notifications Bell
+  // Notifications Bell Dropdown
   const adminNotifBellBtn = document.getElementById('adminNotifBellBtn');
-  if (adminNotifBellBtn) {
-    adminNotifBellBtn.addEventListener('click', () => {
-      alert(`MotaGrowth Operations Hub:\n• ${inquiries.length} Inbound Leads active.\n• ${clients.length} Active Client Workspaces.\n• Live Database Sync operational.\n• Administrator: Fouad Tazi.`);
+  const adminNotifDropdown = document.getElementById('adminNotifDropdown');
+  const adminNotifList = document.getElementById('adminNotifList');
+  const adminNotifDot = document.getElementById('adminNotifDot');
+  const clearNotifsBtn = document.getElementById('clearNotifsBtn');
+
+  function renderAdminNotifications() {
+    if (!adminNotifList) return;
+    const items = [
+      {
+        icon: 'briefcase',
+        title: 'New High-Ticket Brief: Atlas Luxury Living (50,000+ MAD)',
+        time: '4 hours ago'
+      },
+      {
+        icon: 'file-text',
+        title: 'Proposal sent to Noor Botanical Skincare for Q4 Media Scale',
+        time: '18 hours ago'
+      },
+      {
+        icon: 'check-circle-2',
+        title: 'Orsap.ma Web Architecture milestone approved by client',
+        time: 'Yesterday'
+      },
+      {
+        icon: 'shield-check',
+        title: 'Database integrity verified: 256-bit AES vault active',
+        time: 'Live'
+      }
+    ];
+
+    adminNotifList.innerHTML = items.map(n => `
+      <div class="notif-item">
+        <div class="notif-icon"><i data-lucide="${n.icon}" style="width:14px;height:14px;"></i></div>
+        <div>
+          <div class="notif-title">${escapeHtml(n.title)}</div>
+          <div class="notif-time">${escapeHtml(n.time)}</div>
+        </div>
+      </div>
+    `).join('');
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  if (adminNotifBellBtn && adminNotifDropdown) {
+    adminNotifBellBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = adminNotifDropdown.style.display === 'block';
+      adminNotifDropdown.style.display = isVisible ? 'none' : 'block';
+      if (adminDateRangeMenu) adminDateRangeMenu.style.display = 'none';
+      if (adminProfileMenu) adminProfileMenu.style.display = 'none';
+      if (!isVisible) renderAdminNotifications();
     });
   }
+
+  if (clearNotifsBtn) {
+    clearNotifsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (adminNotifDot) adminNotifDot.style.display = 'none';
+      if (adminNotifList) {
+        adminNotifList.innerHTML = '<div style="padding: 1.5rem; text-align: center; color: #64748b; font-size: 0.8rem;">All notifications cleared.</div>';
+      }
+    });
+  }
+
+  // Fouad Tazi Profile Widget Dropdown
+  const adminProfileWidget = document.getElementById('adminProfileWidget');
+  const adminProfileMenu = document.getElementById('adminProfileMenu');
+  const pmOpenToolsBtn = document.getElementById('pmOpenToolsBtn');
+  const pmAddLeadBtn = document.getElementById('pmAddLeadBtn');
+  const pmLockoutBtn = document.getElementById('pmLockoutBtn');
+
+  if (adminProfileWidget && adminProfileMenu) {
+    adminProfileWidget.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = adminProfileMenu.style.display === 'flex';
+      adminProfileMenu.style.display = isVisible ? 'none' : 'flex';
+      if (adminDateRangeMenu) adminDateRangeMenu.style.display = 'none';
+      if (adminNotifDropdown) adminNotifDropdown.style.display = 'none';
+    });
+  }
+
+  if (pmOpenToolsBtn) {
+    pmOpenToolsBtn.addEventListener('click', () => {
+      if (adminProfileMenu) adminProfileMenu.style.display = 'none';
+      if (backupToolsModal) backupToolsModal.style.display = 'flex';
+    });
+  }
+
+  if (pmAddLeadBtn) {
+    pmAddLeadBtn.addEventListener('click', () => {
+      if (adminProfileMenu) adminProfileMenu.style.display = 'none';
+      if (manualLeadModal) manualLeadModal.style.display = 'flex';
+    });
+  }
+
+  if (pmLockoutBtn) {
+    pmLockoutBtn.addEventListener('click', (e) => {
+      if (adminLockoutBtn) adminLockoutBtn.click();
+    });
+  }
+
+  // Close Popovers on Outside Click
+  document.addEventListener('click', (e) => {
+    if (adminDateRangeMenu && !adminDateRangeMenu.contains(e.target) && e.target !== adminDateRangeBtn) {
+      adminDateRangeMenu.style.display = 'none';
+    }
+    if (adminNotifDropdown && !adminNotifDropdown.contains(e.target) && e.target !== adminNotifBellBtn) {
+      adminNotifDropdown.style.display = 'none';
+    }
+    if (adminProfileMenu && !adminProfileMenu.contains(e.target) && e.target !== adminProfileWidget) {
+      adminProfileMenu.style.display = 'none';
+    }
+  });
 
   // Velocity Chart Time Pill Filters (7D, 30D, 90D, All)
   const velocityRangePills = document.getElementById('velocityRangePills');
@@ -2590,9 +2825,9 @@ function initMotaGrowthApp() {
     });
   }
 
-  if (tabInquiriesBtn) tabInquiriesBtn.addEventListener('click', () => switchAdminTab('inquiries'));
-  if (tabClientsBtn) tabClientsBtn.addEventListener('click', () => switchAdminTab('clients'));
-  if (tabAnalyticsBtn) tabAnalyticsBtn.addEventListener('click', () => switchAdminTab('analytics'));
+  if (tabInquiriesBtn) tabInquiriesBtn.addEventListener('click', () => switchAdminTab('inquiries', 'pipeline'));
+  if (tabClientsBtn) tabClientsBtn.addEventListener('click', () => switchAdminTab('clients', 'clients'));
+  if (tabAnalyticsBtn) tabAnalyticsBtn.addEventListener('click', () => switchAdminTab('analytics', 'analytics'));
 
   if (inquirySearchInput) inquirySearchInput.addEventListener('input', renderInquiriesTable);
   document.getElementById('inquiryStatusFilter')?.addEventListener('change', renderInquiriesTable);
@@ -2812,149 +3047,153 @@ function initMotaGrowthApp() {
     });
   }
 
+  function getDefaultDemoInquiries() {
+    return [
+      {
+        id: 'INQ-ATLAS-91A',
+        createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+        clientName: 'Yassine Bennani',
+        companyName: 'Atlas Luxury Living',
+        clientEmail: 'yassine@atlasliving.ma',
+        clientPhone: '+212 661 248910',
+        location: 'Casablanca, Morocco',
+        website: 'atlasliving.ma',
+        budget: '50,000+ MAD',
+        timeline: '1–2 Months',
+        services: ['Full-Service Growth Package'],
+        status: 'Negotiation / Meeting',
+        businessDescription: 'High-end interior design and architectural real estate studio expanding across Morocco and the UAE.',
+        notes: 'Wants full rebrand, cinematic 3D web experience, and private client presentation vaults.',
+        answers: { 'Primary Objective': 'Scale High-Ticket Inquiries', 'Target Market': 'Luxury HNWIs in Casablanca & Dubai', 'Allocated Budget': '50,000+ MAD' }
+      },
+      {
+        id: 'INQ-NOOR-42B',
+        createdAt: new Date(Date.now() - 3600000 * 22).toISOString(),
+        clientName: 'Sofia El Amrani',
+        companyName: 'Noor Botanical Skincare',
+        clientEmail: 'sofia@noorbotanics.com',
+        clientPhone: '+212 662 550192',
+        location: 'Marrakech, Morocco',
+        website: 'noorbotanics.com',
+        budget: '25,000–49,999 MAD',
+        timeline: '2–4 Weeks',
+        services: ['Paid Performance Marketing'],
+        status: 'Proposal Sent',
+        businessDescription: 'Organic argan and prickly pear seed luxury cosmetics brand retailing in high-end hotels and e-commerce.',
+        notes: 'Seeking Meta & TikTok Ads scale to achieve 4x ROAS on direct-to-consumer store.',
+        answers: { 'Current Monthly Spend': '30,000 MAD', 'Ad Objective': 'Scale to 100k MAD/mo profitably' }
+      },
+      {
+        id: 'INQ-CASA-18C',
+        createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
+        clientName: 'Mehdi Tazi',
+        companyName: 'Casa FinTech Solutions',
+        clientEmail: 'mehdi@casafintech.io',
+        clientPhone: '+212 663 881204',
+        location: 'Casablanca Finance City',
+        website: 'casafintech.io',
+        budget: '25,000–49,999 MAD',
+        timeline: 'Immediate',
+        services: ['Website Design & Development'],
+        status: 'Contacted',
+        businessDescription: 'B2B payment infrastructure and embedded financing gateway for North African merchants.',
+        notes: 'Needs enterprise dark-mode interactive website with interactive API docs and fast conversion flow.',
+        answers: { 'Tech Stack': 'Next.js / Tailwind CSS', 'Security Requirements': 'PCI-DSS Compliant' }
+      },
+      {
+        id: 'INQ-SOL-77D',
+        createdAt: new Date(Date.now() - 3600000 * 72).toISOString(),
+        clientName: 'Laila Chraibi',
+        companyName: 'Maison Soliel Hospitality',
+        clientEmail: 'laila@maisonsoliel.com',
+        clientPhone: '+212 665 339011',
+        location: 'Tangier, Morocco',
+        website: 'maisonsoliel.com',
+        budget: '15,000–24,999 MAD',
+        timeline: '2–4 Weeks',
+        services: ['Social Media Management'],
+        status: 'New Lead',
+        businessDescription: 'Boutique riad and culinary retreat overlooking the Strait of Gibraltar.',
+        notes: 'Needs daily organic Instagram reels, influencer partnerships, and direct booking engine growth.',
+        answers: { 'Content Style': 'Cinematic luxury lifestyle', 'Publishing Cadence': '5 Reels / Week' }
+      },
+      {
+        id: 'INQ-MARA-55E',
+        createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+        clientName: 'Tariq Alami',
+        companyName: 'Marrakech Oasis Villas',
+        clientEmail: 'tariq@oasisvillas.ma',
+        clientPhone: '+212 667 992014',
+        location: 'Marrakech Palm Grove',
+        website: 'oasisvillas.ma',
+        budget: '50,000+ MAD',
+        timeline: 'Immediate',
+        services: ['Full-Service Growth Package'],
+        status: 'Negotiation / Meeting',
+        businessDescription: 'Luxury private rental estates catering to international executives and royal families.',
+        notes: 'Requires automated booking integration, VIP concierge portal, and Meta advertising.',
+        answers: { 'Target ROI': '6x Gross Booking Revenue', 'Scope': 'Full-Service Web & Paid Acquisition' }
+      },
+      {
+        id: 'INQ-RIAD-33F',
+        createdAt: new Date(Date.now() - 86400000 * 14).toISOString(),
+        clientName: 'Kenza Benjelloun',
+        companyName: 'Maison Dar Anbar',
+        clientEmail: 'kenza@daranbar.com',
+        clientPhone: '+212 669 443210',
+        location: 'Fes Medina, Morocco',
+        website: 'daranbar.com',
+        budget: '25,000–49,999 MAD',
+        timeline: '2–4 Weeks',
+        services: ['Paid Performance Marketing'],
+        status: 'Proposal Sent',
+        businessDescription: 'Historic palace hotel & botanical spa expanding into artisan fragrance e-commerce.',
+        notes: 'Wants performance ads launched across France, UK, and GCC markets.',
+        answers: { 'Target Markets': 'France, UK, UAE, Saudi Arabia' }
+      },
+      {
+        id: 'INQ-CAP-12G',
+        createdAt: new Date(Date.now() - 86400000 * 21).toISOString(),
+        clientName: 'Adil Mansouri',
+        companyName: 'Atlas Capital Partners',
+        clientEmail: 'adil@atlascapital.ma',
+        clientPhone: '+212 668 119933',
+        location: 'Rabat, Morocco',
+        website: 'atlascapital.ma',
+        budget: '25,000–49,999 MAD',
+        timeline: '1–2 Months',
+        services: ['Website Design & Development'],
+        status: 'Won / Active Client',
+        businessDescription: 'Boutique private equity and real estate investment firm.',
+        notes: 'Contract signed for high-converting deal portal and portfolio showcases.',
+        answers: { 'Security Requirements': 'High-level encryption & NDA client portals' }
+      },
+      {
+        id: 'INQ-MED-88H',
+        createdAt: new Date(Date.now() - 86400000 * 28).toISOString(),
+        clientName: 'Samir Chaoui',
+        companyName: 'Morocco Green Mobility',
+        clientEmail: 'samir@greenmobility.ma',
+        clientPhone: '+212 660 778899',
+        location: 'Tangier Med Zone',
+        website: 'greenmobility.ma',
+        budget: '50,000+ MAD',
+        timeline: '2–4 Weeks',
+        services: ['Social Media Management'],
+        status: 'Contacted',
+        businessDescription: 'Electric vehicle charging and solar mobility operator.',
+        notes: 'High-visibility thought leadership campaigns and B2B partner acquisition.',
+        answers: { 'Primary Goal': 'Nationwide fleet expansion' }
+      }
+    ];
+  }
+
   // Load Demo Leads
   if (btnLoadDemoLeads) {
     btnLoadDemoLeads.addEventListener('click', () => {
-      const demoLeads = [
-        {
-          id: 'INQ-ATLAS-91A',
-          createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-          clientName: 'Yassine Bennani',
-          companyName: 'Atlas Luxury Living',
-          clientEmail: 'yassine@atlasliving.ma',
-          clientPhone: '+212 661 248910',
-          location: 'Casablanca, Morocco',
-          website: 'atlasliving.ma',
-          budget: '50,000+ MAD',
-          timeline: '1–2 Months',
-          services: ['Full-Service Growth Package'],
-          status: 'Negotiation / Meeting',
-          businessDescription: 'High-end interior design and architectural real estate studio expanding across Morocco and the UAE.',
-          notes: 'Wants full rebrand, cinematic 3D web experience, and private client presentation vaults.',
-          answers: { 'Primary Objective': 'Scale High-Ticket Inquiries', 'Target Market': 'Luxury HNWIs in Casablanca & Dubai' }
-        },
-        {
-          id: 'INQ-NOOR-42B',
-          createdAt: new Date(Date.now() - 3600000 * 22).toISOString(),
-          clientName: 'Sofia El Amrani',
-          companyName: 'Noor Botanical Skincare',
-          clientEmail: 'sofia@noorbotanics.com',
-          clientPhone: '+212 662 550192',
-          location: 'Marrakech, Morocco',
-          website: 'noorbotanics.com',
-          budget: '25,000–49,999 MAD',
-          timeline: '2–4 Weeks',
-          services: ['Paid Performance Marketing'],
-          status: 'Proposal Sent',
-          businessDescription: 'Organic argan and prickly pear seed luxury cosmetics brand retailing in high-end hotels and e-commerce.',
-          notes: 'Seeking Meta & TikTok Ads scale to achieve 4x ROAS on direct-to-consumer store.',
-          answers: { 'Current Monthly Spend': '30,000 MAD', 'Ad Objective': 'Scale to 100k MAD/mo profitably' }
-        },
-        {
-          id: 'INQ-CASA-18C',
-          createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
-          clientName: 'Mehdi Tazi',
-          companyName: 'Casa FinTech Solutions',
-          clientEmail: 'mehdi@casafintech.io',
-          clientPhone: '+212 663 881204',
-          location: 'Casablanca Finance City',
-          website: 'casafintech.io',
-          budget: '25,000–49,999 MAD',
-          timeline: 'Immediate',
-          services: ['Website Design & Development'],
-          status: 'Contacted',
-          businessDescription: 'B2B payment infrastructure and embedded financing gateway for North African merchants.',
-          notes: 'Needs enterprise dark-mode interactive website with interactive API docs and fast conversion flow.',
-          answers: { 'Tech Stack': 'Next.js / Tailwind', 'Security Requirements': 'PCI-DSS Compliant' }
-        },
-        {
-          id: 'INQ-SOL-77D',
-          createdAt: new Date(Date.now() - 3600000 * 72).toISOString(),
-          clientName: 'Laila Chraibi',
-          companyName: 'Maison Soliel Hospitality',
-          clientEmail: 'laila@maisonsoliel.com',
-          clientPhone: '+212 665 339011',
-          location: 'Tangier, Morocco',
-          website: 'maisonsoliel.com',
-          budget: '15,000–24,999 MAD',
-          timeline: '2–4 Weeks',
-          services: ['Social Media Management'],
-          status: 'New Lead',
-          businessDescription: 'Boutique riad and culinary retreat overlooking the Strait of Gibraltar.',
-          notes: 'Needs daily organic Instagram reels, influencer partnerships, and direct booking engine growth.',
-          answers: { 'Content Style': 'Cinematic luxury lifestyle', 'Publishing Cadence': '5 Reels / Week' }
-        },
-        {
-          id: 'INQ-MARA-55E',
-          createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
-          clientName: 'Tariq Alami',
-          companyName: 'Marrakech Oasis Villas',
-          clientEmail: 'tariq@oasisvillas.ma',
-          clientPhone: '+212 667 992014',
-          location: 'Marrakech Palm Grove',
-          website: 'oasisvillas.ma',
-          budget: '50,000+ MAD',
-          timeline: 'Immediate',
-          services: ['Full-Service Growth Package'],
-          status: 'Negotiation / Meeting',
-          businessDescription: 'Luxury private rental estates catering to international executives and royal families.',
-          notes: 'Requires automated booking integration, VIP concierge portal, and Meta advertising.',
-          answers: { 'Budget': '50,000+ MAD', 'Target ROI': '6x Gross Booking Revenue' }
-        },
-        {
-          id: 'INQ-RIAD-33F',
-          createdAt: new Date(Date.now() - 86400000 * 14).toISOString(),
-          clientName: 'Kenza Benjelloun',
-          companyName: 'Maison Dar Anbar',
-          clientEmail: 'kenza@daranbar.com',
-          clientPhone: '+212 669 443210',
-          location: 'Fes Medina, Morocco',
-          website: 'daranbar.com',
-          budget: '25,000–49,999 MAD',
-          timeline: '2–4 Weeks',
-          services: ['Paid Performance Marketing'],
-          status: 'Proposal Sent',
-          businessDescription: 'Historic palace hotel & botanical spa expanding into artisan fragrance e-commerce.',
-          notes: 'Wants performance ads launched across France, UK, and GCC markets.',
-          answers: { 'Markets': 'France, UK, UAE, Saudi Arabia' }
-        },
-        {
-          id: 'INQ-CAP-12G',
-          createdAt: new Date(Date.now() - 86400000 * 21).toISOString(),
-          clientName: 'Adil Mansouri',
-          companyName: 'Atlas Capital Partners',
-          clientEmail: 'adil@atlascapital.ma',
-          clientPhone: '+212 668 119933',
-          location: 'Rabat, Morocco',
-          website: 'atlascapital.ma',
-          budget: '25,000–49,999 MAD',
-          timeline: '1–2 Months',
-          services: ['Website Design & Development'],
-          status: 'Won / Active Client',
-          businessDescription: 'Boutique private equity and real estate investment firm.',
-          notes: 'Contract signed for high-converting deal portal and portfolio showcases.',
-          answers: { 'Security': 'High-level encryption & NDA portals' }
-        },
-        {
-          id: 'INQ-MED-88H',
-          createdAt: new Date(Date.now() - 86400000 * 28).toISOString(),
-          clientName: 'Samir Chaoui',
-          companyName: 'Morocco Green Mobility',
-          clientEmail: 'samir@greenmobility.ma',
-          clientPhone: '+212 660 778899',
-          location: 'Tangier Med Zone',
-          website: 'greenmobility.ma',
-          budget: '50,000+ MAD',
-          timeline: '2–4 Weeks',
-          services: ['Social Media Management'],
-          status: 'Contacted',
-          businessDescription: 'Electric vehicle charging and solar mobility operator.',
-          notes: 'High-visibility thought leadership campaigns and B2B partner acquisition.',
-          answers: { 'Goal': 'Nationwide fleet expansion' }
-        }
-      ];
-
-      inquiries = [...demoLeads, ...inquiries];
+      localStorage.removeItem('motagrowth_inquiries_wiped');
+      const demoLeads = getDefaultDemoInquiries();
+      inquiries = [...demoLeads];
       saveInquiries(inquiries);
       renderAdminPortal();
       if (backupToolsModal) backupToolsModal.style.display = 'none';
@@ -2966,6 +3205,7 @@ function initMotaGrowthApp() {
   if (btnClearInquiries) {
     btnClearInquiries.addEventListener('click', () => {
       if (confirm('Are you sure you want to clear all inquiries? This action cannot be undone.')) {
+        localStorage.setItem('motagrowth_inquiries_wiped', 'true');
         inquiries = [];
         saveInquiries(inquiries);
         renderAdminPortal();
@@ -3880,11 +4120,14 @@ function initMotaGrowthApp() {
 
   function loadInquiries() {
     try {
+      if (localStorage.getItem('motagrowth_inquiries_wiped') === 'true') {
+        return [];
+      }
       const data = localStorage.getItem(STORAGE_INQUIRIES);
       if (data !== null) {
         const parsed = JSON.parse(data);
-        if (Array.isArray(parsed)) {
-          return parsed.filter(item => 
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const valid = parsed.filter(item => 
             item &&
             item.companyName !== 'Orsap' && 
             item.companyName !== 'ORSAP' && 
@@ -3893,6 +4136,7 @@ function initMotaGrowthApp() {
             !(item.services && JSON.stringify(item.services).includes('PROTECTION')) &&
             item.type !== 'PARTICULIER'
           );
+          if (valid.length > 0) return valid;
         }
       }
     } catch (e) { console.error(e); }
@@ -4000,7 +4244,7 @@ function initMotaGrowthApp() {
   }
 
   function getSeedInquiries() {
-    return [];
+    return getDefaultDemoInquiries();
   }
 
   function getSeedClients() {
@@ -5944,8 +6188,16 @@ function initMotaGrowthApp() {
 
     // Auto-refresh when localStorage is updated across tabs or admin modals
     window.addEventListener('storage', (e) => {
-      if (e.key === STORAGE_CLIENTS && typeof window._motaRefreshPortal === 'function') {
-        window._motaRefreshPortal();
+      if (e.key === STORAGE_INQUIRIES) {
+        inquiries = loadInquiries();
+        renderAdminPortal();
+      }
+      if (e.key === STORAGE_CLIENTS) {
+        clients = loadClients();
+        renderAdminPortal();
+        if (typeof window._motaRefreshPortal === 'function') {
+          window._motaRefreshPortal();
+        }
       }
     });
 

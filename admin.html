@@ -116,13 +116,33 @@
         </div>
 
         <!-- Bottom Profile Widget -->
-        <div class="admin-user-profile-card" id="adminProfileWidget" title="Executive Account: Fouad Tazi">
-          <div class="profile-avatar-box">FT</div>
-          <div class="profile-info">
-            <span class="profile-name">Fouad Tazi</span>
-            <span class="profile-role">Administrator</span>
+        <div class="admin-profile-wrap" style="position: relative;">
+          <div class="admin-user-profile-card" id="adminProfileWidget" title="Executive Account: Fouad Tazi" style="cursor: pointer;">
+            <div class="profile-avatar-box">FT</div>
+            <div class="profile-info">
+              <span class="profile-name">Fouad Tazi</span>
+              <span class="profile-role">Administrator</span>
+            </div>
+            <i data-lucide="chevron-right" class="profile-chevron"></i>
           </div>
-          <i data-lucide="chevron-right" class="profile-chevron"></i>
+          <div class="admin-profile-menu" id="adminProfileMenu" style="display: none;">
+            <div class="profile-menu-header">
+              <span class="pm-name">Fouad Tazi</span>
+              <span class="pm-sub">Managing Partner • Master Access</span>
+            </div>
+            <button type="button" class="profile-menu-item" id="pmOpenToolsBtn">
+              <i data-lucide="database" style="width:14px;height:14px;"></i>
+              <span>Database Tools & Export</span>
+            </button>
+            <button type="button" class="profile-menu-item" id="pmAddLeadBtn">
+              <i data-lucide="plus" style="width:14px;height:14px;"></i>
+              <span>Add Manual Lead</span>
+            </button>
+            <button type="button" class="profile-menu-item is-danger" id="pmLockoutBtn">
+              <i data-lucide="log-out" style="width:14px;height:14px;"></i>
+              <span>Lock CRM & Sign Out</span>
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -146,10 +166,21 @@
 
           <div class="admin-top-nav-actions">
             <!-- Notification Bell -->
-            <button type="button" class="admin-notif-btn" id="adminNotifBellBtn" title="System Notifications">
-              <i data-lucide="bell" style="width:16px;height:16px;"></i>
-              <span class="admin-notif-dot"></span>
-            </button>
+            <div class="admin-notif-wrap" style="position: relative;">
+              <button type="button" class="admin-notif-btn" id="adminNotifBellBtn" title="System Notifications">
+                <i data-lucide="bell" style="width:16px;height:16px;"></i>
+                <span class="admin-notif-dot" id="adminNotifDot"></span>
+              </button>
+              <div class="admin-notif-dropdown" id="adminNotifDropdown" style="display: none;">
+                <div class="notif-header">
+                  <span class="notif-header-title">Agency Activity & Alerts</span>
+                  <button type="button" class="notif-clear-btn" id="clearNotifsBtn">Mark all as read</button>
+                </div>
+                <div class="notif-list" id="adminNotifList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+            </div>
 
             <!-- Log Out Button -->
             <button type="button" class="admin-logout-btn" id="adminLockoutBtn" title="Lock CRM and sign out">
@@ -166,12 +197,18 @@
             <h1 class="hub-welcome-title">Welcome back, Fouad</h1>
             <p class="hub-welcome-subtitle">Manage leads, clients, projects and business performance — all in one place.</p>
           </div>
-          <div>
+          <div class="date-range-wrap" style="position: relative;">
             <button type="button" class="date-range-dropdown-btn" id="adminDateRangeBtn" title="Filter by date range">
               <i data-lucide="calendar" style="width:14px;height:14px; color:#f59e0b;"></i>
               <span id="dateRangeSelectedText">Select date range</span>
               <i data-lucide="chevron-down" style="width:13px;height:13px; color:#64748b;"></i>
             </button>
+            <div class="date-range-menu" id="adminDateRangeMenu" style="display: none;">
+              <button type="button" class="date-menu-item active" data-range="All Time">All Time</button>
+              <button type="button" class="date-menu-item" data-range="Last 30 Days">Last 30 Days</button>
+              <button type="button" class="date-menu-item" data-range="Last 90 Days">Last 90 Days</button>
+              <button type="button" class="date-menu-item" data-range="Year to Date (2026)">Year to Date (2026)</button>
+            </div>
           </div>
         </div>
 
