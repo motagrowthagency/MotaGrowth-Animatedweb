@@ -1399,8 +1399,223 @@ function initMotaGrowthApp() {
     return digits;
   }
 
+  let activeVelocityRange = '30d';
+
+  function renderPipelineTrendChart() {
+    const waveStroke = document.getElementById('dynamicWaveStroke');
+    const waveArea = document.getElementById('dynamicWaveArea');
+    const waveNodes = document.getElementById('dynamicWaveNodes');
+    const waveTooltip = document.getElementById('waveChartTooltip');
+    const waveCrosshair = document.getElementById('waveHoverCrosshair');
+    const waveXLabels = document.getElementById('waveXAxisLabels');
+    const velocityRateText = document.getElementById('velocityRateText');
+    const velocitySubText = document.getElementById('velocitySubText');
+
+    if (!waveStroke || !waveArea) return;
+
+    const now = Date.now();
+    let numBuckets = 6;
+    let rangeDurationMs = 30 * 86400000;
+
+    if (activeVelocityRange === '7d') {
+      numBuckets = 7;
+      rangeDurationMs = 7 * 86400000;
+    } else if (activeVelocityRange === '30d') {
+      numBuckets = 6;
+      rangeDurationMs = 30 * 86400000;
+    } else if (activeVelocityRange === '90d') {
+      numBuckets = 6;
+      rangeDurationMs = 90 * 86400000;
+    } else if (activeVelocityRange === 'all') {
+      numBuckets = 7;
+      let oldest = now - 180 * 86400000;
+      if (inquiries.length > 0) {
+        const times = inquiries.map(i => new Date(i.createdAt || Date.now()).getTime()).filter(t => !isNaN(t));
+        if (times.length > 0) oldest = Math.min(...times);
+      }
+      rangeDurationMs = Math.max(30 * 86400000, now - oldest);
+    }
+
+    const startMs = now - rangeDurationMs;
+    const bucketDurationMs = rangeDurationMs / numBuckets;
+
+    // Create intervals
+    const buckets = [];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    for (let b = 0; b < numBuckets; b++) {
+      const bStart = startMs + b * bucketDurationMs;
+      const bEnd = (b === numBuckets - 1) ? now + 86400000 : bStart + bucketDurationMs;
+      const midDate = new Date(bStart + bucketDurationMs / 2);
+
+      let label = '';
+      if (activeVelocityRange === '7d') {
+        label = dayNames[midDate.getDay()];
+      } else if (activeVelocityRange === '30d') {
+        label = `${monthNames[midDate.getMonth()]} ${midDate.getDate()}`;
+      } else {
+        label = `${monthNames[midDate.getMonth()]} '${String(midDate.getFullYear()).slice(-2)}`;
+      }
+
+      // Filter inquiries falling into this interval
+      const bucketLeads = inquiries.filter(i => {
+        const t = new Date(i.createdAt || now).getTime();
+        return !isNaN(t) && t >= bStart && t < bEnd;
+      });
+
+      const count = bucketLeads.length;
+      const madValue = bucketLeads.reduce((sum, l) => sum + parseLeadBudgetMAD(l.budget), 0);
+
+      buckets.push({
+        bStart,
+        bEnd,
+        label,
+        count,
+        madValue,
+        leads: bucketLeads
+      });
+    }
+
+    // Inbound velocity calculation (leads per week)
+    const rangeWeeks = Math.max(1, rangeDurationMs / (7 * 86400000));
+    const totalLeadsInRange = buckets.reduce((acc, b) => acc + b.count, 0);
+    const totalMadInRange = buckets.reduce((acc, b) => acc + b.madValue, 0);
+    const weeklyVelocity = (totalLeadsInRange / rangeWeeks).toFixed(1);
+
+    if (velocityRateText) {
+      velocityRateText.textContent = totalLeadsInRange > 0 
+        ? `+${weeklyVelocity} briefs/wk` 
+        : `0.0 briefs/wk`;
+    }
+
+    if (velocitySubText) {
+      velocitySubText.textContent = totalLeadsInRange > 0
+        ? `${totalLeadsInRange} briefs • ${formatCurrencyMAD(totalMadInRange)} pipeline in selected window`
+        : `Inbound brief progression & flow rate (Waiting for leads)`;
+    }
+
+    // Compute SVG coordinates
+    const svgWidth = 540;
+    const svgHeight = 140;
+    const paddingX = 30;
+    const topY = 22;
+    const baselineY = 118;
+
+    const maxCount = Math.max(...buckets.map(b => b.count));
+    const points = buckets.map((bucket, idx) => {
+      const x = paddingX + (idx / (numBuckets - 1)) * (svgWidth - 2 * paddingX);
+      let y = baselineY;
+      if (maxCount > 0) {
+        y = baselineY - (bucket.count / maxCount) * (baselineY - topY);
+      }
+      return {
+        x,
+        y,
+        ...bucket
+      };
+    });
+
+    // Generate smooth cubic bezier spline curve
+    let pathD = `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cp1x = p0.x + (p1.x - p0.x) / 2;
+      const cp1y = p0.y;
+      const cp2x = p0.x + (p1.x - p0.x) / 2;
+      const cp2y = p1.y;
+      pathD += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p1.x.toFixed(1)},${p1.y.toFixed(1)}`;
+    }
+
+    const areaD = `${pathD} L ${points[points.length - 1].x.toFixed(1)},140 L ${points[0].x.toFixed(1)},140 Z`;
+
+    waveStroke.setAttribute('d', pathD);
+    waveArea.setAttribute('d', areaD);
+
+    // If empty, style with a gentle subtle dashed baseline
+    if (maxCount === 0) {
+      waveStroke.setAttribute('stroke-dasharray', '5,5');
+      waveStroke.setAttribute('opacity', '0.45');
+    } else {
+      waveStroke.removeAttribute('stroke-dasharray');
+      waveStroke.setAttribute('opacity', '1');
+    }
+
+    // Render interactive data nodes & hit targets
+    if (waveNodes) {
+      waveNodes.innerHTML = points.map((p, i) => {
+        const hasLeads = p.count > 0;
+        return `
+          <g class="wave-point-group" data-idx="${i}">
+            <circle class="wave-data-node" id="waveNode_${i}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${hasLeads ? 4.5 : 3}" fill="${hasLeads ? '#fbbf24' : '#475569'}" stroke="#0d0f14" stroke-width="2"></circle>
+            <circle class="wave-hit-target" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="22" fill="transparent" data-idx="${i}"></circle>
+          </g>
+        `;
+      }).join('');
+
+      // Wire interactive hover on hit targets
+      waveNodes.querySelectorAll('.wave-hit-target').forEach(target => {
+        target.addEventListener('mouseenter', () => {
+          const idx = parseInt(target.getAttribute('data-idx'), 10);
+          const p = points[idx];
+          if (!p) return;
+
+          // Highlight node
+          const node = document.getElementById(`waveNode_${idx}`);
+          if (node) node.classList.add('active-hover-node');
+
+          // Snap vertical crosshair
+          if (waveCrosshair) {
+            waveCrosshair.setAttribute('x1', p.x.toFixed(1));
+            waveCrosshair.setAttribute('x2', p.x.toFixed(1));
+            waveCrosshair.style.opacity = '1';
+          }
+
+          // Position & show floating tooltip
+          if (waveTooltip) {
+            const leftPercent = (p.x / svgWidth) * 100;
+            const topPercent = (p.y / svgHeight) * 100;
+            waveTooltip.style.left = `${leftPercent}%`;
+            waveTooltip.style.top = `${topPercent}%`;
+
+            waveTooltip.innerHTML = `
+              <div class="tip-date">${escapeHtml(p.label)}</div>
+              <div class="tip-val"><strong>${p.count}</strong> Inbound Brief${p.count === 1 ? '' : 's'}</div>
+              <div class="tip-mad">${formatCurrencyMAD(p.madValue)} est. value</div>
+            `;
+            waveTooltip.style.display = 'block';
+          }
+        });
+
+        target.addEventListener('mouseleave', () => {
+          const idx = parseInt(target.getAttribute('data-idx'), 10);
+          const node = document.getElementById(`waveNode_${idx}`);
+          if (node) node.classList.remove('active-hover-node');
+
+          if (waveCrosshair) waveCrosshair.style.opacity = '0';
+          if (waveTooltip) waveTooltip.style.display = 'none';
+        });
+      });
+    }
+
+    // Render X-axis date labels
+    if (waveXLabels) {
+      waveXLabels.innerHTML = points.map(p => `
+        <span class="wave-xaxis-label-item">${escapeHtml(p.label)}</span>
+      `).join('');
+    }
+
+    // Range buttons active state
+    const rangePills = document.querySelectorAll('#velocityRangePills .chart-time-pill');
+    rangePills.forEach(pill => {
+      pill.classList.toggle('active', pill.getAttribute('data-range') === activeVelocityRange);
+    });
+  }
+
   function renderAdminPortal() {
     updateAdminKPIs();
+    renderPipelineTrendChart();
     renderInquiriesTable();
     renderClientsGrid();
     renderAnalyticsSection();
@@ -2364,6 +2579,17 @@ function initMotaGrowthApp() {
     });
   }
 
+  // Velocity Chart Time Pill Filters (7D, 30D, 90D, All)
+  const velocityRangePills = document.getElementById('velocityRangePills');
+  if (velocityRangePills) {
+    velocityRangePills.querySelectorAll('.chart-time-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeVelocityRange = btn.getAttribute('data-range') || '30d';
+        renderPipelineTrendChart();
+      });
+    });
+  }
+
   if (tabInquiriesBtn) tabInquiriesBtn.addEventListener('click', () => switchAdminTab('inquiries'));
   if (tabClientsBtn) tabClientsBtn.addEventListener('click', () => switchAdminTab('clients'));
   if (tabAnalyticsBtn) tabAnalyticsBtn.addEventListener('click', () => switchAdminTab('analytics'));
@@ -2657,6 +2883,74 @@ function initMotaGrowthApp() {
           businessDescription: 'Boutique riad and culinary retreat overlooking the Strait of Gibraltar.',
           notes: 'Needs daily organic Instagram reels, influencer partnerships, and direct booking engine growth.',
           answers: { 'Content Style': 'Cinematic luxury lifestyle', 'Publishing Cadence': '5 Reels / Week' }
+        },
+        {
+          id: 'INQ-MARA-55E',
+          createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+          clientName: 'Tariq Alami',
+          companyName: 'Marrakech Oasis Villas',
+          clientEmail: 'tariq@oasisvillas.ma',
+          clientPhone: '+212 667 992014',
+          location: 'Marrakech Palm Grove',
+          website: 'oasisvillas.ma',
+          budget: '50,000+ MAD',
+          timeline: 'Immediate',
+          services: ['Full-Service Growth Package'],
+          status: 'Negotiation / Meeting',
+          businessDescription: 'Luxury private rental estates catering to international executives and royal families.',
+          notes: 'Requires automated booking integration, VIP concierge portal, and Meta advertising.',
+          answers: { 'Budget': '50,000+ MAD', 'Target ROI': '6x Gross Booking Revenue' }
+        },
+        {
+          id: 'INQ-RIAD-33F',
+          createdAt: new Date(Date.now() - 86400000 * 14).toISOString(),
+          clientName: 'Kenza Benjelloun',
+          companyName: 'Maison Dar Anbar',
+          clientEmail: 'kenza@daranbar.com',
+          clientPhone: '+212 669 443210',
+          location: 'Fes Medina, Morocco',
+          website: 'daranbar.com',
+          budget: '25,000–49,999 MAD',
+          timeline: '2–4 Weeks',
+          services: ['Paid Performance Marketing'],
+          status: 'Proposal Sent',
+          businessDescription: 'Historic palace hotel & botanical spa expanding into artisan fragrance e-commerce.',
+          notes: 'Wants performance ads launched across France, UK, and GCC markets.',
+          answers: { 'Markets': 'France, UK, UAE, Saudi Arabia' }
+        },
+        {
+          id: 'INQ-CAP-12G',
+          createdAt: new Date(Date.now() - 86400000 * 21).toISOString(),
+          clientName: 'Adil Mansouri',
+          companyName: 'Atlas Capital Partners',
+          clientEmail: 'adil@atlascapital.ma',
+          clientPhone: '+212 668 119933',
+          location: 'Rabat, Morocco',
+          website: 'atlascapital.ma',
+          budget: '25,000–49,999 MAD',
+          timeline: '1–2 Months',
+          services: ['Website Design & Development'],
+          status: 'Won / Active Client',
+          businessDescription: 'Boutique private equity and real estate investment firm.',
+          notes: 'Contract signed for high-converting deal portal and portfolio showcases.',
+          answers: { 'Security': 'High-level encryption & NDA portals' }
+        },
+        {
+          id: 'INQ-MED-88H',
+          createdAt: new Date(Date.now() - 86400000 * 28).toISOString(),
+          clientName: 'Samir Chaoui',
+          companyName: 'Morocco Green Mobility',
+          clientEmail: 'samir@greenmobility.ma',
+          clientPhone: '+212 660 778899',
+          location: 'Tangier Med Zone',
+          website: 'greenmobility.ma',
+          budget: '50,000+ MAD',
+          timeline: '2–4 Weeks',
+          services: ['Social Media Management'],
+          status: 'Contacted',
+          businessDescription: 'Electric vehicle charging and solar mobility operator.',
+          notes: 'High-visibility thought leadership campaigns and B2B partner acquisition.',
+          answers: { 'Goal': 'Nationwide fleet expansion' }
         }
       ];
 

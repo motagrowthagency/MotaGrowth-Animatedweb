@@ -3282,17 +3282,145 @@
   margin-top: 0.15rem;
 }
 
+/* Chart Header Controls */
+.chart-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.chart-time-pill-group {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  padding: 2px;
+}
+
+.chart-time-pill {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chart-time-pill:hover {
+  color: #ffffff;
+}
+
+.chart-time-pill.active {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+}
+
+.velocity-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #34d399;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* Wave chart container */
 .wave-spline-wrap {
   width: 100%;
   height: 140px;
   position: relative;
-  overflow: hidden;
 }
 
 .wave-spline-svg {
   width: 100%;
   height: 100%;
+  overflow: visible;
+}
+
+.wave-data-node {
+  transition: r 0.25s cubic-bezier(0.16, 1, 0.3, 1), fill 0.2s;
+  cursor: pointer;
+}
+
+.wave-data-node.active-hover-node {
+  r: 6.5;
+  fill: #f59e0b;
+  filter: drop-shadow(0 0 8px #f59e0b);
+}
+
+.wave-hit-target {
+  cursor: pointer;
+}
+
+/* Floating Chart Tooltip */
+.wave-chart-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(11, 14, 20, 0.96);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.65), 0 0 15px rgba(245, 158, 11, 0.15);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: #ffffff;
+  z-index: 50;
+  transform: translate(-50%, -100%);
+  margin-top: -12px;
+  white-space: nowrap;
+  backdrop-filter: blur(10px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.wave-chart-tooltip .tip-date {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  margin-bottom: 0.2rem;
+}
+
+.wave-chart-tooltip .tip-val {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.wave-chart-tooltip .tip-val strong {
+  color: #f59e0b;
+}
+
+.wave-chart-tooltip .tip-mad {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #38bdf8;
+  font-weight: 600;
+  margin-top: 0.15rem;
+}
+
+/* X-Axis labels below spline chart */
+.wave-xaxis-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem 0 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  margin-top: 0.25rem;
+}
+
+.wave-xaxis-label-item {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
 }
 
 /* Donut chart layout */

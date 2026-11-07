@@ -220,23 +220,32 @@
 
         <!-- Charts Split Row (Spline Wave Chart + Donut Chart) -->
         <div class="admin-charts-split-row">
-          <!-- Wave Spline Chart Card -->
-          <div class="chart-module-card">
+          <!-- Wave Spline Chart Card (Dynamic Pipeline Trend & Velocity) -->
+          <div class="chart-module-card" id="pipelineTrendCard">
             <div class="chart-module-header">
               <div>
                 <div class="chart-module-title">Pipeline Trend & Velocity</div>
-                <div class="chart-module-subtitle">Inbound brief progression over time</div>
+                <div class="chart-module-subtitle" id="velocitySubText">Inbound brief progression & flow rate</div>
               </div>
-              <span style="font-size: 0.72rem; color: #10b981; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
-                <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981;"></span> Live Inbound
-              </span>
+              <div class="chart-header-controls">
+                <div class="chart-time-pill-group" id="velocityRangePills">
+                  <button type="button" class="chart-time-pill" data-range="7d">7D</button>
+                  <button type="button" class="chart-time-pill active" data-range="30d">30D</button>
+                  <button type="button" class="chart-time-pill" data-range="90d">90D</button>
+                  <button type="button" class="chart-time-pill" data-range="all">All</button>
+                </div>
+                <div class="velocity-stat-pill" id="velocityStatBadge" title="Calculated Inbound Velocity">
+                  <i data-lucide="trending-up" style="width:13px;height:13px;color:#10b981;"></i>
+                  <span id="velocityRateText">+0.0 briefs/wk</span>
+                </div>
+              </div>
             </div>
-            <div class="wave-spline-wrap">
-              <svg class="wave-spline-svg" viewBox="0 0 540 140" preserveAspectRatio="none">
+            <div class="wave-spline-wrap" id="waveSplineWrapper">
+              <svg class="wave-spline-svg" id="dynamicWaveSvg" viewBox="0 0 540 140" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="waveGoldFill" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.32" />
-                    <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.08" />
+                    <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.35" />
+                    <stop offset="65%" stop-color="#f59e0b" stop-opacity="0.08" />
                     <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.0" />
                   </linearGradient>
                   <linearGradient id="waveGoldStroke" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -245,20 +254,27 @@
                     <stop offset="100%" stop-color="#fbbf24" />
                   </linearGradient>
                 </defs>
-                <!-- Grid lines -->
-                <line x1="0" y1="35" x2="540" y2="35" stroke="rgba(255,255,255,0.03)" stroke-dasharray="3,3" />
-                <line x1="0" y1="70" x2="540" y2="70" stroke="rgba(255,255,255,0.03)" stroke-dasharray="3,3" />
-                <line x1="0" y1="105" x2="540" y2="105" stroke="rgba(255,255,255,0.03)" stroke-dasharray="3,3" />
+                <!-- Dynamic Grid lines -->
+                <g id="dynamicWaveGrid">
+                  <line x1="0" y1="35" x2="540" y2="35" stroke="rgba(255,255,255,0.03)" stroke-dasharray="3,3" />
+                  <line x1="0" y1="70" x2="540" y2="70" stroke="rgba(255,255,255,0.03)" stroke-dasharray="3,3" />
+                  <line x1="0" y1="105" x2="540" y2="105" stroke="rgba(255,255,255,0.03)" stroke-dasharray="3,3" />
+                </g>
+                <!-- Interactive Vertical Hover Crosshair Line -->
+                <line id="waveHoverCrosshair" x1="0" y1="0" x2="0" y2="140" stroke="rgba(245, 158, 11, 0.45)" stroke-dasharray="3,3" stroke-width="1.5" style="opacity: 0; pointer-events: none; transition: opacity 0.2s;" />
                 <!-- Area Fill -->
-                <path id="waveSplineArea" d="M 0,118 Q 70,125 130,95 T 260,92 T 370,62 T 460,70 T 540,55 L 540,140 L 0,140 Z" fill="url(#waveGoldFill)" />
+                <path id="dynamicWaveArea" fill="url(#waveGoldFill)" d="M 0,125 L 540,125 L 540,140 L 0,140 Z" />
                 <!-- Spline Curve -->
-                <path id="waveSplinePath" d="M 0,118 Q 70,125 130,95 T 260,92 T 370,62 T 460,70 T 540,55" fill="none" stroke="url(#waveGoldStroke)" stroke-width="2.5" stroke-dasharray="6,4" />
-                <!-- Nodes -->
-                <circle cx="130" cy="95" r="3.5" fill="#fbbf24" />
-                <circle cx="260" cy="92" r="3.5" fill="#fbbf24" />
-                <circle cx="370" cy="62" r="4" fill="#fbbf24" />
-                <circle cx="540" cy="55" r="3.5" fill="#fbbf24" />
+                <path id="dynamicWaveStroke" fill="none" stroke="url(#waveGoldStroke)" stroke-width="2.5" stroke-linecap="round" d="M 0,125 L 540,125" />
+                <!-- Nodes & Hit Targets -->
+                <g id="dynamicWaveNodes"></g>
               </svg>
+              <!-- Interactive Floating Tooltip -->
+              <div class="wave-chart-tooltip" id="waveChartTooltip" style="display: none;"></div>
+            </div>
+            <!-- X-Axis Timeline Labels -->
+            <div class="wave-xaxis-labels" id="waveXAxisLabels">
+              <!-- Dynamically populated dates -->
             </div>
           </div>
 
