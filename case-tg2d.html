@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TG2D Case Study — Building a Structured Digital Company | MotaGrowth</title>
+  <meta name="description" content="How MotaGrowth transformed TG2D from zero online visibility into a structured, credible, and growth-ready construction firm with an architectural website and operational CRM.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/mota-icon.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=9.0">
+  <style>
+    .tg2d-cyan-accent {
+      color: #06b6d4;
+    }
+    .tg2d-tagline-quote {
+      border-left: 3px solid #06b6d4;
+      padding: 0.85rem 1.25rem;
+      background: rgba(6, 182, 212, 0.05);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: #e2e8f0;
+      margin: 1.5rem 0;
+    }
+    .tg2d-arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0 2rem 0;
+    }
+    .tg2d-arch-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 1.15rem;
+      transition: border-color 0.2s ease;
+    }
+    .tg2d-arch-item:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+    .tg2d-arch-page {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #06b6d4;
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .tg2d-arch-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin: 0;
+    }
+  </style>
+</head>
+<body class="is-subpage">
+
+  <!-- Accessible Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Persistent Sticky Header -->
+  <header class="site-header header-visible" id="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-link" aria-label="MotaGrowth Home">
+        <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
+      </a>
+
+      <nav class="nav-menu" aria-label="Primary Navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="services.html" class="nav-link">Services</a>
+        <a href="cases.html" class="nav-link active">Cases</a>
+        <a href="about.html" class="nav-link">About</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="client-space.html" class="nav-link nav-link-client">Client Space</a>
+        <div class="lang-selector" role="group" aria-label="Language Selector">
+          <button type="button" class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
+          <span class="lang-sep" aria-hidden="true">/</span>
+          <button type="button" class="lang-btn" data-lang="fr" aria-pressed="false">FR</button>
+        </div>
+        <a href="proposal.html" class="btn-contact-header">
+          <span>Request Proposal</span>
+        </a>
+        <button type="button" class="frame-menu-dots menu-chooser-trigger" aria-label="Open Studio Menu" title="Studio Menu" aria-haspopup="dialog" aria-expanded="false">
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+          <span class="grid-dot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <article class="cse">
+      <div class="cse-container">
+
+        <!-- Navigation back to Cases -->
+        <a href="cases.html" class="cse-back">
+          <span aria-hidden="true">←</span> Back to all cases
+        </a>
+
+        <!-- Hero Section -->
+        <header class="cse-hero">
+          <p class="cse-eyebrow">TG2D · Construction &amp; Sustainable Development · Casablanca</p>
+          <h1 class="cse-title">Building a Structured Digital Company.</h1>
+          <p class="cse-lede">
+            How TG2D evolved from a company that was effectively invisible online into a structured, credible, and growth-ready business with both a public digital face and an internal operational CRM system.
+          </p>
+
+          <!-- Overview Context & Transformation Callout -->
+          <div class="cse-callout">
+            <div class="cse-callout-value">Zero → <span class="cse-callout-highlight">Growth-Ready</span></div>
+            <div class="cse-callout-subtitle">Complete Digital Structuring &amp; Operational Transformation</div>
+            <p class="cse-callout-text">
+              TG2D (Travaux Généraux de Développement Durable) is a Casablanca-based construction and sustainable development firm. Despite substantial real-world capabilities—spanning structural works, civil engineering, technical installations, and fleet coordination—TG2D had no online storefront and no internal system to manage inquiries. MotaGrowth delivered an end-to-end digital foundation: architectural branding, a multi-page web platform, and a bespoke CRM operational backbone.
+            </p>
+          </div>
+
+          <!-- Verified Project Metadata -->
+          <dl class="cse-meta-grid">
+            <div class="cse-meta-item">
+              <dt>Client</dt>
+              <dd>TG2D SARL<br><span style="color: var(--text-muted); font-size: 0.85em;">Casablanca, Morocco</span></dd>
+            </div>
+            <div class="cse-meta-item">
+              <dt>Sector</dt>
+              <dd>Construction, Civil Engineering &amp; Sustainable Works</dd>
+            </div>
+            <div class="cse-meta-item">
+              <dt>Delivered System</dt>
+              <dd>Multi-page architectural platform &amp; operational CRM</dd>
+            </div>
+            <div class="cse-meta-item">
+              <dt>Studio Role</dt>
+              <dd>Digital transformation, visual identity &amp; internal CRM engineering</dd>
+            </div>
+          </dl>
+        </header>
+
+        <!-- Preview Showcase Visual -->
+        <div class="cse-decision-card" style="margin: 2.5rem 0 3.5rem 0;">
+          <div class="cse-decision-header">
+            <div class="cse-decision-num">Digital Flagship &amp; Operational System</div>
+            <h3 class="cse-decision-headline">Architectural multi-page presence paired with internal commercial CRM</h3>
+            <p class="cse-decision-rationale">A clean technical aesthetic designed to establish institutional trust with property developers, partners, and public authorities.</p>
+          </div>
+          <div class="cse-decision-img-wrap">
+            <img src="assets/card2_clean_hd.jpg" alt="TG2D Digital Architecture Platform &amp; Operational Portal" class="cse-decision-img" loading="lazy">
+          </div>
+        </div>
+
+        <!-- Section 1: The Starting Point -->
+        <section class="cse-section" aria-labelledby="starting-point-title">
+          <p class="cse-section-kicker">01 / Baseline Context</p>
+          <h2 class="cse-section-title" id="starting-point-title">The Starting Point</h2>
+          <p class="cse-body-text">
+            TG2D operates in construction, general works, and sustainable development, with activities that include structural works, civil engineering, technical installations, maintenance, and multi-trade coordination. Despite this operational foundation, the company had no real digital structure to communicate who it was, what it did, or why clients should trust it.
+          </p>
+          <p class="cse-body-text">
+            Before the project, TG2D’s digital side was essentially nonexistent. The company had no professional online storefront, no organized presentation of its services, and no reliable platform to support commercial discussions, partnerships, or project inquiries.
+          </p>
+          <p class="cse-body-text">
+            This created a clear gap between what TG2D could do on the ground and how it appeared to the market.
+          </p>
+        </section>
+
+        <!-- Section 2: The Challenge -->
+        <section class="cse-section" aria-labelledby="challenge-title">
+          <p class="cse-section-kicker">02 / Strategic Obstacles</p>
+          <h2 class="cse-section-title" id="challenge-title">The Challenge</h2>
+          <p class="cse-body-text">
+            The challenge was not simply to “build a website.” It was to transform TG2D from a company with no digital visibility into a firm that could present itself clearly, professionally, and credibly online—while also being equipped internally to manage the opportunities that digital visibility creates.
+          </p>
+          <p class="cse-body-text">
+            Key challenges included:
+          </p>
+          <ul style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.85; margin: 0 0 1.75rem 1.5rem;">
+            <li><strong style="color: #fff;">No structured digital identity</strong> or online positioning.</li>
+            <li><strong style="color: #fff;">No clear presentation</strong> of services, expertise, or company values.</li>
+            <li><strong style="color: #fff;">No professional platform</strong> to build trust with clients, partners, and suppliers.</li>
+            <li><strong style="color: #fff;">Limited visual and content assets</strong>, requiring a strategy based on accuracy and credibility rather than exaggerated claims.</li>
+            <li><strong style="color: #fff;">No internal system</strong> to manage leads, client requests, or commercial follow-up.</li>
+            <li><strong style="color: #fff;">Market positioning:</strong> A need to position TG2D as a serious, modern construction and development company in a competitive Moroccan market.</li>
+          </ul>
+          <p class="cse-body-text" style="border-left: 2px solid var(--brand-gold); padding-left: 1rem; color: #FFFFFF;">
+            The objective was to build a complete digital foundation: a public-facing presence and an internal structure that could support real business growth.
+          </p>
+        </section>
+
+        <!-- Section 3: Our Approach -->
+        <section class="cse-section" aria-labelledby="approach-title">
+          <p class="cse-section-kicker">03 / Comprehensive Execution</p>
+          <h2 class="cse-section-title" id="approach-title">Our Approach</h2>
+          <p class="cse-body-text">
+            We approached TG2D as a full digital transformation project, not just a website design task. The goal was to create a clean, credible, and scalable digital ecosystem aligned with the company’s construction and sustainable-development positioning.
+          </p>
+
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 2rem 0 0.75rem 0;">Brand &amp; Visual Direction</h3>
+          <p class="cse-body-text">
+            We developed a clean, architectural visual direction built around TG2D’s identity: white backgrounds, charcoal typography, generous spacing, and the company’s signature cyan as an accent. The logo’s building-line concept was used as inspiration for subtle design details throughout the interface, reinforcing a technical, modern, and reliable image.
+          </p>
+
+          <div class="tg2d-tagline-quote">
+            “Des fondations solides pour un avenir meilleur” — TG2D Official Tagline preserved and integrated throughout the architecture.
+          </div>
+
+          <p class="cse-body-text">
+            The tone was intentionally professional: strong, clear, and grounded, designed to make TG2D look established, structured, and trustworthy.
+          </p>
+
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 2.25rem 0 0.75rem 0;">Website Architecture</h3>
+          <p class="cse-body-text">
+            We structured the digital presence around the essential pages a construction company needs to communicate effectively:
+          </p>
+
+          <div class="tg2d-arch-grid">
+            <div class="tg2d-arch-item">
+              <div class="tg2d-arch-page">Accueil</div>
+              <p class="tg2d-arch-desc">A clear first impression of TG2D, its engineering positioning, and core value.</p>
+            </div>
+            <div class="tg2d-arch-item">
+              <div class="tg2d-arch-page">À propos</div>
+              <p class="tg2d-arch-desc">Company identity, foundational mission, executive values, and approach.</p>
+            </div>
+            <div class="tg2d-arch-item">
+              <div class="tg2d-arch-page">Expertises</div>
+              <p class="tg2d-arch-desc">A structured technical presentation of civil engineering and works capabilities.</p>
+            </div>
+            <div class="tg2d-arch-item">
+              <div class="tg2d-arch-page">Flotte</div>
+              <p class="tg2d-arch-desc">Machinery, equipment assets, and heavy operational capacity.</p>
+            </div>
+            <div class="tg2d-arch-item">
+              <div class="tg2d-arch-page">Projets</div>
+              <p class="tg2d-arch-desc">A dedicated space for realizations, site milestones, and future case studies.</p>
+            </div>
+            <div class="tg2d-arch-item">
+              <div class="tg2d-arch-page">Contact</div>
+              <p class="tg2d-arch-desc">A direct, professional conversion point for commercial inquiries and RFQs.</p>
+            </div>
+          </div>
+
+          <p class="cse-body-text">
+            This structure was designed to make TG2D easier to understand, easier to trust, and easier to contact.
+          </p>
+
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin: 2.25rem 0 0.75rem 0;">Content &amp; Credibility Strategy</h3>
+          <p class="cse-body-text">
+            Rather than filling the site with generic or unverified claims, the content strategy focused on building a credible foundation. We created a content framework covering the company’s services, positioning, and contact flow, while leaving space for TG2D to validate and supply real project information, photos, and operational details over time.
+          </p>
+          <p class="cse-body-text">
+            This approach protected the brand: TG2D could grow its digital presence without presenting information it could not yet support.
+          </p>
+        </section>
+
+        <!-- Section 4: The CRM Backbone -->
+        <section class="cse-section" aria-labelledby="crm-title">
+          <p class="cse-section-kicker">04 / Operational Infrastructure</p>
+          <h2 class="cse-section-title" id="crm-title">The CRM: Building the Operational Backbone</h2>
+          <p class="cse-body-text">
+            Alongside the website, we developed a CRM system to give TG2D a real operational structure behind its digital presence. The CRM was designed to organize the company’s commercial and client-related activity in one place, turning scattered information into a managed process.
+          </p>
+
+          <h3 style="font-size: 1.2rem; font-weight: 700; color: #ffffff; margin: 1.85rem 0 0.75rem 0;">What the CRM Solves</h3>
+          <p class="cse-body-text">
+            Before the CRM, TG2D had no centralized system to manage leads, client requests, follow-ups, or commercial opportunities. Information could easily remain in messages, calls, or informal notes, making it difficult to track opportunities and maintain a professional response process.
+          </p>
+          <p class="cse-body-text">
+            The CRM gives TG2D a clear structure for:
+          </p>
+          <ul style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.85; margin: 0 0 1.75rem 1.5rem;">
+            <li><strong style="color: #fff;">Lead management:</strong> Centralizing incoming inquiries and potential clients.</li>
+            <li><strong style="color: #fff;">Client follow-up:</strong> Tracking conversations, quotes, and project discussions.</li>
+            <li><strong style="color: #fff;">Commercial pipeline:</strong> Organizing opportunities by status, from first contact to conversion.</li>
+            <li><strong style="color: #fff;">Client data organization:</strong> Keeping contact details, company information, and project context in one place.</li>
+            <li><strong style="color: #fff;">Team coordination:</strong> Creating a shared system instead of relying on individual memory or scattered messages.</li>
+            <li><strong style="color: #fff;">Professional responsiveness:</strong> Making sure no lead or opportunity is lost due to poor follow-up.</li>
+          </ul>
+
+          <h3 style="font-size: 1.2rem; font-weight: 700; color: #ffffff; margin: 1.85rem 0 0.75rem 0;">Why It Matters for TG2D</h3>
+          <p class="cse-body-text">
+            For a construction and development company, the CRM is more than a technical tool—it is part of the company’s professional image. When a potential client contacts TG2D, the company can now manage the request in a structured way, follow up properly, and present itself as an organized and reliable partner.
+          </p>
+          <p class="cse-body-text">
+            This directly supports the company’s positioning: TG2D is not only present online, but also equipped internally to handle the interest its digital presence generates.
+          </p>
+        </section>
+
+        <!-- Section 5: The Transformation Table -->
+        <section class="cse-section" aria-labelledby="transformation-title">
+          <p class="cse-section-kicker">05 / Measured Shift</p>
+          <h2 class="cse-section-title" id="transformation-title">The Transformation</h2>
+          <p class="cse-body-text">
+            The result is a company that now has a real digital structure instead of starting from zero.
+          </p>
+
+          <div class="cse-table-wrap">
+            <table class="cse-table" aria-label="TG2D Before and After Transformation">
+              <thead>
+                <tr>
+                  <th style="width: 45%;">Before MotaGrowth</th>
+                  <th style="width: 55%; color: var(--brand-gold);">After MotaGrowth Structuring</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>No clear digital identity</td>
+                  <td>A defined brand and visual direction</td>
+                </tr>
+                <tr>
+                  <td>No professional online presence</td>
+                  <td>A structured, multi-page website</td>
+                </tr>
+                <tr>
+                  <td>Limited communication of services</td>
+                  <td>Clear presentation of expertise and capabilities</td>
+                </tr>
+                <tr>
+                  <td>No digital credibility platform</td>
+                  <td>A professional site designed to build trust</td>
+                </tr>
+                <tr>
+                  <td>No internal lead management</td>
+                  <td>A CRM to organize leads and follow-up</td>
+                </tr>
+                <tr>
+                  <td>No scalable content structure</td>
+                  <td>A framework ready to grow with projects, fleet, and company evolution</td>
+                </tr>
+                <tr>
+                  <td>No operational system behind the brand</td>
+                  <td>A working business system supporting growth</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="cse-body-text">
+            TG2D moved from being digitally invisible to having a structured online foundation that reflects its identity as a construction and sustainable development company.
+          </p>
+        </section>
+
+        <!-- Section 6: Where TG2D Stands Now -->
+        <section class="cse-section" aria-labelledby="stands-now-title">
+          <p class="cse-section-kicker">06 / Current Position</p>
+          <h2 class="cse-section-title" id="stands-now-title">Where TG2D Stands Now</h2>
+          <p class="cse-body-text">
+            TG2D is no longer a company without a digital side. It now has:
+          </p>
+          <ul style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.85; margin: 0 0 1.75rem 1.5rem;">
+            <li>A professional website structure.</li>
+            <li>A clear visual identity and design direction.</li>
+            <li>Organized service and company presentation.</li>
+            <li>A credible platform to support client conversations and business development.</li>
+            <li>A CRM to manage leads, clients, and commercial opportunities.</li>
+            <li>A scalable foundation for future content, projects, and growth.</li>
+          </ul>
+          <p class="cse-body-text">
+            The company is now positioned to evolve digitally with consistency: adding real projects, strengthening its portfolio, and continuing to build trust online.
+          </p>
+        </section>
+
+        <!-- Section 7: The Bigger Picture -->
+        <section class="cse-section" aria-labelledby="bigger-picture-title">
+          <p class="cse-section-kicker">07 / Executive Takeaway</p>
+          <h2 class="cse-section-title" id="bigger-picture-title">The Bigger Picture</h2>
+          <p class="cse-body-text">
+            This project shows what happens when a company with real operational capability finally gets a digital structure that matches it. TG2D did not need a fake image or exaggerated claims—it needed a clean, credible, and professional digital foundation, supported by an internal system to manage growth.
+          </p>
+          <p class="cse-body-text" style="font-size: 1.08rem; color: #FFFFFF; font-weight: 500;">
+            That is exactly what was built: a company that went from <strong style="color: #94a3b8;">nonexistent digitally</strong> to <strong style="color: var(--brand-gold);">structured, presentable, and ready to grow</strong>—with both a public face and an operational backbone.
+          </p>
+        </section>
+
+        <!-- Final Contact CTA Card -->
+        <section class="cse-contact-card">
+          <h2 class="cse-contact-title">Want the same transformation for your company?</h2>
+          <p class="cse-contact-desc">
+            We help businesses build structured digital identities, professional websites, and internal systems that support real growth.
+          </p>
+          <a href="proposal.html?service=digital-architecture" class="cse-contact-btn">
+            Build your website estimate ↗
+          </a>
+        </section>
+
+      </div>
+    </article>
+  </main>
+
+  <!-- Persistent Footer -->
+  <footer class="site-footer">
+    <div class="content-container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <span class="brand-text"><span class="mota-word">Mota</span><span class="growth-word">Growth</span></span>
+          </a>
+          <p class="footer-tagline">Digital Growth Studio · Strategy, Design &amp; Performance Marketing · Casablanca</p>
+        </div>
+        <div class="footer-nav">
+          <a href="index.html">Home</a>
+          <a href="services.html">Services</a>
+          <a href="cases.html">Cases</a>
+          <a href="about.html">About</a>
+          <a href="proposal.html">Proposal</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="f-copy">© 2026 MotaGrowth Studio. All rights reserved. Casablanca, Morocco.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Studio Custom Precision Cursor -->
+  <div class="studio-cursor-dot cursor-dot" id="cursor-dot" aria-hidden="true"></div>
+  <div class="studio-cursor-ring cursor-ring" id="cursor-ring" aria-hidden="true"></div>
+
+  <script src="app.js?v=5.0"></script>
+</body>
+</html>
