@@ -19,7 +19,7 @@
     rel="stylesheet">
 
   <!-- Studio Design System -->
-  <link rel="stylesheet" href="styles.css?v=8.0">
+  <link rel="stylesheet" href="styles.css?v=9.0">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -55,16 +55,73 @@
     <div class="wizard-progress-track" aria-hidden="true">
       <div class="wizard-progress-fill" id="wizardProgressFill" style="width: 6%;"></div>
     </div>
+
+    <!-- Mobile Collapsible Live Estimate Bar -->
+    <div class="wizard-mobile-estimate-bar" id="wizardMobileEstimateBar" style="display: none;">
+      <button type="button" class="mobile-est-toggle-btn" id="mobileEstToggleBtn" aria-expanded="false" aria-label="Toggle Live Scope Estimate Summary">
+        <div class="m-est-left">
+          <span class="m-est-indicator"></span>
+          <span class="m-est-label">Live Estimate:</span>
+          <span class="m-est-price" id="mobileEstPriceVal">4,000 MAD</span>
+          <span class="m-est-monthly" id="mobileEstMonthlyVal" style="display: none;"></span>
+        </div>
+        <div class="m-est-right">
+          <span class="m-est-view-text">Scope Breakdown</span>
+          <span class="m-est-arrow" id="mobileEstArrow">▾</span>
+        </div>
+      </button>
+      <div class="mobile-est-drawer" id="mobileEstDrawer" style="display: none;">
+        <div class="mobile-est-content" id="mobileEstContent">
+          <!-- Dynamic breakdown injected by proposal.js -->
+        </div>
+      </div>
+    </div>
   </header>
 
   <!-- Main Wizard Viewport (One Question At A Time Stage) -->
   <main class="wizard-main" id="wizardMain" tabindex="-1">
-    <div class="wizard-shell">
+    <div class="wizard-shell" id="wizardShell">
 
       <!-- Dynamic Question Container (Injected & Animated by proposal.js) -->
       <div class="wizard-stage" id="wizardStage" aria-live="polite">
         <!-- Step DOM injected dynamically -->
       </div>
+
+      <!-- Sticky Live Estimate Summary Rail (Desktop) -->
+      <aside class="wizard-sticky-rail" id="wizardStickyRail" aria-label="Live Scope Estimate Summary" style="display: none;">
+        <div class="sticky-estimate-card" id="stickyEstimateCard">
+          <div class="s-est-header">
+            <span class="s-est-badge">LIVE SCOPE ESTIMATE</span>
+            <div class="s-est-service-title" id="stickyEstServiceTitle">Digital Architecture</div>
+          </div>
+
+          <div class="s-est-pricing-box" id="stickyEstPricingBox">
+            <div class="s-est-price-val" id="stickyEstPriceVal">4,000 MAD</div>
+            <div class="s-est-period" id="stickyEstPeriod">Estimated project investment</div>
+            <div class="s-est-monthly-val" id="stickyEstMonthlyVal" style="display: none;"></div>
+          </div>
+
+          <!-- Custom Notice Banner if custom triggered -->
+          <div class="s-est-custom-banner" id="stickyEstCustomBanner" style="display: none;">
+            <div class="s-est-custom-icon">✦</div>
+            <div class="s-est-custom-text">
+              <strong>Custom Proposal Required</strong>
+              <span>Estimated starting investment from 100,000 MAD based on your architecture requirements.</span>
+            </div>
+          </div>
+
+          <div class="s-est-breakdown-wrap">
+            <div class="s-est-breakdown-title">Selected Scope &amp; Specifications:</div>
+            <ul class="s-est-breakdown-list" id="stickyEstBreakdownList">
+              <!-- Dynamically populated list of selected items with price tags -->
+            </ul>
+          </div>
+
+          <div class="s-est-disclaimer">
+            Prices in MAD. Official proposal confirmed after brief review. Third-party hosting, domains, ad spend &amp; subscriptions are separate.
+          </div>
+        </div>
+      </aside>
 
     </div>
   </main>
@@ -151,7 +208,7 @@
 
   <!-- Scripts -->
   <script src="app.js?v=5.0"></script>
-  <script src="proposal.js?v=8.0"></script>
+  <script src="proposal.js?v=9.0"></script>
 </body>
 
 </html>
