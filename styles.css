@@ -7474,3 +7474,390 @@ body.wizard-body {
   font-family: var(--font-mono);
   letter-spacing: 0.04em;
 }
+
+/* =========================================================================
+   SCOPE ESTIMATE & BUDGET FLOW EXTENSIONS (V8)
+   ========================================================================= */
+.q-option-text-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.q-option-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.q-option-row.is-selected .q-option-badge {
+  background: rgba(245, 176, 20, 0.16);
+  border-color: rgba(245, 176, 20, 0.38);
+  color: var(--brand-gold);
+}
+
+/* Live Scope Estimate Card */
+.q-scope-estimate-view {
+  width: 100%;
+}
+
+.q-scope-estimate-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(245, 176, 20, 0.04) 100%);
+  border: 1.5px solid rgba(245, 176, 20, 0.3);
+  border-radius: 18px;
+  padding: 2.25rem;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), 0 0 24px rgba(245, 176, 20, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.q-scope-estimate-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-gold);
+  background: rgba(245, 176, 20, 0.12);
+  border: 1px solid rgba(245, 176, 20, 0.28);
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  margin-bottom: 0.85rem;
+}
+
+.q-scope-service-name {
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin-bottom: 0.75rem;
+}
+
+.q-scope-price-box {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.q-scope-price-val {
+  font-family: var(--font-mono);
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  color: var(--brand-gold);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.q-scope-price-period {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.q-scope-summary-line {
+  margin-bottom: 1.15rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: #f1f5f9;
+}
+
+.q-scope-summary-label {
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.q-scope-summary-text {
+  font-size: 1.12rem;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.q-scope-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 1.75rem;
+}
+
+.q-scope-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+
+.pill-check {
+  color: var(--brand-gold);
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.q-scope-inclusions {
+  background: rgba(2, 6, 18, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.q-scope-inclusions-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+}
+
+.q-scope-inclusions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem 1rem;
+}
+
+.q-scope-inclusions-list li {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  line-height: 1.4;
+}
+
+.inc-check {
+  color: var(--brand-gold);
+  font-size: 0.75rem;
+  margin-top: 0.15rem;
+}
+
+.q-scope-next-note {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.86rem;
+  color: #94a3b8;
+  line-height: 1.45;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.q-info-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--brand-gold);
+  flex-shrink: 0;
+}
+
+/* Review / Comparison Card */
+.q-budget-comparison-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.q-comparison-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.q-comp-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.q-comp-label {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.q-comp-value {
+  font-size: 1.02rem;
+  color: #FFFFFF;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.q-comp-price {
+  font-family: var(--font-mono);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--brand-gold);
+}
+
+.q-comp-badge {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.q-priority-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.q-priority-tag.p-high {
+  background: rgba(245, 176, 20, 0.15);
+  color: var(--brand-gold);
+  border: 1px solid rgba(245, 176, 20, 0.35);
+}
+
+.q-priority-tag.p-med {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.q-priority-tag.p-low {
+  background: rgba(148, 163, 184, 0.12);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.q-comparison-feedback {
+  margin-top: 1.35rem;
+}
+
+.q-feedback-alert {
+  border-radius: 12px;
+  padding: 1.25rem 1.4rem;
+  line-height: 1.5;
+}
+
+.q-alert-above {
+  background: rgba(245, 176, 20, 0.06);
+  border: 1px solid rgba(245, 176, 20, 0.3);
+  color: #fef08a;
+}
+
+.q-alert-fit {
+  background: rgba(16, 185, 129, 0.07);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #a7f3d0;
+}
+
+.q-alert-guidance {
+  background: rgba(56, 189, 248, 0.07);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #bae6fd;
+}
+
+.q-alert-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.q-alert-icon {
+  font-size: 1.1rem;
+}
+
+.q-alert-msg {
+  font-size: 0.92rem;
+  margin: 0;
+  color: #f1f5f9;
+}
+
+.q-alert-msg strong {
+  color: #FFFFFF;
+}
+
+.q-proceed-choice-box {
+  margin-top: 1.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(245, 176, 20, 0.2);
+}
+
+.q-proceed-title {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.q-proceed-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.q-proceed-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.95rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.q-proceed-opt:hover {
+  background: rgba(245, 176, 20, 0.08);
+  border-color: rgba(245, 176, 20, 0.3);
+}
+
+.q-proceed-opt input[type="radio"] {
+  accent-color: var(--brand-gold);
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 640px) {
+  .q-scope-inclusions-list {
+    grid-template-columns: 1fr;
+  }
+  .q-comparison-row {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  .q-scope-estimate-card {
+    padding: 1.5rem;
+  }
+}

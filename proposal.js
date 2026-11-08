@@ -1,8 +1,15 @@
 /**
- * MotaGrowth Studio — Project Proposal Scope Wizard Engine
- * One-question-at-a-time fluid experience with dynamic branching,
- * split country code phone inputs, explicit budget qualification,
- * keyboard accessibility, starting prices, and direct CRM persistence.
+ * MotaGrowth Studio — Project Proposal Scope Wizard Engine (V8)
+ * 
+ * Order of flow:
+ * 1. Select service
+ * 2. Contact details (Name, Company, Email, Phone split, Location, Website, Business description)
+ * 3. Service-specific scope questions
+ * 4. Live scope estimate (Calculates estimated project price based on selections)
+ * 5. Budget (Separate question near the end, including ad spend split for Performance Marketing)
+ * 6. Start date (Priority qualification: ASAP, 1 month, 3 months, exploring)
+ * 7. Additional notes (Optional long text)
+ * 8. Submit & Agreement (Compares estimate with budget; guides phased/tailored next step)
  */
 
 (function () {
@@ -70,7 +77,7 @@
     return '+212'; // Default Morocco
   }
 
-  // 1. Service Definitions & Starting Prices
+  // 1. Service Definitions & Scope Questions (Budget questions removed — moved to Step 5)
   const SERVICES = {
     'performance-marketing': {
       id: 'performance-marketing',
@@ -78,7 +85,8 @@
       discipline: 'Paid Acquisition & Revenue Scaling',
       price: 'From 5,000 MAD / month',
       shortPrice: '5,000 MAD / month',
-      notice: 'Management starts at 5,000 MAD / month for one advertising platform. Advertising spend is separate. Additional platforms, extensive creative production, and advanced tracking are quoted according to scope.',
+      period: 'month',
+      notice: 'Management starts at 5,000 MAD / month for one advertising platform. Advertising spend is separate. Additional platforms, creative production, and advanced funnel tracking are quoted according to scope.',
       questions: [
         {
           id: 'pm_goal',
@@ -123,25 +131,8 @@
           ]
         },
         {
-          id: 'pm_budget',
-          eyebrow: '04 / Advertising Spend Budget',
-          title: 'What is your monthly advertising budget?',
-          subtitle: 'Required · Single selection',
-          helper: 'This is the amount paid directly to advertising platforms, separate from MotaGrowth’s management fee (starts at 5,000 MAD / month).',
-          type: 'single',
-          required: true,
-          options: [
-            { value: 'Under 5,000 MAD', label: 'Under 5,000 MAD / month' },
-            { value: '5,000–9,999 MAD', label: '5,000–9,999 MAD / month' },
-            { value: '10,000–24,999 MAD', label: '10,000–24,999 MAD / month' },
-            { value: '25,000–49,999 MAD', label: '25,000–49,999 MAD / month' },
-            { value: '50,000 MAD or more', label: '50,000 MAD or more / month' },
-            { value: 'Not decided yet', label: 'Not decided yet' }
-          ]
-        },
-        {
           id: 'pm_content',
-          eyebrow: '05 / Creative Production',
+          eyebrow: '04 / Creative Production',
           title: 'Do you have existing ad content?',
           subtitle: 'Required · Single selection',
           type: 'single',
@@ -154,8 +145,8 @@
         },
         {
           id: 'pm_improvements',
-          eyebrow: '06 / Targets & Objectives',
-          title: 'What would you like to improve or achieve?',
+          eyebrow: '05 / Targets & Objectives',
+          title: 'What would you like to achieve?',
           subtitle: 'Required · Long text',
           type: 'textarea',
           required: true,
@@ -169,7 +160,8 @@
       discipline: 'Bespoke Web Design & Development',
       price: 'From 15,000 MAD / project',
       shortPrice: '15,000 MAD',
-      notice: 'Projects start at 15,000 MAD for a bespoke showcase website of up to 5 pages. E-commerce, advanced animation, custom integrations, hosting, and maintenance are quoted separately.',
+      period: 'project',
+      notice: 'Projects start at 15,000 MAD for a bespoke showcase website of up to 5 pages. Custom booking flows, e-commerce, custom animations, hosting, and maintenance are quoted according to selected scope.',
       questions: [
         {
           id: 'da_build_type',
@@ -251,24 +243,8 @@
           ]
         },
         {
-          id: 'da_budget',
-          eyebrow: '06 / Budget Allocation',
-          title: 'What is your allocated budget for this project?',
-          subtitle: 'Required · Single selection',
-          helper: 'Digital Architecture engagements start at 15,000 MAD for a bespoke showcase flagship.',
-          type: 'single',
-          required: true,
-          options: [
-            { value: '15,000–24,999 MAD', label: '15,000–24,999 MAD (Essential Bespoke Showcase)' },
-            { value: '25,000–49,999 MAD', label: '25,000–49,999 MAD (Custom Interactive Architecture)' },
-            { value: '50,000–99,999 MAD', label: '50,000–99,999 MAD (E-commerce / Multi-Market Flagship)' },
-            { value: '100,000 MAD or more', label: '100,000 MAD or more (Enterprise Custom Platform)' },
-            { value: 'Flexible / Based on recommendation', label: 'Flexible / Based on recommendation' }
-          ]
-        },
-        {
           id: 'da_examples',
-          eyebrow: '07 / Design Benchmarks',
+          eyebrow: '06 / Design Benchmarks',
           title: 'Share up to three websites you like.',
           subtitle: 'Optional · Long text',
           type: 'textarea',
@@ -277,8 +253,8 @@
         },
         {
           id: 'da_notes',
-          eyebrow: '08 / Technical Context',
-          title: 'Tell us anything else we should know about the project.',
+          eyebrow: '07 / Technical Context',
+          title: 'Tell us anything else we should know about the website.',
           subtitle: 'Optional · Long text',
           type: 'textarea',
           required: false,
@@ -292,7 +268,8 @@
       discipline: 'Brand Identity & Visual Worlds',
       price: 'From 8,000 MAD / project',
       shortPrice: '8,000 MAD',
-      notice: 'Projects start at 8,000 MAD for a core visual identity: logo system, color palette, typography, and concise brand guidelines. Photography, video production, packaging, and additional collateral are quoted separately.',
+      period: 'project',
+      notice: 'Projects start at 8,000 MAD for a core visual identity: logo system, color palette, typography, and concise brand guidelines. Photography, video production, packaging, and collateral are quoted according to selected scope.',
       questions: [
         {
           id: 'cd_stage',
@@ -341,7 +318,7 @@
           subtitle: 'Required · Long text',
           type: 'textarea',
           required: true,
-          placeholder: 'Describe the impression you want to create—for example, refined, bold, understated, editorial, or energetic.'
+          placeholder: 'Describe the impression you want to create—e.g., refined, bold, understated, editorial, or energetic.'
         },
         {
           id: 'cd_existing_materials',
@@ -357,24 +334,8 @@
           ]
         },
         {
-          id: 'cd_budget',
-          eyebrow: '06 / Budget Allocation',
-          title: 'What is your allocated budget for this brand identity?',
-          subtitle: 'Required · Single selection',
-          helper: 'Creative Direction projects start at 8,000 MAD for a core visual identity system.',
-          type: 'single',
-          required: true,
-          options: [
-            { value: '8,000–14,999 MAD', label: '8,000–14,999 MAD (Core Visual Identity)' },
-            { value: '15,000–29,999 MAD', label: '15,000–29,999 MAD (Full Identity System & Collateral)' },
-            { value: '30,000–59,999 MAD', label: '30,000–59,999 MAD (Multi-Touchpoint Brand & Art Direction)' },
-            { value: '60,000 MAD or more', label: '60,000 MAD or more (Complete Brand Universe)' },
-            { value: 'Flexible / Based on recommendation', label: 'Flexible / Based on recommendation' }
-          ]
-        },
-        {
           id: 'cd_references',
-          eyebrow: '07 / Visual References',
+          eyebrow: '06 / Visual References',
           title: 'Share brands or visual references you admire.',
           subtitle: 'Optional · Long text',
           type: 'textarea',
@@ -383,7 +344,7 @@
         },
         {
           id: 'cd_launch_essentials',
-          eyebrow: '08 / Launch Priorities',
+          eyebrow: '07 / Launch Priorities',
           title: 'Which deliverables are essential for launch?',
           subtitle: 'Required · Long text',
           type: 'textarea',
@@ -398,7 +359,8 @@
       discipline: 'Conversion Rate Optimization',
       price: 'Audits from 5,000 MAD',
       shortPrice: '5,000 MAD',
-      notice: 'Audits start at 5,000 MAD for one website or funnel, including a conversion review and prioritized improvement plan. Implementation and ongoing testing are quoted separately.',
+      period: 'project',
+      notice: 'Audits start at 5,000 MAD for one website or funnel, including a conversion review and prioritized improvement plan. Direct implementation and ongoing testing are quoted according to scope.',
       questions: [
         {
           id: 'cs_website',
@@ -482,24 +444,8 @@
           placeholder: 'Enter your approximate rate, or leave blank if unknown.'
         },
         {
-          id: 'cs_budget',
-          eyebrow: '07 / Budget Allocation',
-          title: 'What is your allocated budget for conversion optimization?',
-          subtitle: 'Required · Single selection',
-          helper: 'Conversion Strategy audits start at 5,000 MAD for one website or funnel.',
-          type: 'single',
-          required: true,
-          options: [
-            { value: '5,000–9,999 MAD', label: '5,000–9,999 MAD (Diagnostic Funnel Audit)' },
-            { value: '10,000–24,999 MAD', label: '10,000–24,999 MAD (Audit + Implementation)' },
-            { value: '25,000–49,999 MAD', label: '25,000–49,999 MAD (Ongoing CRO Program)' },
-            { value: '50,000 MAD or more', label: '50,000 MAD or more (Enterprise Scale Testing)' },
-            { value: 'Flexible / Based on recommendation', label: 'Flexible / Based on recommendation' }
-          ]
-        },
-        {
           id: 'cs_support',
-          eyebrow: '08 / Scope of Support',
+          eyebrow: '07 / Scope of Support',
           title: 'What kind of support are you looking for?',
           subtitle: 'Required · Single selection',
           type: 'single',
@@ -587,39 +533,239 @@
     }
   ];
 
-  // 3. Closing Questions (Timing, Extra Notes & Dynamic Review/Agreement)
-  const CLOSING_QUESTIONS = [
-    {
-      id: 'timeline',
-      eyebrow: 'Timing · 01',
-      title: 'When would you like to start?',
-      subtitle: 'Required · Single selection',
-      type: 'single',
-      required: true,
-      options: [
-        { value: 'As soon as possible', label: 'As soon as possible' },
-        { value: 'Within one month', label: 'Within one month' },
-        { value: 'Within three months', label: 'Within three months' },
-        { value: 'I’m exploring options', label: 'I’m exploring options' }
-      ]
-    },
-    {
-      id: 'additionalNotes',
-      eyebrow: 'Timing · 02',
-      title: 'Anything else we should know?',
-      subtitle: 'Optional · Long text',
-      type: 'textarea',
-      required: false,
-      placeholder: 'Share any important requirements, deadlines, or questions.'
-    },
-    {
-      id: 'reviewAgreement',
-      eyebrow: 'Scope Review & Confirmation',
-      title: 'Let’s build your next stage of growth.',
-      subtitle: 'Review your selected service scope and submit your inquiry.',
-      type: 'agreement'
+  // Helper: Format MAD Currency
+  function formatMAD(amount) {
+    return new Intl.NumberFormat('en-US').format(amount) + ' MAD';
+  }
+
+  // 3. Dynamic Scope Pricing Calculator
+  function calculateScopeEstimate(serviceKey, answers) {
+    answers = answers || {};
+    let amount = 15000;
+    let period = 'project';
+    let scopeSummary = '';
+    let pills = [];
+    let inclusions = [];
+
+    if (serviceKey === 'digital-architecture') {
+      amount = 15000; // Baseline 5-page bespoke showcase
+      period = 'project';
+      const pages = answers['da_pages'] || '1–5 pages';
+      const buildType = answers['da_build_type'] || 'A new business website';
+      const features = Array.isArray(answers['da_features']) ? answers['da_features'] : [];
+
+      let pageLabel = '5-page website';
+      if (pages.includes('6–10')) {
+        amount += 5000;
+        pageLabel = '6–10 page website';
+      } else if (pages.includes('More than 10')) {
+        amount += 12000;
+        pageLabel = '10+ page scalable website';
+      }
+
+      if (buildType.includes('e-commerce')) {
+        amount += 8000;
+      } else if (buildType.includes('custom platform')) {
+        amount += 15000;
+      } else if (buildType.includes('landing page')) {
+        amount = Math.max(11000, amount - 4000);
+        pageLabel = 'High-converting landing page';
+      }
+
+      pills.push(pageLabel);
+
+      const featureLabels = [];
+      if (features.includes('Booking system')) {
+        amount += 6000;
+        featureLabels.push('booking system');
+        pills.push('Booking system');
+      }
+      if (features.includes('Online payments')) {
+        amount += 5000;
+        featureLabels.push('online checkout');
+        pills.push('Online payments');
+      }
+      if (features.includes('Product catalogue')) {
+        amount += 4000;
+        featureLabels.push('product catalogue');
+        pills.push('Product catalogue');
+      }
+      if (features.includes('Multiple languages')) {
+        amount += 3500;
+        featureLabels.push('multilingual');
+        pills.push('Multiple languages');
+      }
+      if (features.includes('Custom animations or 3D')) {
+        amount += 5000;
+        featureLabels.push('custom animations');
+        pills.push('3D & Custom Animations');
+      }
+      if (features.includes('CRM or other integrations')) {
+        amount += 4000;
+        featureLabels.push('CRM integration');
+        pills.push('CRM Sync');
+      }
+      if (features.includes('Contact form / WhatsApp integration')) {
+        featureLabels.push('WhatsApp integration');
+        pills.push('WhatsApp Integration');
+      }
+
+      if (featureLabels.length > 0) {
+        scopeSummary = `${pageLabel} + ${featureLabels.join(' + ')}`;
+      } else {
+        scopeSummary = `${pageLabel} bespoke showcase website`;
+      }
+
+      inclusions = [
+        'Bespoke visual architecture & responsive UI/UX',
+        'Direct WhatsApp & interactive inquiry funnel',
+        'Mobile performance & technical SEO foundation',
+        'Content management system & live deployment'
+      ];
+    } else if (serviceKey === 'performance-marketing') {
+      amount = 5000;
+      period = 'month';
+      const platforms = Array.isArray(answers['pm_platforms']) ? answers['pm_platforms'] : [];
+      const content = answers['pm_content'] || '';
+
+      let channelCount = platforms.filter(p => !p.includes('recommendation')).length;
+      if (channelCount >= 3) {
+        amount += 4500;
+      } else if (channelCount === 2) {
+        amount += 2500;
+      }
+
+      const activeChannels = platforms.length > 0 ? platforms.map(p => p.split('—')[0].trim()).join(' + ') : 'Meta & Google';
+      pills.push(activeChannels);
+
+      if (content.includes('need creative support')) {
+        amount += 3000;
+        scopeSummary = `${activeChannels} · Campaign architecture & full creative production`;
+        pills.push('Creative Video & Ad Production');
+      } else if (content.includes('Some content')) {
+        amount += 1500;
+        scopeSummary = `${activeChannels} · Campaign management & creative remixing`;
+        pills.push('Creative Asset Enhancement');
+      } else {
+        scopeSummary = `${activeChannels} · Paid campaign management & optimization`;
+        pills.push('Media Buying & Funnel Optimization');
+      }
+
+      inclusions = [
+        'Full campaign setup & ad account architecture',
+        'Weekly optimization, bid adjustments & scaling',
+        'Real-time conversion tracking & CAPI validation',
+        'Executive bi-weekly reporting & CAC / ROAS dashboard'
+      ];
+    } else if (serviceKey === 'creative-direction') {
+      amount = 8000;
+      period = 'project';
+      const stage = answers['cd_stage'] || '';
+      const deliverables = Array.isArray(answers['cd_deliverables']) ? answers['cd_deliverables'] : [];
+
+      if (stage.includes('Full rebrand')) amount += 6000;
+      else if (stage.includes('Expanding')) amount += 3000;
+      else if (stage.includes('Refreshing')) amount += 2000;
+
+      pills.push('Core Visual Identity');
+
+      const extraItems = [];
+      if (deliverables.includes('A complete brand system')) {
+        amount += 10000;
+        extraItems.push('complete brand universe');
+        pills.push('Complete Brand Universe');
+      }
+      if (deliverables.includes('Packaging')) {
+        amount += 6000;
+        extraItems.push('packaging design');
+        pills.push('Luxury Packaging');
+      }
+      if (deliverables.includes('Photography or video creative direction')) {
+        amount += 5000;
+        extraItems.push('photoshoot art direction');
+        pills.push('Art & Shoot Direction');
+      }
+      if (deliverables.includes('Social media and digital assets')) {
+        amount += 3000;
+        extraItems.push('digital & social kit');
+        pills.push('Digital Brand Kit');
+      }
+      if (deliverables.includes('Menus, print, or hospitality collateral')) {
+        amount += 3500;
+        extraItems.push('hospitality collateral');
+        pills.push('Hospitality Print Collateral');
+      }
+
+      if (extraItems.length > 0) {
+        scopeSummary = `Core visual identity + ${extraItems.join(' + ')}`;
+      } else {
+        scopeSummary = `Core brand identity system & comprehensive guidelines`;
+      }
+
+      inclusions = [
+        'Distinctive logo system & responsive marks',
+        'Curated color harmonies & typography hierarchy',
+        'Comprehensive brand guidelines (PDF & digital)',
+        'Vector source master files ready for production'
+      ];
+    } else if (serviceKey === 'conversion-strategy') {
+      amount = 5000;
+      period = 'project';
+      const support = answers['cs_support'] || 'Audit and recommendations';
+      const visitors = answers['cs_visitors'] || '';
+
+      if (support.includes('Audit plus implementation')) {
+        amount += 7000;
+        scopeSummary = 'Full conversion funnel audit + direct UI implementation';
+        pills.push('Audit & Implementation');
+      } else if (support.includes('Ongoing optimization')) {
+        amount += 10000;
+        period = 'month';
+        scopeSummary = 'Ongoing conversion rate optimization & split-testing program';
+        pills.push('Continuous CRO Program');
+      } else {
+        scopeSummary = 'Diagnostic funnel audit & prioritized CRO roadmap';
+        pills.push('Funnel Audit & Roadmap');
+      }
+
+      if (visitors.includes('20,000 or more')) {
+        amount += 3000;
+        pills.push('High-Traffic Optimization');
+      }
+
+      inclusions = [
+        'Heuristic UI/UX friction analysis across mobile & desktop',
+        'Checkout, lead form & micro-conversion drop-off audit',
+        'Prioritized ICE impact roadmap with quick wins',
+        'Direct consultation call with senior conversion strategist'
+      ];
     }
-  ];
+
+    return {
+      amount,
+      formattedPrice: formatMAD(amount),
+      period,
+      scopeSummary,
+      pills,
+      inclusions
+    };
+  }
+
+  // Parse Budget String into min/max range
+  function parseBudgetRange(str) {
+    if (!str) return { min: 0, max: Infinity, isGuidance: true };
+    if (str.includes('Under 5,000')) return { min: 0, max: 4999 };
+    if (str.includes('5,000–9,999')) return { min: 5000, max: 9999 };
+    if (str.includes('10,000–19,999')) return { min: 10000, max: 19999 };
+    if (str.includes('10,000–24,999')) return { min: 10000, max: 24999 };
+    if (str.includes('20,000–39,999')) return { min: 20000, max: 39999 };
+    if (str.includes('25,000–49,999')) return { min: 25000, max: 49999 };
+    if (str.includes('40,000–74,999')) return { min: 40000, max: 74999 };
+    if (str.includes('25,000 MAD or more')) return { min: 25000, max: Infinity };
+    if (str.includes('75,000 MAD or more') || str.includes('60,000 MAD or more') || str.includes('50,000 MAD or more') || str.includes('100,000 MAD or more')) return { min: 75000, max: Infinity };
+    if (str.includes('guidance') || str.includes('Not decided') || str.includes('Flexible')) return { min: 0, max: Infinity, isGuidance: true };
+    return { min: 0, max: Infinity };
+  }
 
   // 4. Wizard State Store
   const state = {
@@ -641,8 +787,9 @@
     }
   } catch (e) {}
 
-  // Build dynamic question chain based on selected service
+  // 5. Build dynamic question chain based on user's exact 8-stage sequence
   function getQuestionsList() {
+    // Stage 1: Service Selection
     const serviceQuestion = {
       id: 'selectedService',
       eyebrow: '01 / Scope Foundation',
@@ -678,13 +825,126 @@
       ]
     };
 
-    const serviceSpecific = (SERVICES[state.selectedService] || SERVICES['performance-marketing']).questions;
+    // Stage 2: Universal Contact Questions (7 items)
+    // Stage 3: Service-Specific Scope Questions
+    const currentService = SERVICES[state.selectedService] || SERVICES['performance-marketing'];
+    const serviceSpecific = currentService.questions;
+
+    // Stage 4: Live Scope Estimate Question
+    const scopeEstimateQuestion = {
+      id: 'liveScopeEstimate',
+      eyebrow: 'Investment Scope Calculation',
+      title: 'Your Tailored Scope Estimate',
+      subtitle: 'Calculated in real-time based on your selected features & specifications',
+      type: 'scope_estimate',
+      required: false
+    };
+
+    // Stage 5: Budget Question(s)
+    const budgetQuestions = [];
+    if (state.selectedService === 'performance-marketing') {
+      budgetQuestions.push({
+        id: 'pm_management_budget',
+        eyebrow: 'Budget Qualification · 01',
+        title: 'What is your monthly budget for advertising and marketing?',
+        subtitle: 'Required · Single selection',
+        helper: 'This covers campaign strategy, architecture, testing, and weekly optimization.',
+        type: 'single',
+        required: true,
+        options: [
+          { value: 'Under 5,000 MAD', label: 'Under 5,000 MAD', badge: 'Low-budget lead' },
+          { value: '5,000–9,999 MAD', label: '5,000–9,999 MAD', badge: 'Entry-level projects' },
+          { value: '10,000–19,999 MAD', label: '10,000–19,999 MAD', badge: 'Standard small-business projects' },
+          { value: '20,000–39,999 MAD', label: '20,000–39,999 MAD', badge: 'Larger websites, branding, or CRO work' },
+          { value: '40,000–74,999 MAD', label: '40,000–74,999 MAD', badge: 'Premium or multi-feature projects' },
+          { value: '75,000 MAD or more', label: '75,000 MAD or more', badge: 'High-end / complex projects' },
+          { value: 'I need guidance on the right budget', label: 'I need guidance on the right budget', badge: 'Consultation lead' }
+        ]
+      });
+
+      budgetQuestions.push({
+        id: 'pm_ad_spend',
+        eyebrow: 'Budget Qualification · 02',
+        title: 'What is your planned monthly advertising spend?',
+        subtitle: 'Required · Single selection',
+        helper: 'This separates your management fee from the money paid directly to Meta, Google, or TikTok.',
+        type: 'single',
+        required: true,
+        options: [
+          { value: 'Under 5,000 MAD', label: 'Under 5,000 MAD', badge: 'Small campaigns' },
+          { value: '5,000–9,999 MAD', label: '5,000–9,999 MAD', badge: 'Entry-level campaigns' },
+          { value: '10,000–24,999 MAD', label: '10,000–24,999 MAD', badge: 'Standard campaigns' },
+          { value: '25,000 MAD or more', label: '25,000 MAD or more', badge: 'Scaling campaigns' },
+          { value: 'Not decided yet', label: 'Not decided yet', badge: 'Needs guidance' }
+        ]
+      });
+    } else {
+      budgetQuestions.push({
+        id: 'project_budget',
+        eyebrow: 'Budget Qualification',
+        title: 'What is your budget for this project?',
+        subtitle: 'Required · Single selection',
+        helper: 'This allows us to evaluate initial proposal alignment and recommend appropriate scoping.',
+        type: 'single',
+        required: true,
+        options: [
+          { value: 'Under 5,000 MAD', label: 'Under 5,000 MAD', badge: 'Low-budget lead' },
+          { value: '5,000–9,999 MAD', label: '5,000–9,999 MAD', badge: 'Entry-level projects' },
+          { value: '10,000–19,999 MAD', label: '10,000–19,999 MAD', badge: 'Standard small-business projects' },
+          { value: '20,000–39,999 MAD', label: '20,000–39,999 MAD', badge: 'Larger websites, branding, or CRO work' },
+          { value: '40,000–74,999 MAD', label: '40,000–74,999 MAD', badge: 'Premium or multi-feature projects' },
+          { value: '75,000 MAD or more', label: '75,000 MAD or more', badge: 'High-end / complex projects' },
+          { value: 'I need guidance on the right budget', label: 'I need guidance on the right budget', badge: 'Consultation lead' }
+        ]
+      });
+    }
+
+    // Stage 6: Start Date / Priority Question
+    const timelineQuestion = {
+      id: 'timeline',
+      eyebrow: 'Project Priority & Timing',
+      title: 'How soon do you want to start?',
+      subtitle: 'Required · Single selection',
+      type: 'single',
+      required: true,
+      options: [
+        { value: 'As soon as possible', label: 'As soon as possible', badge: 'High priority', badgeClass: 'p-high' },
+        { value: 'Within one month', label: 'Within one month', badge: 'High priority', badgeClass: 'p-high' },
+        { value: 'Within three months', label: 'Within three months', badge: 'Medium priority', badgeClass: 'p-med' },
+        { value: 'I’m exploring options', label: 'I’m exploring options', badge: 'Low priority', badgeClass: 'p-low' }
+      ]
+    };
+
+    // Stage 7: Additional Notes Question
+    const notesQuestion = {
+      id: 'additionalNotes',
+      eyebrow: 'Additional Details',
+      title: 'Anything else we should know?',
+      subtitle: 'Optional · Long text',
+      type: 'textarea',
+      required: false,
+      placeholder: 'Share any important requirements, specific deadlines, or context.'
+    };
+
+    // Stage 8: Scope Review & Comparison / Submit
+    const agreementQuestion = {
+      id: 'reviewAgreement',
+      eyebrow: 'Inquiry Review & Alignment',
+      title: 'Let’s build your next stage of growth.',
+      subtitle: 'Review how your scope aligns with your budget before submitting.',
+      type: 'agreement',
+      required: true
+    };
 
     return [
       serviceQuestion,
       ...UNIVERSAL_CONTACT_QUESTIONS,
       ...serviceSpecific,
-      ...CLOSING_QUESTIONS
+      scopeEstimateQuestion,
+      ...budgetQuestions,
+      timelineQuestion,
+      notesQuestion,
+      agreementQuestion
     ];
   }
 
@@ -696,32 +956,22 @@
   const backBtn = document.getElementById('wizardBackBtn');
   const nextBtn = document.getElementById('wizardNextBtn');
   const hintEl = document.getElementById('wizardHint');
-  const privacyModal = document.getElementById('privacyModal');
-  const closePrivacyBtn = document.getElementById('closePrivacyBtn');
-  const ackPrivacyBtn = document.getElementById('ackPrivacyBtn');
+  const errorBanner = document.getElementById('wizardErrorBanner');
+  const errorText = document.getElementById('wizardErrorText');
 
-  // Modal Controls
-  if (closePrivacyBtn) {
-    closePrivacyBtn.addEventListener('click', () => {
-      privacyModal?.removeAttribute('open');
-      document.body.style.overflow = '';
-    });
-  }
-  if (ackPrivacyBtn) {
-    ackPrivacyBtn.addEventListener('click', () => {
-      privacyModal?.removeAttribute('open');
-      document.body.style.overflow = '';
-    });
-  }
-
-  function openPrivacy() {
-    if (privacyModal) {
-      privacyModal.setAttribute('open', '');
-      document.body.style.overflow = 'hidden';
+  function showStepError(msg) {
+    if (errorText) errorText.textContent = msg;
+    if (errorBanner) {
+      errorBanner.style.display = 'flex';
+      errorBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
 
-  // Validation function for current step
+  function clearStepError() {
+    if (errorBanner) errorBanner.style.display = 'none';
+    if (errorText) errorText.textContent = '';
+  }
+
   function validateCurrentStep() {
     const list = getQuestionsList();
     const q = list[state.currentStepIndex];
@@ -733,9 +983,14 @@
     if (q.type === 'agreement') {
       const chk = document.getElementById('qAgreeCheckbox');
       if (!chk || !chk.checked) {
-        showStepError('Please acknowledge the starting price scope to submit your inquiry.');
+        showStepError('Please acknowledge the scope estimate to submit your inquiry.');
         return false;
       }
+      return true;
+    }
+
+    // Live Scope Estimate step has no validation
+    if (q.type === 'scope_estimate') {
       return true;
     }
 
@@ -770,8 +1025,12 @@
         }
       }
       if (q.type === 'url') {
-        if (!/^https?:\/\/.+/i.test(val)) {
-          showStepError('Please enter a full URL starting with https://');
+        const urlStr = val.startsWith('http://') || val.startsWith('https://') ? val : `https://${val}`;
+        try {
+          new URL(urlStr);
+          state.answers[q.id] = urlStr;
+        } catch (e) {
+          showStepError('Please enter a valid website address (e.g. yourdomain.com).');
           return false;
         }
       }
@@ -780,30 +1039,11 @@
     return true;
   }
 
-  function showStepError(msg) {
-    let err = document.getElementById('qStepError');
-    if (!err) {
-      err = document.createElement('div');
-      err.id = 'qStepError';
-      err.className = 'q-step-error-banner';
-      const container = stageEl.querySelector('.q-step-wrap');
-      if (container) container.appendChild(err);
-    }
-    err.textContent = msg;
-    err.classList.add('is-visible');
-    const input = stageEl.querySelector('.q-input, .q-textarea');
-    if (input) input.classList.add('has-error');
-  }
-
-  function clearStepError() {
-    const err = document.getElementById('qStepError');
-    if (err) err.remove();
-    const inputs = stageEl.querySelectorAll('.has-error');
-    inputs.forEach(i => i.classList.remove('has-error'));
-  }
-
-  // Render current question
   function renderStep(direction) {
+    if (!stageEl) return;
+
+    clearStepError();
+
     const list = getQuestionsList();
     const total = list.length;
     const currentQ = list[state.currentStepIndex];
@@ -839,19 +1079,25 @@
       if (currentQ.type === 'agreement') {
         nextBtn.innerHTML = `<span>Send My Project Inquiry ↗</span>`;
         nextBtn.classList.add('btn-wizard-submit');
+      } else if (currentQ.type === 'scope_estimate') {
+        nextBtn.innerHTML = `<span>Review Budget &amp; Next Steps</span><span class="btn-arrow">→</span>`;
+        nextBtn.classList.remove('btn-wizard-submit');
       } else {
         nextBtn.innerHTML = `<span>Continue</span><span class="btn-arrow">→</span>`;
         nextBtn.classList.remove('btn-wizard-submit');
       }
     }
 
+    // Update Helper Hint
     if (hintEl) {
-      if (currentQ.type === 'single' || currentQ.type === 'service_select') {
+      if (currentQ.type === 'service_select' || currentQ.type === 'single') {
         hintEl.innerHTML = `<span>Select an option to proceed · or press <kbd>Enter ↵</kbd></span>`;
       } else if (currentQ.type === 'multi') {
         hintEl.innerHTML = `<span>Select all that apply · then click Continue</span>`;
       } else if (currentQ.type === 'phone_split') {
         hintEl.innerHTML = `<span>Select code &amp; enter number · press <kbd>Enter ↵</kbd></span>`;
+      } else if (currentQ.type === 'scope_estimate') {
+        hintEl.innerHTML = `<span>Click Continue to match with your planned budget</span>`;
       } else if (currentQ.type === 'textarea') {
         hintEl.innerHTML = `<span>Shift + Enter for new line · or click Continue</span>`;
       } else {
@@ -916,10 +1162,14 @@
           ${currentQ.options.map((opt, idx) => {
             const isChecked = currentVal === opt.value;
             const letter = String.fromCharCode(65 + idx);
+            const badgeHtml = opt.badge ? `<span class="q-option-badge ${opt.badgeClass || ''}">${opt.badge}</span>` : '';
             return `
               <div class="q-option-row ${isChecked ? 'is-selected' : ''}" data-value="${opt.value}" role="radio" aria-checked="${isChecked}" tabindex="0">
                 <span class="q-key-pill">${letter}</span>
-                <span class="q-option-label">${opt.label}</span>
+                <div class="q-option-text-group">
+                  <span class="q-option-label">${opt.label}</span>
+                  ${badgeHtml}
+                </div>
                 <span class="q-check-circle">${isChecked ? '✓' : ''}</span>
               </div>
             `;
@@ -943,6 +1193,53 @@
           }).join('')}
         </div>
       `;
+    } else if (currentQ.type === 'scope_estimate') {
+      const estimate = calculateScopeEstimate(state.selectedService, state.answers);
+      const svc = SERVICES[state.selectedService];
+      bodyHtml = `
+        <div class="q-scope-estimate-view">
+          <div class="q-scope-estimate-card">
+            <span class="q-scope-estimate-badge">SCOPE ESTIMATE</span>
+            <h3 class="q-scope-service-name">${svc.title}</h3>
+            
+            <div class="q-scope-price-box">
+              <span class="q-scope-price-val">${estimate.formattedPrice}</span>
+              <span class="q-scope-price-period">${estimate.period === 'month' ? '/ month' : 'estimated investment'}</span>
+            </div>
+
+            <div class="q-scope-summary-line">
+              <span class="q-scope-summary-label">Estimated Scope:</span>
+              <span class="q-scope-summary-text">${escapeHtml(estimate.scopeSummary)}</span>
+            </div>
+
+            ${estimate.pills.length > 0 ? `
+              <div class="q-scope-pills-row">
+                ${estimate.pills.map(p => `
+                  <span class="q-scope-pill"><span class="pill-check">✓</span> ${escapeHtml(p)}</span>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <div class="q-scope-inclusions">
+              <div class="q-scope-inclusions-title">Included in this scope tier</div>
+              <ul class="q-scope-inclusions-list">
+                ${estimate.inclusions.map(inc => `
+                  <li><span class="inc-check">✦</span> ${escapeHtml(inc)}</li>
+                `).join('')}
+              </ul>
+            </div>
+
+            <div class="q-scope-next-note">
+              <svg class="q-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>Next, select your budget range and target start date so we can ensure proposal alignment.</span>
+            </div>
+          </div>
+        </div>
+      `;
     } else if (currentQ.type === 'textarea') {
       const currentVal = state.answers[currentQ.id] || '';
       bodyHtml = `
@@ -959,19 +1256,84 @@
       const phone = state.answers['phone'] || '—';
       const timeline = state.answers['timeline'] || 'As soon as possible';
 
-      // Check for chosen budget answer if available
-      const budgetKey = (state.selectedService === 'performance-marketing') ? 'pm_budget' :
-                        (state.selectedService === 'digital-architecture') ? 'da_budget' :
-                        (state.selectedService === 'creative-direction') ? 'cd_budget' : 'cs_budget';
-      const budgetVal = state.answers[budgetKey] || svc.price;
+      const estimate = calculateScopeEstimate(state.selectedService, state.answers);
+      
+      const budgetKey = (state.selectedService === 'performance-marketing') ? 'pm_management_budget' : 'project_budget';
+      const selectedBudget = state.answers[budgetKey] || 'I need guidance on the right budget';
+      const plannedAdSpend = state.answers['pm_ad_spend'] || '';
+
+      const budgetRange = parseBudgetRange(selectedBudget);
+
+      let comparisonHead = '';
+      let comparisonMsg = '';
+      let alertClass = 'q-alert-fit';
+      let showProceedChoices = false;
+
+      if (budgetRange.isGuidance) {
+        alertClass = 'q-alert-guidance';
+        comparisonHead = 'Consultation & Guidance Requested';
+        comparisonMsg = `Your selected scope is estimated at <strong>${estimate.formattedPrice}</strong>. We will review your goals during our consultation and provide tiered options to match your exact business priorities.`;
+      } else if (estimate.amount > budgetRange.max) {
+        alertClass = 'q-alert-above';
+        comparisonHead = 'Investment Alignment Note';
+        comparisonMsg = `Your selected scope is estimated at <strong>${estimate.formattedPrice}</strong>. Based on your selected budget (${escapeHtml(selectedBudget)}), we can discuss a phased approach, a reduced initial scope, or a custom proposal.`;
+        showProceedChoices = true;
+      } else {
+        alertClass = 'q-alert-fit';
+        comparisonHead = 'Direct Budget Alignment';
+        comparisonMsg = `Your selected scope fits your selected budget range. Submit your request and we’ll confirm the final proposal within 24 hours.`;
+      }
 
       bodyHtml = `
         <div class="q-agreement-card">
-          <div class="q-agreement-summary-head">
-            <span class="q-agree-tag">PROJECT SUMMARY</span>
-            <h4 class="q-agree-title">${svc.title}</h4>
-            <div class="q-agree-price">${svc.price}</div>
-            <p class="q-agree-notice">${svc.notice}</p>
+          <!-- Live Comparison Card -->
+          <div class="q-budget-comparison-card">
+            <div class="q-comparison-row">
+              <div class="q-comp-col">
+                <span class="q-comp-label">Calculated Scope Estimate</span>
+                <span class="q-comp-price">${estimate.formattedPrice}</span>
+                <span class="q-comp-value" style="font-size: 0.88rem; color: #cbd5e1;">${escapeHtml(estimate.scopeSummary)}</span>
+              </div>
+              <div class="q-comp-col">
+                <span class="q-comp-label">Your Selected Budget</span>
+                <span class="q-comp-badge" style="color: var(--brand-gold);">${escapeHtml(selectedBudget)}</span>
+                ${plannedAdSpend ? `<span style="font-size: 0.84rem; color: #94a3b8;">Planned Ad Spend: ${escapeHtml(plannedAdSpend)}</span>` : ''}
+                <div style="margin-top: 0.35rem;">
+                  <span class="q-priority-tag ${timeline.includes('soon') || timeline.includes('month') ? 'p-high' : 'p-med'}">${escapeHtml(timeline)}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alignment Alert -->
+            <div class="q-comparison-feedback">
+              <div class="q-feedback-alert ${alertClass}">
+                <div class="q-alert-head">
+                  <span class="q-alert-icon">✦</span>
+                  <span>${comparisonHead}</span>
+                </div>
+                <p class="q-alert-msg">${comparisonMsg}</p>
+
+                ${showProceedChoices ? `
+                  <div class="q-proceed-choice-box">
+                    <span class="q-proceed-title">Preferred consultation approach:</span>
+                    <div class="q-proceed-options">
+                      <label class="q-proceed-opt">
+                        <input type="radio" name="proceedPref" value="Phased approach" ${!state.answers['proceedPreference'] || state.answers['proceedPreference'] === 'Phased approach' ? 'checked' : ''}>
+                        <span>Phased approach — start with high-impact core features first</span>
+                      </label>
+                      <label class="q-proceed-opt">
+                        <input type="radio" name="proceedPref" value="Adjusted scope" ${state.answers['proceedPreference'] === 'Adjusted scope' ? 'checked' : ''}>
+                        <span>Adjusted scope — streamline requirements to fit target budget</span>
+                      </label>
+                      <label class="q-proceed-opt">
+                        <input type="radio" name="proceedPref" value="Custom proposal" ${state.answers['proceedPreference'] === 'Custom proposal' ? 'checked' : ''}>
+                        <span>Custom proposal — explore creative options during discovery</span>
+                      </label>
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
           </div>
 
           <div class="q-recap-grid">
@@ -983,20 +1345,12 @@
               <span class="q-recap-lbl">WhatsApp / Email</span>
               <span class="q-recap-val">${escapeHtml(phone)} • ${escapeHtml(email)}</span>
             </div>
-            <div class="q-recap-item">
-              <span class="q-recap-lbl">Allocated Budget</span>
-              <span class="q-recap-val" style="color: var(--brand-gold);">${escapeHtml(budgetVal)}</span>
-            </div>
-            <div class="q-recap-item">
-              <span class="q-recap-lbl">Target Timeline</span>
-              <span class="q-recap-val">${escapeHtml(timeline)}</span>
-            </div>
           </div>
 
           <label class="q-agree-row" for="qAgreeCheckbox">
             <input type="checkbox" id="qAgreeCheckbox" class="q-agree-chk">
             <span class="q-agree-text">
-              I understand this service starts at <strong>${svc.shortPrice}</strong>, and additional requirements may increase the final quote.
+              I acknowledge this estimate is based on my selected scope, and final investment is confirmed upon project briefing review.
             </span>
           </label>
 
@@ -1099,15 +1453,16 @@
           state.selectedService = val;
           state.answers['selectedService'] = val;
           boxes.forEach(b => {
-            const isMatch = b.getAttribute('data-value') === val;
-            b.classList.toggle('is-selected', isMatch);
-            b.setAttribute('aria-checked', isMatch);
-            b.querySelector('.q-check-circle').textContent = isMatch ? '✓' : '';
+            b.classList.remove('is-selected');
+            b.setAttribute('aria-checked', 'false');
+            const chk = b.querySelector('.q-check-circle');
+            if (chk) chk.textContent = '';
           });
-          clearStepError();
-          setTimeout(() => {
-            handleNext();
-          }, 240);
+          box.classList.add('is-selected');
+          box.setAttribute('aria-checked', 'true');
+          const chk = box.querySelector('.q-check-circle');
+          if (chk) chk.textContent = '✓';
+          setTimeout(() => handleNext(), 160);
         });
 
         box.addEventListener('keydown', (e) => {
@@ -1119,7 +1474,7 @@
       });
     }
 
-    // Single Choice listeners
+    // Single choice listener
     if (currentQ.type === 'single') {
       const rows = stageEl.querySelectorAll('.q-option-row');
       rows.forEach(row => {
@@ -1127,15 +1482,16 @@
         row.addEventListener('click', () => {
           state.answers[currentQ.id] = val;
           rows.forEach(r => {
-            const isMatch = r.getAttribute('data-value') === val;
-            r.classList.toggle('is-selected', isMatch);
-            r.setAttribute('aria-checked', isMatch);
-            r.querySelector('.q-check-circle').textContent = isMatch ? '✓' : '';
+            r.classList.remove('is-selected');
+            r.setAttribute('aria-checked', 'false');
+            const chk = r.querySelector('.q-check-circle');
+            if (chk) chk.textContent = '';
           });
-          clearStepError();
-          setTimeout(() => {
-            handleNext();
-          }, 240);
+          row.classList.add('is-selected');
+          row.setAttribute('aria-checked', 'true');
+          const chk = row.querySelector('.q-check-circle');
+          if (chk) chk.textContent = '✓';
+          setTimeout(() => handleNext(), 160);
         });
 
         row.addEventListener('keydown', (e) => {
@@ -1147,27 +1503,26 @@
       });
     }
 
-    // Multiple Choice listeners
+    // Multi choice listener
     if (currentQ.type === 'multi') {
       const rows = stageEl.querySelectorAll('.q-option-row');
       rows.forEach(row => {
         const val = row.getAttribute('data-value');
         row.addEventListener('click', () => {
-          let selected = state.answers[currentQ.id] || [];
-          if (!Array.isArray(selected)) selected = [];
-
-          if (selected.includes(val)) {
-            selected = selected.filter(item => item !== val);
+          let arr = state.answers[currentQ.id] || [];
+          if (!Array.isArray(arr)) arr = [];
+          if (arr.includes(val)) {
+            arr = arr.filter(item => item !== val);
           } else {
-            selected.push(val);
+            arr.push(val);
           }
-          state.answers[currentQ.id] = selected;
+          state.answers[currentQ.id] = arr;
 
-          const isSelected = selected.includes(val);
-          row.classList.toggle('is-selected', isSelected);
-          row.setAttribute('aria-checked', isSelected);
-          row.querySelector('.q-check-box').textContent = isSelected ? '✓' : '';
-          clearStepError();
+          const isNowChecked = arr.includes(val);
+          row.classList.toggle('is-selected', isNowChecked);
+          row.setAttribute('aria-checked', isNowChecked ? 'true' : 'false');
+          const chk = row.querySelector('.q-check-box');
+          if (chk) chk.textContent = isNowChecked ? '✓' : '';
         });
 
         row.addEventListener('keydown', (e) => {
@@ -1179,16 +1534,23 @@
       });
     }
 
-    // Privacy modal trigger
-    const privLink = document.getElementById('triggerPrivacyModal');
-    if (privLink) {
-      privLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        openPrivacy();
+    // Agreement radio proceed choices
+    if (currentQ.type === 'agreement') {
+      const radios = stageEl.querySelectorAll('input[name="proceedPref"]');
+      radios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          state.answers['proceedPreference'] = e.target.value;
+        });
       });
-    }
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+      const privacyTrigger = document.getElementById('triggerPrivacyModal');
+      if (privacyTrigger) {
+        privacyTrigger.addEventListener('click', () => {
+          const modal = document.getElementById('privacyModal');
+          if (modal) modal.classList.add('is-open');
+        });
+      }
+    }
   }
 
   function handleNext() {
@@ -1239,11 +1601,19 @@
     const timeline = state.answers['timeline'] || 'As soon as possible';
     const additionalNotes = state.answers['additionalNotes'] || '';
 
-    // Extract budget value
-    const budgetKey = (state.selectedService === 'performance-marketing') ? 'pm_budget' :
-                      (state.selectedService === 'digital-architecture') ? 'da_budget' :
-                      (state.selectedService === 'creative-direction') ? 'cd_budget' : 'cs_budget';
-    const budgetVal = state.answers[budgetKey] || svc.price;
+    // Calculate scope estimate
+    const estimate = calculateScopeEstimate(state.selectedService, state.answers);
+
+    // Selected budget
+    const budgetKey = (state.selectedService === 'performance-marketing') ? 'pm_management_budget' : 'project_budget';
+    const selectedBudget = state.answers[budgetKey] || 'I need guidance on the right budget';
+    const plannedAdSpend = state.answers['pm_ad_spend'] || '';
+    const proceedPreference = state.answers['proceedPreference'] || '';
+
+    const budgetRange = parseBudgetRange(selectedBudget);
+    let budgetAlignment = 'fit';
+    if (budgetRange.isGuidance) budgetAlignment = 'guidance';
+    else if (estimate.amount > budgetRange.max) budgetAlignment = 'above';
 
     // Collect service responses
     const answerNotes = [];
@@ -1259,13 +1629,19 @@
       `BUSINESS CONTEXT: ${bizDesc}`,
       `LOCATION: ${location}`,
       website && website !== '—' ? `WEBSITE: ${website}` : '',
-      `ALLOCATED BUDGET: ${budgetVal}`,
-      `TIMELINE: ${timeline}`,
+      `ESTIMATED SCOPE: ${estimate.scopeSummary}`,
+      `ESTIMATED INVESTMENT: ${estimate.formattedPrice}`,
+      `SELECTED BUDGET: ${selectedBudget}`,
+      plannedAdSpend ? `PLANNED AD SPEND: ${plannedAdSpend}` : '',
+      `BUDGET ALIGNMENT: ${budgetAlignment.toUpperCase()}`,
+      proceedPreference ? `PROCEED PREFERENCE: ${proceedPreference}` : '',
+      `TIMELINE / PRIORITY: ${timeline}`,
       '--- SERVICE SPECIFIC ---',
       ...answerNotes,
       additionalNotes ? `ADDITIONAL NOTES: ${additionalNotes}` : ''
     ].filter(Boolean).join('\n');
 
+    // CRM Lead Record
     const record = {
       id: refId,
       createdAt: now.toISOString(),
@@ -1277,13 +1653,20 @@
       clientPhone: phone,
       location: location,
       website: website,
-      budget: budgetVal,
+      budget: selectedBudget,
+      dealValue: estimate.formattedPrice,
       businessDescription: bizDesc,
       serviceKey: state.selectedService,
-      services: [`${svc.title} (${svc.price})`],
+      services: [`${svc.title} (${estimate.formattedPrice})`],
       sector: location || 'Studio Client',
       timeline: timeline,
+      priority: (timeline === 'As soon as possible' || timeline === 'Within one month') ? 'High' : (timeline === 'Within three months' ? 'Medium' : 'Low'),
       notes: fullNotes,
+      estimatedScope: estimate.scopeSummary,
+      estimatedPrice: estimate.formattedPrice,
+      budgetAlignment: budgetAlignment,
+      proceedPreference: proceedPreference,
+      plannedAdSpend: plannedAdSpend,
       answers: state.answers,
       status: 'Nouveau',
       priceNoticeAgreed: true
@@ -1318,108 +1701,45 @@
     const footer = document.getElementById('wizardFooter');
     if (footer) footer.style.display = 'none';
 
+    const estimate = calculateScopeEstimate(state.selectedService, state.answers);
+
     stageEl.innerHTML = `
-      <section class="q-confirmation-view">
-        <div class="q-success-ring" aria-hidden="true">✓</div>
-        <h2 class="q-confirmation-heading">Your next stage starts here.</h2>
-        <p class="q-confirmation-copy">
-          Thank you for reaching out to MotaGrowth. We’ve received your inquiry and will contact you to discuss your project, scope, and next steps.
+      <section class="q-confirmation-card slide-from-right">
+        <div class="q-conf-icon">✓</div>
+        <p class="q-conf-eyebrow">Project Brief Received · Reference ${refId}</p>
+        <h2 class="q-conf-title">Thank you, ${escapeHtml(record.clientName.split(' ')[0])}.</h2>
+        <p class="q-conf-lead">
+          We have received your project details for <strong>${svc.title}</strong> (${estimate.formattedPrice}).
+          Our team is reviewing your requirements and will reach out via WhatsApp / Email within 24 business hours.
         </p>
 
-        <div class="q-confirmation-card">
-          <div class="q-conf-row">
-            <span class="q-conf-lbl">Inquiry Reference</span>
-            <span class="q-conf-val q-conf-ref">${refId}</span>
+        <div class="q-conf-summary-grid">
+          <div class="q-conf-item">
+            <span class="q-conf-lbl">Reference ID</span>
+            <span class="q-conf-val q-conf-mono">${refId}</span>
           </div>
-          <div class="q-conf-row">
-            <span class="q-conf-lbl">Selected Service</span>
-            <span class="q-conf-val">${svc.title}</span>
+          <div class="q-conf-item">
+            <span class="q-conf-lbl">Scope Estimate</span>
+            <span class="q-conf-val" style="color: var(--brand-gold);">${estimate.formattedPrice}</span>
           </div>
-          <div class="q-conf-row">
-            <span class="q-conf-lbl">Scope Foundation</span>
-            <span class="q-conf-val">${svc.price}</span>
+          <div class="q-conf-item">
+            <span class="q-conf-lbl">Selected Budget</span>
+            <span class="q-conf-val">${escapeHtml(record.budget)}</span>
           </div>
-          <div class="q-conf-row">
-            <span class="q-conf-lbl">Allocated Budget</span>
-            <span class="q-conf-val" style="color: var(--brand-gold);">${escapeHtml(record.budget || svc.price)}</span>
-          </div>
-          <div class="q-conf-row">
-            <span class="q-conf-lbl">Client Contact</span>
-            <span class="q-conf-val">${escapeHtml(record.clientName)} (${escapeHtml(record.companyName)})</span>
-          </div>
-          <div class="q-conf-row">
-            <span class="q-conf-lbl">Direct WhatsApp</span>
-            <span class="q-conf-val">${escapeHtml(record.clientPhone)}</span>
-          </div>
-          <div class="q-conf-row">
-            <span class="q-conf-lbl">Target Timeline</span>
+          <div class="q-conf-item">
+            <span class="q-conf-lbl">Target Start</span>
             <span class="q-conf-val">${escapeHtml(record.timeline)}</span>
           </div>
         </div>
 
-        <div class="q-confirmation-actions">
-          <a href="https://wa.me/34675194956?text=Hello%20MotaGrowth%2C%20I%20just%20submitted%20inquiry%20${refId}%20and%20wanted%20to%20connect%20directly."
-             target="_blank" rel="noopener" class="btn-ref btn-ref-gold">
-            <span class="btn-text">Connect on WhatsApp Direct ↗</span>
-          </a>
-          <a href="index.html" class="btn-ref">
-            <span class="btn-text">Return to Studio Home</span>
-          </a>
-          <button type="button" class="btn-ref" id="restartWizardBtn">
-            <span class="btn-text">Start Another Inquiry</span>
-          </button>
+        <div class="q-conf-actions">
+          <a href="index.html" class="btn btn-primary">Return to Homepage ↗</a>
+          <a href="cases.html" class="btn btn-secondary">Explore Client Case Studies</a>
         </div>
       </section>
     `;
-
-    const restartBtn = document.getElementById('restartWizardBtn');
-    if (restartBtn) {
-      restartBtn.addEventListener('click', () => {
-        state.answers = {
-          phoneCountryCode: detectDefaultCountryCode(),
-          phoneNumberRaw: ''
-        };
-        state.currentStepIndex = 0;
-        if (footer) footer.style.display = 'block';
-        renderStep('back');
-      });
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Keyboard shortcut navigation
-  window.addEventListener('keydown', (e) => {
-    const activeEl = document.activeElement;
-    const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
-
-    if (e.key === 'Escape') {
-      if (privacyModal && privacyModal.hasAttribute('open')) {
-        privacyModal.removeAttribute('open');
-        document.body.style.overflow = '';
-      } else {
-        handleBack();
-      }
-      return;
-    }
-
-    if (isTyping) return;
-
-    if (/^[a-z]$/i.test(e.key)) {
-      const charCode = e.key.toUpperCase().charCodeAt(0);
-      const optionIndex = charCode - 65;
-      const options = stageEl.querySelectorAll('.q-service-box, .q-option-row');
-      if (options[optionIndex]) {
-        options[optionIndex].click();
-      }
-    }
-  });
-
-  // Attach button listeners
-  if (nextBtn) nextBtn.addEventListener('click', handleNext);
-  if (backBtn) backBtn.addEventListener('click', handleBack);
-
-  // Helper function to escape HTML
   function escapeHtml(str) {
     if (!str) return '';
     return String(str)
@@ -1427,10 +1747,70 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+      .replace(/'/g, '&#39;');
   }
 
-  // Initial Step Render
-  renderStep('init');
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    // If modal is open, ignore
+    const modal = document.getElementById('privacyModal');
+    if (modal && modal.classList.contains('is-open')) return;
+
+    // Ignore when typing inside input / textarea / select
+    const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+      if (e.key === 'Escape') {
+        e.target.blur();
+      }
+      return;
+    }
+
+    const list = getQuestionsList();
+    const currentQ = list[state.currentStepIndex];
+
+    // Number / Letter selection on service or single choice
+    if (currentQ && (currentQ.type === 'service_select' || currentQ.type === 'single')) {
+      const char = e.key.toUpperCase();
+      if (char.length === 1 && char >= 'A' && char <= 'Z') {
+        const idx = char.charCodeAt(0) - 65;
+        if (currentQ.options && currentQ.options[idx]) {
+          e.preventDefault();
+          const targetOpt = currentQ.options[idx];
+          if (currentQ.type === 'service_select') {
+            state.selectedService = targetOpt.value;
+            state.answers['selectedService'] = targetOpt.value;
+          } else {
+            state.answers[currentQ.id] = targetOpt.value;
+          }
+          renderStep('next');
+          setTimeout(() => handleNext(), 160);
+          return;
+        }
+      }
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleNext();
+    } else if (e.key === 'Backspace' && e.altKey) {
+      e.preventDefault();
+      handleBack();
+    }
+  });
+
+  // Attach button listeners
+  if (nextBtn) nextBtn.addEventListener('click', handleNext);
+  if (backBtn) backBtn.addEventListener('click', handleBack);
+
+  // Initial render
+  document.addEventListener('DOMContentLoaded', () => {
+    renderStep('init');
+  });
+
+  // Export state for debugging if needed
+  window._motaProposalEngine = {
+    getState: () => state,
+    calculateScopeEstimate
+  };
 
 })();
